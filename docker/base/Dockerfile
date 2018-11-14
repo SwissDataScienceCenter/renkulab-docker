@@ -44,7 +44,7 @@ RUN python3 -m pip install -U pip && \
     jupyter serverextension enable --py jupyterlab_git
 
 # install renku-python
-ARG RENKU_VERSION=0.2.0
+ARG RENKU_VERSION=v0.2.0
 RUN conda create -y -n renku python=3.6 && \
     $CONDA_DIR/envs/renku/bin/pip install git+https://github.com/SwissDataScienceCenter/renku-python@$RENKU_VERSION#egg=renku && \
     mkdir -p /home/$NB_USER/.renku/bin && \
