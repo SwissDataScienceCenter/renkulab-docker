@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
+#!/bin/env bash
 #
-# Copyright 2017-2018 - Swiss Data Science Center (SDSC)
+# Copyright 2018 - Swiss Data Science Center (SDSC)
 # A partnership between École Polytechnique Fédérale de Lausanne (EPFL) and
 # Eidgenössische Technische Hochschule Zürich (ETHZ).
 #
@@ -16,34 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-sudo: required
+set -e
 
-notifications:
-  email: false
-
-sudo: required
-
-services:
-  - docker
-
-language: python
-
-python:
-  - 3.6
-
-git:
-  depth: false
-
-script:
-  - echo "building renku jupyter images"
-  - docker pull renku/singleuser
-  - docker pull renku/singleuser-r
-  - docker pull renku/singleuser-cuda-9.2
-  - make base
-
-deploy:
-  - provider: script
-    skip_cleanup: true
-    script: bash .travis-deploy.sh
-    on:
-      branch: master
+make login
+make push
