@@ -51,6 +51,13 @@ push:
 		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA) ; \
 	done
 
+pull:
+	for ext in "" $(extensions) ; do \
+		if test "$$ext" != "" ; then \
+			ext=-$$ext; \
+		fi; \
+		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
+	done
 %:
 	cd docker/$@ && \
 	docker build \

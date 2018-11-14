@@ -36,10 +36,8 @@ git:
 
 script:
   - echo "building renku jupyter images"
-  - docker pull renku/singleuser
-  - docker pull renku/singleuser-r
-  - docker pull renku/singleuser-cuda-9.2
-  - make base
+  - make pull
+  - make all
 
 deploy:
   - provider: script
