@@ -38,19 +38,22 @@ base:
 		-t $(DOCKER_PREFIX):$(DOCKER_LABEL) . && \
 	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)
 
+
+login:
+	@echo "${DOCKER_PASSWORD}" | docker login -u="${DOCKER_USERNAME}" --password-stdin ${DOCKER_REGISTRY}
+
+push:
+	for ext in "" $(extensions) ; do \
+		if test "$$ext" != "" ; then \
+			ext=-$$ext; \
+		fi; \
+		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA) ; \
+	done
+
 %:
 	cd docker/$@ && \
 	docker build \
 		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) . && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
-
-login:
-	@echo "${DOCKER_PASSWORD}" | docker login -u="${DOCKER_USERNAME}" --password-stdin ${DOCKER_REGISTRY}
-
-push/%:
-ifeq (${RENKU_VERSION}, master)
-	docker push $(DOCKER_PREFIX)$(notdir $@):latest
-endif
-	docker push $(DOCKER_PREFIX)$(notdir $@):$(DOCKER_LABEL)
-	docker push $(DOCKER_PREFIX)$(notdir $@):$(GIT_MASTER_HEAD_SHA)
