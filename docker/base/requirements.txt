@@ -1,0 +1,3 @@
+papermill
+requests>=2.20.0
+jupyterlab>=0.35.4
