@@ -18,7 +18,7 @@
 
 extensions = \
 	r \
-	cuda
+	cuda-9.2
 
 DOCKER_PREFIX=renku/singleuser
 DOCKER_LABEL=latest
