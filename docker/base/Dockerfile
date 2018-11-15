@@ -14,16 +14,17 @@ USER root
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
     curl \
-    gnupg \
     git \
+    gnupg \
     libsm6 \
     libxext-dev \
     libxrender1 \
     lmodern \
+    nano \
     netcat \
     python-dev \
     unzip \
-    nano \
+    vim \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
@@ -47,6 +48,7 @@ RUN python3 -m pip install -U pip && \
 ARG RENKU_VERSION=master
 RUN conda create -y -n renku python=3.6 && \
     $CONDA_DIR/envs/renku/bin/pip install git+https://github.com/SwissDataScienceCenter/renku-python@$RENKU_VERSION#egg=renku && \
+    conda clean --yes --all && \
     mkdir -p /home/$NB_USER/.renku/bin && \
     ln -s $CONDA_DIR/envs/renku/bin/renku /home/$NB_USER/.renku/bin/renku && \
     echo "export PATH=~/.renku/bin:$PATH" >> /home/$NB_USER/.bashrc
