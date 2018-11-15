@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter.svg?branch=master)](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter)
+
 # Renku Jupyter images
 
 This repository contains the Dockerfiles to build Jupyter notebook images
