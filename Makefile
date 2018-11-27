@@ -20,8 +20,8 @@ extensions = \
 	r \
 	cuda-9.2
 
-DOCKER_PREFIX=renku/singleuser
-DOCKER_LABEL=latest
+DOCKER_PREFIX?=renku/singleuser
+DOCKER_LABEL?=latest
 RENKU_VERSION?=master
 JUPYTERHUB_VERSION?=0.9.2
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
