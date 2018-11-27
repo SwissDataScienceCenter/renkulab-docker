@@ -31,11 +31,10 @@ GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 all: base $(extensions)
 
 base:
-	cd docker/base && \
-	docker build \
+	docker build docker/base \
 		--build-arg RENKU_VERSION=$(RENKU_VERSION) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		-t $(DOCKER_PREFIX):$(DOCKER_LABEL) . && \
+		-t $(DOCKER_PREFIX):$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)
 
 
