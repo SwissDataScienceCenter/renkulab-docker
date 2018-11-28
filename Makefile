@@ -20,8 +20,8 @@ extensions = \
 	r \
 	cuda-9.2
 
-DOCKER_PREFIX=renku/singleuser
-DOCKER_LABEL=latest
+DOCKER_PREFIX?=renku/singleuser
+DOCKER_LABEL?=latest
 RENKU_VERSION?=master
 JUPYTERHUB_VERSION?=0.9.2
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
@@ -31,11 +31,10 @@ GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 all: base $(extensions)
 
 base:
-	cd docker/base && \
-	docker build \
+	docker build docker/base \
 		--build-arg RENKU_VERSION=$(RENKU_VERSION) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		-t $(DOCKER_PREFIX):$(DOCKER_LABEL) . && \
+		-t $(DOCKER_PREFIX):$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)
 
 

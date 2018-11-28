@@ -3,9 +3,22 @@
 
 ARG JUPYTERHUB_VERSION=0.9.2
 ARG BASE_IMAGE=jupyterhub/singleuser:$JUPYTERHUB_VERSION
+FROM $BASE_IMAGE as base
 
-FROM $BASE_IMAGE
-ARG JUPYTERHUB_VERSION
+# Renku wheel builder
+FROM python:3.6-alpine as renku
+ARG RENKU_VERSION=master
+
+ENV BUILD_DEPS "alpine-sdk g++ gcc linux-headers libxslt-dev zeromq-dev"
+
+RUN apk add --no-cache git && \
+    pip install --no-cache --upgrade pip && \
+    apk add --no-cache $BUILD_DEPS && \
+    pip wheel --wheel-dir /wheels git+https://github.com/SwissDataScienceCenter/renku-python@$RENKU_VERSION#egg=renku && \
+    apk del --purge $BUILD_DEPS
+
+# build singleuser image
+FROM base
 MAINTAINER Swiss Data Science Center <info@datascience.ch>
 
 USER root
@@ -33,7 +46,6 @@ USER $NB_USER
 
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
 COPY requirements.txt /tmp/requirements.txt
-
 RUN python3 -m pip install -U pip && \
     pip install -r /tmp/requirements.txt && \
     jupyter labextension update @jupyterlab/hub-extension --no-build && \
@@ -45,9 +57,10 @@ RUN python3 -m pip install -U pip && \
     jupyter serverextension enable --py jupyterlab_git
 
 # install renku-python
-ARG RENKU_VERSION=master
+COPY --from=renku /wheels /wheels
+
 RUN conda create -y -n renku python=3.6 && \
-    $CONDA_DIR/envs/renku/bin/pip install git+https://github.com/SwissDataScienceCenter/renku-python@$RENKU_VERSION#egg=renku && \
+    $CONDA_DIR/envs/renku/bin/pip install /wheels/*.whl && \
     conda clean --yes --all && \
     mkdir -p /home/$NB_USER/.renku/bin && \
     ln -s $CONDA_DIR/envs/renku/bin/renku /home/$NB_USER/.renku/bin/renku && \
@@ -58,7 +71,8 @@ RUN cat /home/$NB_USER/git-config.bashrc >> /home/$NB_USER/.bashrc && rm /home/$
 
 # Add user `jovyan` to sudoers (passwordless)
 USER root
-RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    rm -rf /wheels
 USER $NB_USER
 
 CMD '/usr/local/bin/start-singleuser.sh'
