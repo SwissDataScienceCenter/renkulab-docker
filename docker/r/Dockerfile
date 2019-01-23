@@ -21,7 +21,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.0.136-amd64.deb
+ENV RSTUDIO_PKG=rstudio-server-1.1.463-amd64.deb
 
 RUN wget -q http://download2.rstudio.org/${RSTUDIO_PKG}
 RUN dpkg -i ${RSTUDIO_PKG}
@@ -57,12 +57,7 @@ RUN conda install --quiet --yes \
     fix-permissions $CONDA_DIR
 
 # install R Jupyter extension
-RUN pip install git+https://github.com/jupyterhub/nbserverproxy.git && \
-    jupyter serverextension enable --sys-prefix --py nbserverproxy && \
-    pip install git+https://github.com/jupyterhub/nbrsessionproxy.git && \
-    jupyter serverextension enable --sys-prefix --py nbrsessionproxy && \
-    jupyter nbextension install    --sys-prefix --py nbrsessionproxy && \
-    jupyter nbextension enable     --sys-prefix --py nbrsessionproxy
+RUN pip install git+https://github.com/jupyterhub/jupyter-rsession-proxy
 
 # The desktop package uses /usr/lib/rstudio/bin
 ENV PATH="${PATH}:/usr/lib/rstudio-server/bin"
