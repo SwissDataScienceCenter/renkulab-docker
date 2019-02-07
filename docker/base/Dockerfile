@@ -60,7 +60,7 @@ RUN python3 -m pip install -U pip && \
 COPY --from=renku /wheels /wheels
 
 RUN conda create -y -n renku python=3.6 && \
-    $CONDA_DIR/envs/renku/bin/pip install /wheels/*.whl && \
+    $CONDA_DIR/envs/renku/bin/pip install --no-cache-dir /wheels/renku*.whl && \
     conda clean --yes --all && \
     mkdir -p /home/$NB_USER/.renku/bin && \
     ln -s $CONDA_DIR/envs/renku/bin/renku /home/$NB_USER/.renku/bin/renku && \
