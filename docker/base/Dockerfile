@@ -59,6 +59,7 @@ RUN python3 -m pip install -U pip && \
 # install renku-python
 COPY --from=renku /wheels /wheels
 
+ENV RENKU_DISABLE_VERSION_CHECK 1
 RUN conda create -y -n renku python=3.6 && \
     $CONDA_DIR/envs/renku/bin/pip install /wheels/*.whl && \
     conda clean --yes --all && \
