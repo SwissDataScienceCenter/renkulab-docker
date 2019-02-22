@@ -3,7 +3,7 @@ FROM $BASE_IMAGE
 
 MAINTAINER Swiss Data Science Center <info@datascience.ch>
 
-# Insall cuda
+# Install cuda
 # From: https://gitlab.com/nvidia/cuda/blob/ubuntu18.04/9.2/base/Dockerfile
 USER root
 RUN apt-get update && apt-get install -y --no-install-recommends gnupg2 curl ca-certificates && \
@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends gnupg2 curl ca-
     apt-get purge --autoremove -y curl && \
     rm -rf /var/lib/apt/lists/*
 
+# Compatible with NVIDIA graphics driver R396.37 and higher ; known to work with cuDNN v7.1.2
 ENV CUDA_VERSION 9.2.148
 
 ENV CUDA_PKG_VERSION 9-2=$CUDA_VERSION-1
