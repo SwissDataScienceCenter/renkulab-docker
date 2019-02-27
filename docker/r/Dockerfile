@@ -17,17 +17,8 @@ RUN apt-get update && \
     lsb-release \
     psmisc \
     libssl1.0.0 \
-    gcc && apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# You can use rsession from rstudio's desktop package as well.
-ENV RSTUDIO_PKG=rstudio-server-1.1.463-amd64.deb
-
-RUN wget -q http://download2.rstudio.org/${RSTUDIO_PKG}
-RUN dpkg -i ${RSTUDIO_PKG}
-RUN rm ${RSTUDIO_PKG}
-
-RUN apt-get clean && \
+    gcc && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 USER $NB_USER
@@ -36,8 +27,8 @@ USER $NB_USER
 RUN conda install --quiet --yes \
     'r-base' \
     'r-irkernel' \
-    'r-plyr' \
-    'r-devtools' && \
+    'r-devtools' \
+    'rstudio' && \
     conda clean -tipsy && \
     fix-permissions $CONDA_DIR
 
