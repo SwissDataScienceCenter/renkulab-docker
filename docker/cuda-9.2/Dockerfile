@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=renku/singleuser:latest
 FROM $BASE_IMAGE
 
-MAINTAINER Swiss Data Science Center <info@datascience.ch>
+LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 # Install cuda
 # From: https://gitlab.com/nvidia/cuda/blob/ubuntu18.04/9.2/base/Dockerfile
@@ -36,4 +36,4 @@ ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
 ENV NVIDIA_VISIBLE_DEVICES all
 ENV NVIDIA_DRIVER_CAPABILITIES compute,utility
 ENV NVIDIA_REQUIRE_CUDA "cuda>=9.2"
-USER jovyan
+USER $NB_USER

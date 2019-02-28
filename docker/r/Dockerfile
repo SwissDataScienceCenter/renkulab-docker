@@ -2,7 +2,7 @@ ARG BASE_IMAGE=renku/singleuser:latest
 
 FROM $BASE_IMAGE
 
-MAINTAINER Swiss Data Science Center <info@datascience.ch>
+LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
 
