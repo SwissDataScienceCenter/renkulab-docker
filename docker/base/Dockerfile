@@ -74,7 +74,7 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 
 RUN pip install pipx && \
     pipx install --spec /wheels/renku*.whl renku && \
-    echo "export PATH=~/.local/bin:$PATH" >> /home/$NB_USER/.bashrc
+    pipx ensurepath
 
 COPY git-config.bashrc /home/$NB_USER/
 RUN cat /home/$NB_USER/git-config.bashrc >> /home/$NB_USER/.bashrc && rm /home/$NB_USER/git-config.bashrc
