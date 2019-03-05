@@ -73,8 +73,9 @@ COPY --from=renku /wheels /wheels
 
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
-RUN pip install pipx && \
+RUN python3 -m pip install pipx && \
     pipx install --spec /wheels/renku*.whl renku && \
+    pipx inject renku sentry-sdk && \
     pipx ensurepath
 
 COPY git-config.bashrc /home/$NB_USER/
