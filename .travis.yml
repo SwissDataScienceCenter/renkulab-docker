@@ -49,7 +49,7 @@ deploy:
     skip_cleanup: true
     script: bash .travis-deploy.sh
     on: &script_on
-      branch: master
+      branch: prep-0.4.0
       repo: SwissDataScienceCenter/renku-jupyter
   - <<: *script
     on:
