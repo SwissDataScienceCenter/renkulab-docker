@@ -31,6 +31,10 @@ language: python
 python:
   - 3.6
 
+env:
+  - RENKU_VERSION=""
+  - RENKU_VERSION="0.4.0"
+
 git:
   depth: false
 
