@@ -57,7 +57,7 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 
 RUN python3 -m pip install pipx
 ARG RENKU_PIP_SPEC=""
-RUN pipx install --spec renku${RENKU_PIP_SPEC} renku&& \
+RUN pipx install ${RENKU_PIP_SPEC} --pip-args pre renku && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 

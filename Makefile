@@ -26,7 +26,7 @@ JUPYTERHUB_VERSION?=0.9.2
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 ifdef RENKU_VERSION
-	RENKU_PIP_SPEC="==$(RENKU_VERSION)"
+	RENKU_PIP_SPEC="--spec renku==$(RENKU_VERSION)"
 	RENKU_TAG=-renku$(RENKU_VERSION)
 endif
 
@@ -40,7 +40,6 @@ base:
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		-t $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) && \
 	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
-
 
 login:
 	@echo "${DOCKER_PASSWORD}" | docker login -u="${DOCKER_USERNAME}" --password-stdin ${DOCKER_REGISTRY}
@@ -61,6 +60,7 @@ pull:
 		fi; \
 		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
 	done
+
 %:
 	cd docker/$@ && \
 	docker build \
