@@ -50,8 +50,8 @@ push:
 		if test "$$ext" != "" ; then \
 			ext=-$$ext; \
 		fi; \
-		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
-		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL)$(RENKU_TAG) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) ; \
 	done
 
 pull:
@@ -64,6 +64,6 @@ pull:
 %:
 	cd docker/$@ && \
 	docker build \
-		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL) \
+		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
-	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
