@@ -5,21 +5,6 @@ ARG JUPYTERHUB_VERSION=0.9.2
 ARG BASE_IMAGE=jupyterhub/singleuser:$JUPYTERHUB_VERSION
 FROM $BASE_IMAGE as base
 
-# Renku wheel builder
-FROM python:3.6-alpine as renku
-ARG RENKU_VERSION=master
-
-ENV BUILD_DEPS "alpine-sdk g++ gcc linux-headers libxslt-dev zeromq-dev"
-
-RUN apk add --no-cache git && \
-    pip install --no-cache --upgrade pip && \
-    apk add --no-cache $BUILD_DEPS && \
-    pip wheel --wheel-dir /wheels git+https://github.com/SwissDataScienceCenter/renku-python@$RENKU_VERSION#egg=renku && \
-    apk del --purge $BUILD_DEPS
-
-# build singleuser image
-FROM base
-
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
@@ -70,12 +55,11 @@ RUN python3 -m pip install -U pip && \
 RUN conda install gxx_linux-64
 
 # install renku-python
-COPY --from=renku /wheels /wheels
-
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
-RUN python3 -m pip install pipx && \
-    pipx install --spec /wheels/renku*.whl renku && \
+RUN python3 -m pip install pipx
+ARG RENKU_PIP_SPEC=""
+RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 

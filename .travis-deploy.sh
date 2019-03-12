@@ -20,7 +20,7 @@ set -e
 
 make login
 if [[ -n $TRAVIS_TAG ]]; then
-    DOCKER_LABEL=$TRAVIS_TAG RENKU_VERSION=v${TRAVIS_TAG} make all
+    DOCKER_LABEL=$TRAVIS_TAG make all
     DOCKER_LABEL=$TRAVIS_TAG make push
 fi
 make push
