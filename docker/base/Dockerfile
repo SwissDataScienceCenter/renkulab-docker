@@ -1,7 +1,7 @@
 # Build as renku/singleuser
 # Run with the RenkuKubeSpawner via JupyterHub
 
-ARG JUPYTERHUB_VERSION=0.9.2
+ARG JUPYTERHUB_VERSION=0.9.4
 ARG BASE_IMAGE=jupyterhub/singleuser:$JUPYTERHUB_VERSION
 FROM $BASE_IMAGE as base
 
