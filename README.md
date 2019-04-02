@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter.svg?branch=master)](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter)
+[![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
 
 # Renku Jupyter images
 
