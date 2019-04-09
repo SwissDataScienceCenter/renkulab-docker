@@ -64,6 +64,8 @@ RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
 COPY git-config.bashrc /home/$NB_USER/
 RUN cat /home/$NB_USER/git-config.bashrc >> /home/$NB_USER/.bashrc && rm /home/$NB_USER/git-config.bashrc
 
+COPY lifecycle/ /usr/local/bin/
+
 # Add user `jovyan` to sudoers (passwordless)
 USER root
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
