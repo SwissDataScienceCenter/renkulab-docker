@@ -15,17 +15,18 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     curl \
     git \
     gnupg \
+    graphviz \
+    less \
     libsm6 \
     libxext-dev \
     libxrender1 \
     lmodern \
+    musl-dev \
     nano \
     netcat \
     python-dev \
     unzip \
     vim \
-    musl-dev \
-    less \
     && apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
