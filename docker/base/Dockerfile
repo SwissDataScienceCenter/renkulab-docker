@@ -45,10 +45,9 @@ RUN python3 -m pip install -U pip && \
     pip install -r /tmp/requirements.txt && \
     jupyter labextension update @jupyterlab/hub-extension --no-build && \
     jupyter labextension install @jupyterlab/git && \
-    jupyter labextension install renku-jupyterlab-ts --no-build && \
     jupyter lab build && \
     jupyter labextension list && \
-    pip install jupyterlab-git==0.5.0 && \
+    pip install jupyterlab-git && \
     jupyter serverextension enable --py jupyterlab_git
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
