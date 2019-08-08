@@ -25,7 +25,7 @@ USER $NB_USER
 
 # R packages
 RUN conda install --quiet --yes \
-    'r-base' \
+    'r-base=3.6.0' \
     'r-irkernel' \
     'r-devtools' \
     'rstudio' && \
