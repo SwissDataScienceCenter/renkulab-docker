@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2017, 2018 - Swiss Data Science Center (SDSC)
+# Copyright 2017-2019 - Swiss Data Science Center (SDSC)
 # A partnership between École Polytechnique Fédérale de Lausanne (EPFL) and
 # Eidgenössische Technische Hochschule Zürich (ETHZ).
 #
@@ -64,6 +64,7 @@ pull:
 %:
 	cd docker/$@ && \
 	docker build \
+		--build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
 		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
