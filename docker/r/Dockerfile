@@ -3,6 +3,10 @@ FROM rocker/rstudio:${RVERSION}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 # The initial setup is based on https://github.com/rocker-org/binder
+# Why?
+# We chose to build the jupyter & renku portions on top of rocker because
+# rocker's version of R/Rstudio is historically more up to date than the
+# versions provided by conda.
 
 USER root
 
@@ -79,6 +83,11 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86
     find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
     /opt/conda/bin/conda clean -afy
 
+# prepend the conda path so the pip used for the rest of the time comes from conda
+# note that the `conda env` calls in the user's dockerfile for installing new dependencies seem to work
+# even though we didn't change any permissions.
+ENV PATH=/opt/conda/bin:$PATH
+
 USER ${NB_USER}
 
 # install jupyter dependencies
@@ -104,7 +113,6 @@ RUN pip3 install --no-cache-dir pipx && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
-ENV PATH=/opt/conda/bin/conda:$PATH
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]

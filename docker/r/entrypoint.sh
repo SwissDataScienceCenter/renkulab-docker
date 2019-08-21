@@ -8,5 +8,9 @@ for var in ${VariableArray[*]}; do
     fi
 done
 
+# add a symlink to the work directory containing the project to the home
+# where Rstudio puts you when rstudio starts up.
+ln -s /work /home/rstudio
+
 # run the command
 $@
