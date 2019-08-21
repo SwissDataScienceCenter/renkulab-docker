@@ -83,9 +83,12 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86
     find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
     /opt/conda/bin/conda clean -afy
 
+<<<<<<< HEAD
 # prepend the conda path so the pip used for the rest of the time comes from conda
 # note that the `conda env` calls in the user's dockerfile for installing new dependencies seem to work
 # even though we didn't change any permissions.
+=======
+>>>>>>> moved conda path to before jupyter installs
 ENV PATH=/opt/conda/bin:$PATH
 
 USER ${NB_USER}
@@ -113,7 +116,10 @@ RUN pip3 install --no-cache-dir pipx && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> moved conda path to before jupyter installs
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
 CMD [ "jupyterhub-singleuser" ]
