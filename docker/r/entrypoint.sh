@@ -10,7 +10,7 @@ done
 
 # add a symlink to the work directory containing the project to the home
 # where Rstudio puts you when rstudio starts up.
-ln -s /work /home/rstudio
+[ -n "$CI_PROJECT" ] && ln -s /work/${CI_PROJECT} /home/rstudio
 
 # run the command
 $@

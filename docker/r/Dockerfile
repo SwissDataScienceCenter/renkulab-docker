@@ -12,13 +12,15 @@ USER root
 
 ENV NB_USER rstudio
 ENV NB_UID 1000
+ENV NB_GID 1000
 ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
+ENV CONDA_PATH /opt/conda
 
-# Set ENV for all programs...
-ENV PATH ${VENV_DIR}/bin:$PATH
-# And set ENV for R! It doesn't read from the environment...
+# prepend conda to PATH
+ENV PATH ${CONDA_PATH}/bin:$PATH
+# And set PATH for R! It doesn't read from the environment...
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
     echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh
 
@@ -73,53 +75,51 @@ RUN apt-get update --fix-missing && \
     apt-get clean
 
 RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O ~/miniconda.sh && \
-    /bin/bash ~/miniconda.sh -b -p /opt/conda && \
+    /bin/bash ~/miniconda.sh -b -p ${CONDA_PATH} && \
     rm ~/miniconda.sh && \
-    /opt/conda/bin/conda clean -tipsy && \
-    ln -s /opt/conda/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
-    echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc && \
+    ${CONDA_PATH}/bin/conda clean -tipsy && \
+    ln -s ${CONDA_PATH}/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
+    echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc && \
-    find /opt/conda/ -follow -type f -name '*.a' -delete && \
-    find /opt/conda/ -follow -type f -name '*.js.map' -delete && \
-    /opt/conda/bin/conda clean -afy
+    find ${CONDA_PATH}/ -follow -type f -name '*.a' -delete && \
+    find ${CONDA_PATH}/ -follow -type f -name '*.js.map' -delete && \
+    ${CONDA_PATH}/bin/conda clean -afy
 
-<<<<<<< HEAD
-# prepend the conda path so the pip used for the rest of the time comes from conda
-# note that the `conda env` calls in the user's dockerfile for installing new dependencies seem to work
-# even though we didn't change any permissions.
-=======
->>>>>>> moved conda path to before jupyter installs
-ENV PATH=/opt/conda/bin:$PATH
+# set permissions in the conda directory to be editable by NB_USER
+ADD fix-permissions.sh /usr/local/bin
+RUN fix-permissions.sh ${CONDA_PATH}
 
 USER ${NB_USER}
 
 # install jupyter dependencies
 ARG JUPYTERHUB_VERSION=0.9.6
-RUN python3 -m venv ${VENV_DIR} && \
-    pip3 install -U --no-cache-dir pip wheel && \
-    pip3 install --no-cache-dir \
-         jupyter-rsession-proxy \
-         jupyterlab==1.0.0 \
-         jupyterhub==${JUPYTERHUB_VERSION}
+RUN pip install -U --no-cache-dir pip wheel && \
+    pip install --no-cache-dir \
+        jupyter-rsession-proxy \
+        jupyterlab==1.0.0 \
+        jupyterhub==${JUPYTERHUB_VERSION} \
+        jupyterlab-git && \
+    jupyter labextension install @jupyterlab/git && \
+    jupyter serverextension enable --py jupyterlab_git
+
+
+RUN conda install nb_conda_kernels
 
 # install IRKernel and renv
+ENV RENV_VERSION 0.5.0-25
 RUN R --quiet -e "install.packages('IRkernel')" && \
-    R --quiet -e "IRkernel::installspec(prefix='${VENV_DIR}')" && \
-    R --quiet -e "install.packages('remotes')" && \
-    R --quiet -e "remotes::install_github('rstudio/renv')"
+    R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}/bin')" && \
+    R --quiet -e 'install.packages("remotes", repos = c(CRAN = "https://cran.rstudio.com"))' && \
+    R --quiet -e 'remotes::install_github("rstudio/renv@${RENV_VERSION}")'
 
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
 ARG RENKU_PIP_SPEC=""
-RUN pip3 install --no-cache-dir pipx && \
+RUN pip install --no-cache-dir pipx && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
-<<<<<<< HEAD
-
-=======
->>>>>>> moved conda path to before jupyter installs
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
 CMD [ "jupyterhub-singleuser" ]
