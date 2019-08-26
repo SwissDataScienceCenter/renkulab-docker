@@ -28,26 +28,6 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 # without this being explicitly set
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
-# RUN apt-get update && \
-#     apt-get -yq install \
-#                        build-essential \
-#                        checkinstall \
-#                        curl \
-#                        gnupg \
-#                        libbz2-dev \
-#                        libc6-dev \
-#                        libffi-dev \
-#                        libgdbm-dev \
-#                        libncursesw5-dev \
-#                        libreadline-gplv2-dev \
-#                        libsqlite3-dev \
-#                        libssl-dev \
-#                        tk-dev \
-#                        zlib1g-dev && \
-#     apt-get purge && \
-#     apt-get clean && \
-#     rm -rf /var/lib/apt/lists/*
-
 # Add Tini
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
@@ -101,8 +81,7 @@ RUN conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
     'jupyterlab=1.0.9' \
-    'nodejs>=6.11.5' \
-    nb_conda_kernels && \
+    'nodejs>=6.11.5' && \
     conda clean --all -f -y && \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
@@ -119,7 +98,7 @@ RUN conda install --quiet --yes \
 # install IRKernel and renv
 ENV RENV_VERSION 0.5.0-25
 RUN R --quiet -e "install.packages('IRkernel')" && \
-    R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}/bin')" && \
+    R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')" && \
     R --quiet -e 'install.packages("remotes", repos = c(CRAN = "https://cran.rstudio.com"))' && \
     R --quiet -e "remotes::install_github(\"rstudio/renv@${RENV_VERSION}\")"
 
