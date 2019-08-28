@@ -99,8 +99,6 @@ RUN conda install --quiet --yes \
 ENV RENV_VERSION 0.5.0-25
 RUN R --quiet -e "install.packages('IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')" && \
-    R --quiet -e 'install.packages("remotes", repos = c(CRAN = "https://cran.rstudio.com"))' && \
-    R --quiet -e "remotes::install_github(\"rstudio/renv@${RENV_VERSION}\")"
 
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
