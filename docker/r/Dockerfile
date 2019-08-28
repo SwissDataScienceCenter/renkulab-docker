@@ -91,7 +91,7 @@ RUN conda install --quiet --yes \
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
-    R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')" && \
+    R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')"
 
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
