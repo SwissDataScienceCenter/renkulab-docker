@@ -2,12 +2,6 @@ ARG RVERSION=3.6.1
 FROM rocker/rstudio:${RVERSION}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
-# The initial setup is based on https://github.com/rocker-org/binder
-# Why?
-# We chose to build the jupyter & renku portions on top of rocker because
-# rocker's version of R/Rstudio is historically more up to date than the
-# versions provided by conda.
-
 USER root
 
 ENV NB_USER rstudio
@@ -95,8 +89,7 @@ RUN conda install --quiet --yes \
     jupyter labextension install @jupyterlab/git && \
     jupyter serverextension enable --py jupyterlab_git
 
-# install IRKernel and renv
-ENV RENV_VERSION 0.5.0-25
+# install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')" && \
 

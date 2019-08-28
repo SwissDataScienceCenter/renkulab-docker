@@ -33,6 +33,8 @@ The basic Jupyter image with minimal dependencies
 
 ### R
 
+Based on the rocker docker image: https://github.com/rocker-org/binder,
+chosen because rocker keeps a more up-to-date version of R than conda.
 Includes the R Jupyter kernel as well as RStudio. To access RStudio,
 simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
