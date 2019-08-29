@@ -8,5 +8,8 @@ for var in ${VariableArray[*]}; do
     fi
 done
 
+# add a symlink to the project directory in /home/rstudio
+[ -n "$CI_PROJECT" ] && ln -s /work/${CI_PROJECT} /home/rstudio
+
 # run the command
 $@
