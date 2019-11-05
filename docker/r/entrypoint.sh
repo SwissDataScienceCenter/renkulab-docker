@@ -8,8 +8,17 @@ for var in ${VariableArray[*]}; do
     fi
 done
 
+# Setup git user
+if [ -z "$(git config --global --get user.name)" ]; then
+    git config --global user.name "$GIT_AUTHOR_NAME"
+fi
+if [ -z "$(git config --global --get user.email)" ]; then
+    git config --global user.email "$EMAIL"
+fi
+
 # add a symlink to the project directory in /home/rstudio
 [ -n "$CI_PROJECT" ] && ln -s /work/${CI_PROJECT} /home/rstudio
+
 
 # run the command
 $@

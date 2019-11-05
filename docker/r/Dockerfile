@@ -38,7 +38,8 @@ RUN apt-get update --fix-missing && \
         libsm6 \
         libxext6 \
         libxrender1 \
-        wget && \
+        wget \
+        vim && \
     apt-get purge && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
