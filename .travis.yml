@@ -36,7 +36,7 @@ env:
   - RENKU_VERSION="0.5.0"
   - RENKU_VERSION="0.5.1"
   - RENKU_VERSION="0.5.2"
-  - RENKU_VERSION="0.6.0"
+  - RENKU_VERSION="0.6.1"
   - RENKU_VERSION="0.7.2"
 
 git:
