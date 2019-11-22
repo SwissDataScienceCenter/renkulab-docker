@@ -80,4 +80,4 @@ RUN /opt/conda/bin/pip install tensorflow-gpu==1.14
 
 # Tensorboard jupyter(lab) extension 
 RUN jupyter labextension install jupyterlab_tensorboard && \
-    pip install jupyter-tensorboard
+    pip install jupyter-tensorboard==0.1.10
