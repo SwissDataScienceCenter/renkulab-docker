@@ -78,7 +78,6 @@ USER $NB_USER
 ## Tensorflow GPU
 RUN /opt/conda/bin/pip install tensorflow-gpu==1.14
 
-# Tensorboard jupyter extension 
-#RUN    pip install nbserverproxy \
-#    && jupyter serverextension enable --py nbserverproxy \
-#    && jupyter labextension install @renku/jupyterlab-vnc
+# Tensorboard jupyter(lab) extension 
+RUN jupyter labextension install jupyterlab_tensorboard && \
+    pip install jupyter-tensorboard
