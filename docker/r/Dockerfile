@@ -77,13 +77,14 @@ RUN conda install --quiet --yes \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
     'jupyterlab=1.0.9' \
     'nodejs>=6.11.5' && \
-    conda clean --all -f -y && \
-    npm cache clean --force && \
-    jupyter notebook --generate-config && \
+    conda build purge-all  && \
+    #conda clean --all -f -y && \
+    npm cache clean --force 
+
+RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn 
-##&& \
-RUN df -h
+
 RUN pip install -U --no-cache-dir pip wheel && \
     pip install --no-cache-dir \
         jupyter-rsession-proxy \
