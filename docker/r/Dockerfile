@@ -84,10 +84,10 @@ RUN conda install --quiet --yes \
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn 
+    rm -rf /home/$NB_USER/.cache/yarn && \
+    pip install -U --no-cache-dir pip wheel 
 
-RUN pip install -U --no-cache-dir pip wheel && \
-    pip install --no-cache-dir \
+RUN pip install --no-cache-dir \
         jupyter-rsession-proxy \
         jupyterlab==1.0.0 \
         jupyterlab-git && \
@@ -101,7 +101,7 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
 ARG RENKU_PIP_SPEC=""
-RUN pip install --no-cache-dir pipx && \
+RUN pip install pipx && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
