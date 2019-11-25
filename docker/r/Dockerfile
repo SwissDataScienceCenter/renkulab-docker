@@ -76,7 +76,8 @@ RUN conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
     'jupyterlab=1.0.9' \
-    'nodejs>=6.11.5' && \
+    'nodejs>=6.11.5' \
+    conda-build && \
     conda build purge-all  && \
     #conda clean --all -f -y && \
     npm cache clean --force 
