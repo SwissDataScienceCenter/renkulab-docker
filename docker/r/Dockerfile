@@ -81,8 +81,10 @@ RUN conda install --quiet --yes \
     npm cache clean --force && \
     jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    pip install -U --no-cache-dir pip wheel && \
+    rm -rf /home/$NB_USER/.cache/yarn 
+##&& \
+RUN df -h
+RUN pip install -U --no-cache-dir pip wheel && \
     pip install --no-cache-dir \
         jupyter-rsession-proxy \
         jupyterlab==1.0.0 \
