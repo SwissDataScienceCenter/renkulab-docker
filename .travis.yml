@@ -26,6 +26,10 @@ sudo: required
 services:
   - docker
 
+branches:
+  only:
+    - master
+
 language: python
 
 python:
@@ -33,11 +37,10 @@ python:
 
 env:
   - RENKU_VERSION=""
-  - RENKU_VERSION="0.5.0"
-  - RENKU_VERSION="0.5.1"
   - RENKU_VERSION="0.5.2"
-  - RENKU_VERSION="0.6.0"
-  - RENKU_VERSION="0.7.1"
+  - RENKU_VERSION="0.6.1"
+  - RENKU_VERSION="0.7.2"
+  - RENKU_VERSION="0.8.1"
 
 git:
   depth: false
