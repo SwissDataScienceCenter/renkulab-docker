@@ -51,14 +51,15 @@ script:
   - make all
 
 deploy:
-  - &script
-    provider: script
+  - provider: script
     skip_cleanup: true
     script: bash .travis-deploy.sh
-    on: &script_on
+    on:
       branch: master
       repo: SwissDataScienceCenter/renku-jupyter
-  - <<: *script
+  - provider: script
+    skip_cleanup: true
+    script: bash .travis-deploy.sh
     on:
-      <<: *script_on
       tags: true
+      repo: SwissDataScienceCenter/renku-jupyter
