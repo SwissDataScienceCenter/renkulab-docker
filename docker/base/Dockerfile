@@ -36,6 +36,11 @@ RUN ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 # install git-lfs
 RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && sudo apt-get install git-lfs=2.8.0
 
+# Add Tini
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini
+
 # switch to the notebook user
 USER $NB_USER
 
@@ -70,5 +75,8 @@ USER root
 RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
     rm -rf /wheels
 USER $NB_USER
+
+COPY entrypoint.sh /entrypoint.sh
+ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
 
 CMD '/usr/local/bin/start-singleuser.sh'
