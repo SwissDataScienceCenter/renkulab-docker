@@ -75,7 +75,7 @@ ARG JUPYTERHUB_VERSION=0.9.6
 RUN conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
-    'jupyterlab=1.0.9' \
+    'jupyterlab=1.2.1' \
     'nodejs>=6.11.5' \
     conda-build && \
     conda build purge-all  && \
@@ -89,7 +89,6 @@ RUN jupyter notebook --generate-config && \
 
 RUN pip install --no-cache-dir \
         jupyter-rsession-proxy \
-        jupyterlab==1.0.0 \
         jupyterlab-git && \
     jupyter labextension install @jupyterlab/git && \
     jupyter serverextension enable --py jupyterlab_git
