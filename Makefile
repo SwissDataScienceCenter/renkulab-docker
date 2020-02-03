@@ -26,7 +26,7 @@ JUPYTERHUB_VERSION?=0.9.6
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 ifdef RENKU_VERSION
-	RENKU_PIP_SPEC="--spec renku==$(RENKU_VERSION)"
+	RENKU_PIP_SPEC="renku==$(RENKU_VERSION)"
 	RENKU_TAG=-renku$(RENKU_VERSION)
 endif
 
