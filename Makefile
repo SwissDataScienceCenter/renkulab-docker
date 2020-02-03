@@ -25,6 +25,8 @@ DOCKER_LABEL?=latest
 JUPYTERHUB_VERSION?=0.9.6
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
+# for the empty version case:
+RENKU_PIP_SPEC="renku"
 ifdef RENKU_VERSION
 	RENKU_PIP_SPEC="renku==$(RENKU_VERSION)"
 	RENKU_TAG=-renku$(RENKU_VERSION)
