@@ -80,12 +80,12 @@ RUN conda install --quiet --yes \
     conda-build && \
     conda build purge-all  && \
     #conda clean --all -f -y && \
-    npm cache clean --force 
+    npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
-    pip install -U --no-cache-dir pip wheel 
+    pip install -U --no-cache-dir pip wheel
 
 RUN pip install --no-cache-dir \
         jupyter-rsession-proxy \
@@ -98,10 +98,10 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')"
 
 # install renku
-# the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
+# the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
 ARG RENKU_PIP_SPEC=""
-RUN pip install pipx && \
-    pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
+RUN python3 -m pip install pipx>=0.15.0.0 && \
+    pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 

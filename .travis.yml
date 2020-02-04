@@ -29,7 +29,7 @@ services:
 branches:
   only:
     - master
-    - "/(^\\d+\\.\\d+\\.\\d+$)/"
+    - /\d+\.\d+(\.\d+)?(-rc\d+)?/
 
 language: python
 

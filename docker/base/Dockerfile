@@ -61,9 +61,9 @@ RUN conda install gxx_linux-64
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
-RUN python3 -m pip install pipx
+RUN python3 -m pip install pipx>=0.15.0.0
 ARG RENKU_PIP_SPEC=""
-RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
+RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
