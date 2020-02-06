@@ -88,7 +88,7 @@ RUN conda install --quiet --yes 'jupyterlab=1.2.1'
 RUN conda install --quiet --yes 'nodejs>=6.11.5'
 RUN conda install --quiet --yes conda-build
 RUN conda build purge-all
-RUN npm cache clean --force
+#RUN npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
