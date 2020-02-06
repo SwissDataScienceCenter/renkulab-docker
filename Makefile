@@ -17,7 +17,7 @@
 # limitations under the License.
 
 extensions = \
-	r \
+	r r-bioconductor \
 	cuda-9.2 cuda-10.0-tensorflow-1.14
 
 DOCKER_PREFIX?=renku/singleuser
