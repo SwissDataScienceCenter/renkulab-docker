@@ -98,10 +98,10 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')"
 
 # install renku
-# the RENKU_PIP_SPEC should be e.g. "--spec renku==0.5.2"
+# the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
 ARG RENKU_PIP_SPEC=""
-RUN pip install pipx && \
-    pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" renku && \
+RUN python3 -m pip install pipx>=0.15.0.0 && \
+    pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
