@@ -95,11 +95,12 @@ RUN jupyter notebook --generate-config && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     pip install -U --no-cache-dir pip wheel
 
-RUN pip install --no-cache-dir \
-        jupyter-rsession-proxy \
-        jupyterlab-git && \
-    jupyter labextension install @jupyterlab/git && \
-    jupyter serverextension enable --py jupyterlab_git
+RUN pip install --no-cache-dir jupyter-rsession-proxy
+RUN pip install --no-cache-dir jupyterlab-git
+RUN jupyter serverextension list
+RUN jupyter labextension list
+RUN jupyter labextension install @jupyterlab/git
+RUN jupyter serverextension enable --py jupyterlab_git
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
