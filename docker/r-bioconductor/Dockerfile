@@ -1,5 +1,5 @@
 ARG RELEASE=RELEASE_3_10
-FROM bioconductor/bioconductor_full:${RELEASE}
+FROM bioconductor/bioconductor_docker:${RELEASE}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
