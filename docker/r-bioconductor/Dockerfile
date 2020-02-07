@@ -82,12 +82,12 @@ ARG JUPYTERHUB_VERSION=0.9.6
 #    #conda clean --all -f -y && \
 #    npm cache clean --force
 
-RUN conda install --quiet --yes 'notebook=6.0.0'
-RUN conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
-RUN conda install --quiet --yes 'jupyterlab>=1.0.0'
-RUN conda install --quiet --yes 'nodejs>=6.11.5'
-RUN conda install --quiet --yes conda-build
-RUN conda build purge-all
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'notebook=6.0.0'
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'jupyterlab>=1.0.0'
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'nodejs>=6.11.5'
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes conda-build
+RUN ${CONDA_PATH}/bin/conda build purge-all
 #RUN npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
