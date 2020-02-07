@@ -99,7 +99,7 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
-ARG RENKU_PIP_SPEC=""
+ARG RENKU_PIP_SPEC="renku"
 RUN python3 -m pip install pipx>=0.15.0.0 && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
