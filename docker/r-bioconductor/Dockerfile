@@ -84,7 +84,7 @@ ARG JUPYTERHUB_VERSION=0.9.6
 
 RUN conda install --quiet --yes 'notebook=6.0.0'
 RUN conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
-RUN conda install --quiet --yes 'jupyterlab=1.2.1'
+RUN conda install --quiet --yes 'jupyterlab>=1.0.0'
 RUN conda install --quiet --yes 'nodejs>=6.11.5'
 RUN conda install --quiet --yes conda-build
 RUN conda build purge-all
@@ -95,12 +95,22 @@ RUN jupyter notebook --generate-config && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     pip install -U --no-cache-dir pip wheel
 
-RUN pip install --no-cache-dir jupyter-rsession-proxy
-RUN pip install --no-cache-dir jupyterlab-git
-RUN jupyter serverextension list
-RUN jupyter labextension list
-RUN jupyter labextension install @jupyterlab/git
-RUN jupyter serverextension enable --py jupyterlab_git
+#RUN pip install --no-cache-dir jupyter-rsession-proxy
+#RUN pip install --no-cache-dir jupyterlab-git
+#RUN jupyter serverextension list
+#RUN jupyter labextension list
+#RUN jupyter labextension install @jupyterlab/git
+#RUN jupyter serverextension enable --py jupyterlab_git
+
+# install jupyterlab, papermill, git extension and renku-jupyterlab-ts
+RUN python3 -m pip install -U pip && \
+    jupyter labextension update @jupyterlab/hub-extension --no-build && \
+    jupyter labextension install @jupyterlab/git --no-build && \
+    jupyter labextension list && \
+    pip install jupyter-rsession-proxy && \
+    pip install jupyterlab-git && \
+    jupyter serverextension enable --py jupyterlab_git && \
+    jupyter lab build
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
