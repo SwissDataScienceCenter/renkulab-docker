@@ -82,15 +82,13 @@ ARG JUPYTERHUB_VERSION=0.9.6
 #    #conda clean --all -f -y && \
 #    npm cache clean --force
 
-RUN ${CONDA_PATH}/bin/conda uninstall 'nodejs'
-
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'notebook=6.0.0'
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'jupyterlab>=1.0.0'
-RUN ${CONDA_PATH}/bin/conda install --yes 'nodejs>=6.11.5'
+RUN ${CONDA_PATH}/bin/conda install -c conda-forge 'nodejs>=6.11.5'
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes conda-build
 RUN ${CONDA_PATH}/bin/conda build purge-all
-#RUN npm cache clean --force
+RUN npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
@@ -120,7 +118,7 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
-ARG RENKU_PIP_SPEC=""
+ARG RENKU_PIP_SPEC="renku"
 RUN python3 -m pip install pipx>=0.15.0.0 && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
