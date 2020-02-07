@@ -85,10 +85,12 @@ ARG JUPYTERHUB_VERSION=0.9.6
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'notebook=6.0.0'
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'jupyterlab>=1.0.0'
-RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'nodejs>=6.11.5'
+RUN ${CONDA_PATH}/bin/conda install --yes 'nodejs>=6.11.5'
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes conda-build
 RUN ${CONDA_PATH}/bin/conda build purge-all
 #RUN npm cache clean --force
+RUN npm --version
+RUN npm i @jupyterlab/git
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
