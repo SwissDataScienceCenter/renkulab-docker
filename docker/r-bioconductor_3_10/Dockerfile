@@ -1,5 +1,5 @@
-ARG RVERSION=3.6.1
-FROM rocker/rstudio:${RVERSION}
+ARG RELEASE=RELEASE_3_10
+FROM bioconductor/bioconductor_docker:${RELEASE}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
@@ -72,14 +72,14 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
 
 # install the jupyter stack
 ARG JUPYTERHUB_VERSION=0.9.6
-RUN conda install --quiet --yes \
+
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
-    'jupyterlab=1.2.1' \
-    'nodejs>=6.11.5' \
-    conda-build && \
-    conda build purge-all  && \
-    #conda clean --all -f -y && \
+    'jupyterlab=1.2.1' && \
+    ${CONDA_PATH}/bin/conda install -c conda-forge 'nodejs>=6.11.5' && \
+    ${CONDA_PATH}/bin/conda install --quiet --yes conda-build && \
+    ${CONDA_PATH}/bin/conda build purge-all && \
     npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
@@ -87,11 +87,16 @@ RUN jupyter notebook --generate-config && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     pip install -U --no-cache-dir pip wheel
 
-RUN pip install --no-cache-dir \
-        jupyter-rsession-proxy \
-        jupyterlab-git && \
-    jupyter labextension install @jupyterlab/git && \
-    jupyter serverextension enable --py jupyterlab_git
+
+# install jupyterlab, git extension
+RUN python3 -m pip install -U pip && \
+    jupyter labextension update @jupyterlab/hub-extension --no-build && \
+    jupyter labextension install @jupyterlab/git --no-build && \
+    jupyter labextension list && \
+    pip install jupyter-rsession-proxy && \
+    pip install jupyterlab-git && \
+    jupyter serverextension enable --py jupyterlab_git && \
+    jupyter lab build
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \

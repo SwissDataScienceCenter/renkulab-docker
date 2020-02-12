@@ -19,7 +19,6 @@ fi
 # add a symlink to the project directory in /home/rstudio
 [ -n "$CI_PROJECT" ] && ln -s /work/${CI_PROJECT} /home/rstudio
 
-
 # configure rstudio to open the rpath project
 if [[ ! -f /home/rstudio/${CI_PROJECT}/${CI_PROJECT}.Rproj ]]; then
 cat > /home/rstudio/${CI_PROJECT}/${CI_PROJECT}.Rproj <<- EOM
@@ -38,7 +37,7 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 EOM
 fi
-mkdir -p /home/rstudio/.rstudio/projects_settings 
+mkdir -p /home/rstudio/.rstudio/projects_settings
 echo /home/rstudio/${CI_PROJECT}/${CI_PROJECT}.Rproj | tee /home/rstudio/.rstudio/projects_settings/next-session-project
 chown -R rstudio:root /home/rstudio/.rstudio/projects_settings
 
