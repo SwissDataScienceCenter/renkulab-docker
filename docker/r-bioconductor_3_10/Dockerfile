@@ -72,37 +72,23 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
 
 # install the jupyter stack
 ARG JUPYTERHUB_VERSION=0.9.6
-#RUN conda install --quiet --yes \
-#    'notebook=6.0.0' \
-#    "jupyterhub=${JUPYTERHUB_VERSION}" \
-#    'jupyterlab=1.2.1' \
-#    'nodejs>=6.11.5' \
-#    conda-build && \
-#    conda build purge-all  && \
-#    #conda clean --all -f -y && \
-#    npm cache clean --force
 
-RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'notebook=6.0.0'
-RUN ${CONDA_PATH}/bin/conda install --quiet --yes "jupyterhub=${JUPYTERHUB_VERSION}"
-RUN ${CONDA_PATH}/bin/conda install --quiet --yes 'jupyterlab>=1.0.0'
-RUN ${CONDA_PATH}/bin/conda install -c conda-forge 'nodejs>=6.11.5'
-RUN ${CONDA_PATH}/bin/conda install --quiet --yes conda-build
-RUN ${CONDA_PATH}/bin/conda build purge-all
-RUN npm cache clean --force
+RUN ${CONDA_PATH}/bin/conda install --quiet --yes \
+    'notebook=6.0.0' \
+    "jupyterhub=${JUPYTERHUB_VERSION}" \
+    'jupyterlab=1.2.1' && \
+    ${CONDA_PATH}/bin/conda install -c conda-forge 'nodejs>=6.11.5' && \
+    ${CONDA_PATH}/bin/conda install --quiet --yes conda-build && \
+    ${CONDA_PATH}/bin/conda build purge-all && \
+    npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
     rm -rf /home/$NB_USER/.cache/yarn && \
     pip install -U --no-cache-dir pip wheel
 
-#RUN pip install --no-cache-dir jupyter-rsession-proxy
-#RUN pip install --no-cache-dir jupyterlab-git
-#RUN jupyter serverextension list
-#RUN jupyter labextension list
-#RUN jupyter labextension install @jupyterlab/git
-#RUN jupyter serverextension enable --py jupyterlab_git
 
-# install jupyterlab, papermill, git extension and renku-jupyterlab-ts
+# install jupyterlab, git extension
 RUN python3 -m pip install -U pip && \
     jupyter labextension update @jupyterlab/hub-extension --no-build && \
     jupyter labextension install @jupyterlab/git --no-build && \
