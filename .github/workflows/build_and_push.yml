@@ -16,10 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
     - name: Build the Renku Docker pull request images for testing
       #if: github.event_name == 'pull_request'
       run: |
-        echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
         docker build docker/${{ matrix.EXTENSIONS }} --tag $RENKU_DOCKER_TAG
         docker push $RENKU_DOCKER_TAG
       env:
