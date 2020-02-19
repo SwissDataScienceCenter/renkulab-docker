@@ -1,0 +1,37 @@
+name: Renku Base Docker Image CI
+
+on: [push]
+  branches:
+    - master
+  tags:
+    - **
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        RENKU_VERSION: ["", "0.8.2", "0.9.0"]
+        EXTENSIONS: ["base", "r", "r-bioconductor_3_10", "cuda-9.2", "cuda-10.0-tensorflow-1.14"]
+
+    steps:
+
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build the Renku Docker pull request images for testing
+      run: |
+        export RENKU_TAG_NAME=$(echo $GITHUB_REF | cut -d / -f 3)
+        export RENKU_DOCKER_TAG="renku/singleuser-$EXTENSION:$RENKU_TAG_NAME-renku$RENKU_VERSION"
+        docker build docker/$EXTENSION --tag $RENKU_DOCKER_TAG
+        docker push $RENKU_DOCKER_TAG
+      env:
+        EXTENSION: ${{ matrix.EXTENSIONS }}
+        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
