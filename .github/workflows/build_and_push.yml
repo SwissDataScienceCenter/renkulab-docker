@@ -28,13 +28,14 @@ jobs:
     - name: Build the Renku Docker pull request images for testing
       #if: github.event_name == 'pull_request'
       run: |
-        echo "::set-env name=RENKU_DOCKER_TAG::renku/singleuser-$EXTENSION:test-renku$RENKU_VERSION"
+        #echo "::set-env name=RENKU_DOCKER_TAG::renku/singleuser-$EXTENSION:test-renku$RENKU_VERSION"
+        export RENKU_DOCKER_TAG="renku/singleuser-$EXTENSION:${{ github.sha }}-renku$RENKU_VERSION"
         docker build docker/$EXTENSION --tag $RENKU_DOCKER_TAG
         docker push $RENKU_DOCKER_TAG
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
-        #RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:GITHUB_SHA::8-renku${{ matrix.RENKU_VERSION }}
+        #RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:$GITHUB_SHA::8-renku${{ matrix.RENKU_VERSION }}
 
     # - uses: actions/checkout@v2
     # - name: Build the Renku Docker master tagged images
