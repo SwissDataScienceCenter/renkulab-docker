@@ -1,10 +1,11 @@
 name: Renku Base Docker Image CI
 
-on: [push]
-  branches:
-    - master
-  tags:
-    - **
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - **
 jobs:
 
   build:
