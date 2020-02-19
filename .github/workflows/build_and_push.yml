@@ -30,8 +30,7 @@ jobs:
         docker build docker/${{ matrix.EXTENSIONS }} --tag $RENKU_DOCKER_TAG
         docker push $RENKU_DOCKER_TAG
       env:
-        GIT_HASH: $(git rev-parse --short "$GITHUB_SHA")
-        RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:$GIT_HASH-renku${{ matrix.RENKU_VERSION }}
+        RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:$(git rev-parse --short "$GITHUB_SHA")-renku${{ matrix.RENKU_VERSION }}
 
     # - uses: actions/checkout@v2
     # - name: Build the Renku Docker master tagged images
