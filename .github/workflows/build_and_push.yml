@@ -23,14 +23,18 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
+
     - uses: actions/checkout@v2
     - name: Build the Renku Docker pull request images for testing
       #if: github.event_name == 'pull_request'
       run: |
-        docker build docker/${{ matrix.EXTENSIONS }} --tag $RENKU_DOCKER_TAG
+        echo "::set-env name=RENKU_DOCKER_TAG::renku/singleuser-$EXTENSION:${GITHUB_SHA::8}-renku$RENKU_VERSION"
+        docker build docker/$EXTENSION --tag $RENKU_DOCKER_TAG
         docker push $RENKU_DOCKER_TAG
       env:
-        RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:$GITHUB_SHA::8-renku${{ matrix.RENKU_VERSION }}
+        EXTENSION: ${{ matrix.EXTENSIONS }}
+        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        #RENKU_DOCKER_TAG: renku/singleuser-${{ matrix.EXTENSIONS }}:GITHUB_SHA::8-renku${{ matrix.RENKU_VERSION }}
 
     # - uses: actions/checkout@v2
     # - name: Build the Renku Docker master tagged images
