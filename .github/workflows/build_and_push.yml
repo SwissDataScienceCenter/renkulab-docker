@@ -28,7 +28,7 @@ jobs:
     - name: Build the Renku Docker pull request images for testing
       #if: github.event_name == 'pull_request'
       run: |
-        echo "::set-env name=RENKU_DOCKER_TAG::renku/singleuser-$EXTENSION:${GITHUB_SHA::8}-renku$RENKU_VERSION"
+        echo "::set-env name=RENKU_DOCKER_TAG::renku/singleuser-$EXTENSION:test-renku$RENKU_VERSION"
         docker build docker/$EXTENSION --tag $RENKU_DOCKER_TAG
         docker push $RENKU_DOCKER_TAG
       env:
