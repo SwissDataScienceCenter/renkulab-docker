@@ -1,11 +1,11 @@
-name: Renku Base Docker Image CI
+name: Renku Docker Image CI - MASTER
 
 on:
   push:
     branches:
       - master
     tags:
-      - *
+      - '**'
 jobs:
 
   build:

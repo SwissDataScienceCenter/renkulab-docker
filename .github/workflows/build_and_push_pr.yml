@@ -1,4 +1,4 @@
-name: Renku Base Docker Image CI
+name: Renku Docker Image CI - PR
 
 on: [pull_request]
 
