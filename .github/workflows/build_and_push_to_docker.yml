@@ -1,6 +1,6 @@
-name: Renku Docker Image CI - PR
+name: Renku Docker Image CI
 
-on: [pull_request]
+on: [push]
 
 jobs:
 
@@ -23,12 +23,17 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
-    - name: Build the Renku Docker pull request images for testing
+    - name: Build renku project docker images
       run: |
-        export RENKU_TAG_NAME=$(echo ${{ github.sha }} | cut -c 1-7)
-        export RENKU_DOCKER_TAG="renku/singleuser-$EXTENSION:$RENKU_TAG_NAME-renku$RENKU_VERSION"
-        docker build docker/$EXTENSION --tag $RENKU_DOCKER_TAG
-        docker push $RENKU_DOCKER_TAG
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+        export DOCKER_NAME="renku/singleuser-$EXTENSION"
+        export DOCKER_TAG="$LABEL-renku$RENKU_VERSION"
+        docker build docker/$EXTENSION --tag $DOCKER_NAME:$DOCKER_TAG
+        docker push $DOCKER_NAME:$DOCKER_TAG
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
