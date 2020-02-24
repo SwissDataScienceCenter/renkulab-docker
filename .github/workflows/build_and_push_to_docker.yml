@@ -1,0 +1,41 @@
+name: Renku Docker Image CI
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        RENKU_VERSION: ["", "0.8.2", "0.9.0"]
+        EXTENSIONS: ["base", "r", "r-bioconductor_3_10", "cuda-9.2", "cuda-10.0-tensorflow-1.14"]
+
+    steps:
+
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project docker images
+      run: |
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+        export DOCKER_NAME="renku/singleuser-$EXTENSION"
+        export DOCKER_TAG="$LABEL-renku$RENKU_VERSION"
+        docker build docker/$EXTENSION --tag $DOCKER_NAME:$DOCKER_TAG
+        if [[ ${{ github.ref }} == refs/tags* ]] || [[ ${{ github.ref }} == refs/heads/master ]]; then
+          docker push $DOCKER_NAME:$DOCKER_TAG
+        fi
+      env:
+        EXTENSION: ${{ matrix.EXTENSIONS }}
+        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
