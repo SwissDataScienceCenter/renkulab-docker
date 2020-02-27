@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION: ["", "0.8.2", "0.9.0"]
+        RENKU_VERSION: ["", "0.8.2", "0.9.1"]
         EXTENSIONS: ["base", "r", "r-bioconductor_3_10", "cuda-9.2", "cuda-10.0-tensorflow-1.14"]
 
     steps:
