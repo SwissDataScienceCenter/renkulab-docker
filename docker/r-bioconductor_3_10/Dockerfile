@@ -105,10 +105,23 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
 ARG RENKU_PIP_SPEC="renku"
-RUN python3 -m pip install pipx>=0.15.0.0 && \
+RUN python3 -m pip install "pipx>=0.15.0.0" && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
+
+# configure powerline
+COPY powerline.bashrc /tmp/powerline.bashrc
+COPY powerline.config /tmp/powerline.config
+
+RUN git clone https://github.com/powerline/fonts.git /tmp/fonts && \
+    /tmp/fonts/install.sh && \
+    mkdir -p .jupyter/lab/user-settings/@jupyterlab/terminal-extension/ && \
+    echo '{"fontFamily": "Roboto Mono for Powerline"}' > .jupyter/lab/user-settings/\@jupyterlab/terminal-extension/plugin.jupyterlab-settings && \
+    cat /tmp/powerline.bashrc >> ~/.bashrc && \
+    pip install powerline-shell && \
+    mkdir -p ~/.config/powerline-shell/ && \
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
