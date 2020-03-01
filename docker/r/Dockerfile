@@ -109,11 +109,7 @@ RUN python3 -m pip install "pipx>=0.15.0.0" && \
 COPY powerline.bashrc /tmp/powerline.bashrc
 COPY powerline.config /tmp/powerline.config
 
-RUN git clone https://github.com/powerline/fonts.git /tmp/fonts && \
-    /tmp/fonts/install.sh && \
-    mkdir -p .jupyter/lab/user-settings/@jupyterlab/terminal-extension/ && \
-    echo '{"fontFamily": "Roboto Mono for Powerline"}' > .jupyter/lab/user-settings/\@jupyterlab/terminal-extension/plugin.jupyterlab-settings && \
-    cat /tmp/powerline.bashrc >> ~/.bashrc && \
+RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
     pip install powerline-shell && \
     mkdir -p ~/.config/powerline-shell/ && \
     cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
