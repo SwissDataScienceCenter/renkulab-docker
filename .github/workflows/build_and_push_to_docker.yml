@@ -12,7 +12,7 @@ jobs:
       fail-fast: true
       matrix:
         RENKU_VERSION: ["", "0.8.2", "0.9.1"]
-        EXTENSIONS: ["base", "r", "r-bioconductor_3_10", "cuda-9.2", "cuda-10.0-tensorflow-1.14"]
+        EXTENSIONS: ["py3.7", "r3.6.1", "bioc3_10", "cuda9.2", "cuda10.0-tf1.14"]
 
     steps:
 
@@ -30,8 +30,7 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        export DOCKER_NAME="renku/singleuser-$EXTENSION"
-        export DOCKER_TAG="$LABEL-renku$RENKU_VERSION"
+        export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION-$LABEL"
         docker build docker/$EXTENSION --tag $DOCKER_NAME:$DOCKER_TAG
         if [[ ${{ github.ref }} == refs/tags* ]] || [[ ${{ github.ref }} == refs/heads/master ]]; then
           docker push $DOCKER_NAME:$DOCKER_TAG
@@ -39,3 +38,4 @@ jobs:
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        DOCKER_NAME: "renku/renkulab"
