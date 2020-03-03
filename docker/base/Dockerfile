@@ -61,14 +61,24 @@ RUN conda install gxx_linux-64
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
-RUN python3 -m pip install pipx>=0.15.0.0
+RUN python3 -m pip install "pipx>=0.15.0.0"
 ARG RENKU_PIP_SPEC="renku"
 RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
 
+# configure git
 COPY git-config.bashrc /home/$NB_USER/
 RUN cat /home/$NB_USER/git-config.bashrc >> /home/$NB_USER/.bashrc && rm /home/$NB_USER/git-config.bashrc
+
+# configure powerline
+COPY powerline.bashrc /tmp/powerline.bashrc
+COPY powerline.config /tmp/powerline.config
+
+RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
+    pip install powerline-shell && \
+    mkdir -p ~/.config/powerline-shell/ && \
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
 
 # Add user `jovyan` to sudoers (passwordless)
 USER root
