@@ -71,12 +71,12 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
 # install the jupyter stack
-ARG JUPYTERHUB_VERSION=1.2
+ARG JUPYTERHUB_VERSION=1.1.0
 
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
-    'jupyterlab=1.2.1' && \
+    'jupyterlab=1.2.6' && \
     ${CONDA_PATH}/bin/conda install -c conda-forge 'nodejs>=6.11.5' && \
     ${CONDA_PATH}/bin/conda install --quiet --yes conda-build && \
     ${CONDA_PATH}/bin/conda build purge-all && \
