@@ -71,7 +71,7 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
 # install the jupyter stack
-ARG JUPYTERHUB_VERSION=0.9.6
+ARG JUPYTERHUB_VERSION=1.2
 
 RUN ${CONDA_PATH}/bin/conda install --quiet --yes \
     'notebook=6.0.0' \
