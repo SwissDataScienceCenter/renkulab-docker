@@ -17,8 +17,8 @@
 # limitations under the License.
 
 extensions = \
-	r-bioconductor_3_10 r \
-	cuda-9.2 cuda-10.0-tensorflow-1.14
+	bioc3_10 r3.6.1 \
+	cuda9.2 cuda10.0-tf1.14
 
 DOCKER_PREFIX?=renku/singleuser
 DOCKER_LABEL?=latest
@@ -37,7 +37,7 @@ endif
 all: base $(extensions)
 
 base:
-	docker build docker/base \
+	docker build docker/py3.7 \
 		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
 		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
 		-t $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) && \
