@@ -20,7 +20,7 @@ extensions = \
 	bioc3_10 r3.6.1 \
 	cuda9.2 cuda10.0-tf1.14
 
-DOCKER_PREFIX?=renku/singleuser
+DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
 JUPYTERHUB_VERSION?=0.9.6
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
