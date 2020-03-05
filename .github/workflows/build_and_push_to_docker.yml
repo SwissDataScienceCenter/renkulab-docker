@@ -42,9 +42,7 @@ jobs:
         fi
         export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION-$LABEL"
         docker build docker/$EXTENSION --tag $DOCKER_NAME:$DOCKER_TAG
-        if [[ ${{ github.ref }} == refs/tags* ]] || [[ ${{ github.ref }} == refs/heads/master ]]; then
-          docker push $DOCKER_NAME:$DOCKER_TAG
-        fi
+        docker push $DOCKER_NAME:$DOCKER_TAG
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
