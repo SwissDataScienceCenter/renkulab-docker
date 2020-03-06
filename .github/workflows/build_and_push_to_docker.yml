@@ -31,10 +31,14 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
         export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION-$LABEL"
-        docker build docker/$EXTENSION --tag $DOCKER_NAME:$DOCKER_TAG
-        if [[ ${{ github.ref }} == refs/tags* ]] || [[ ${{ github.ref }} == refs/heads/master ]]; then
-          docker push $DOCKER_NAME:$DOCKER_TAG
+
+        if [ -z $RENKU_VERSION ]; then
+          export RENKU_PIP_SPEC=renku
+        else
+          export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
         fi
+        docker build docker/$EXTENSION --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} --tag $DOCKER_NAME:$DOCKER_TAG
+        docker push $DOCKER_NAME:$DOCKER_TAG
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
