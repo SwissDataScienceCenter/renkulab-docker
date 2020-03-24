@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         RENKU_VERSION: ["", "0.9.1", "0.10.0"]
         EXTENSIONS: ["py3.7", "r3.6.1", "bioc3_10", "cuda9.2", "cuda10.0-tf1.14"]
@@ -21,7 +21,7 @@ jobs:
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-
+ 
     - uses: actions/checkout@v2
     - name: Build renku project docker images
       run: |
@@ -30,16 +30,38 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION-$LABEL"
-
         if [ -z $RENKU_VERSION ]; then
           export RENKU_PIP_SPEC=renku
         else
           export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
         fi
-        docker build docker/$EXTENSION --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} --tag $DOCKER_NAME:$DOCKER_TAG
-        docker push $DOCKER_NAME:$DOCKER_TAG
+        if [ $EXTENSION == 'r' ]; then
+          IFS=',; ' read -r -a rversion_array <<< $RVERSIONS
+          for rversion in ${rversion_array[@]}; do
+            export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION$rversion-$LABEL"
+            docker build docker/$EXTENSION \
+              --build-arg RVERSION=$rversion \
+              --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
+              --tag $DOCKER_NAME:$DOCKER_TAG
+            docker push $DOCKER_NAME:$DOCKER_TAG
+          done
+        else
+          export DOCKER_TAG="renku$RENKU_VERSION-$EXTENSION-$LABEL"
+          docker build docker/$EXTENSION \
+            --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
+            --tag $DOCKER_NAME:$DOCKER_TAG
+          docker push $DOCKER_NAME:$DOCKER_TAG
+        fi
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
-        DOCKER_NAME: "renku/renkulab"
+        RENKU_VERSION: ${{ matrix.RENKU_VERSIONS }}
+        #DOCKER_NAME: "renku/renkulab"
+        DOCKER_NAME: "auwerxlab/renkulab"
+        #RVERSIONS: >
+        #  3.3.0,3.3.1,3.3.2,3.3.3,
+        #  3.4.0,3.4.1,3.4.2,3.4.3,3.4.4,
+        #  3.5.0,3.5.1,3.5.2,3.5.3,
+        #  3.6.0,3.6.1,3.6.2
+        RVERSIONS: >
+          3.5.2,
+          3.6.1,3.6.2
