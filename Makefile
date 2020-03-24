@@ -17,8 +17,11 @@
 # limitations under the License.
 
 extensions = \
-	bioc3_10 r3.6.1 \
-	cuda9.2 cuda10.0-tf1.14
+	py3.7 \
+	bioc3_10
+	r \
+	cuda-9.2 \
+	cuda-10.0-tf-1.14
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
@@ -32,16 +35,12 @@ ifdef RENKU_VERSION
 	RENKU_TAG=-renku$(RENKU_VERSION)
 endif
 
-.PHONY: base all
+RVERSION?=3.6.1
+R_TAG=-r$(RVERSION)
 
-all: base $(extensions)
+.PHONY: all
 
-base:
-	docker build docker/py3.7 \
-		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
-		-t $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) && \
-	docker tag $(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX):$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+all: $(extensions)
 
 login:
 	@echo "${DOCKER_PASSWORD}" | docker login -u="${DOCKER_USERNAME}" --password-stdin ${DOCKER_REGISTRY}
@@ -62,6 +61,14 @@ pull:
 		fi; \
 		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
 	done
+
+r:
+	docker build docker/r \
+		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg RVERSION=$(RVERSION) \
+		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) && \
+	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(R_TAG)
 
 %:
 	cd docker/$@ && \
