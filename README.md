@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter.svg?branch=master)](https://travis-ci.com/SwissDataScienceCenter/renku-jupyter)
+[![Renku Docker Image CI](https://github.com/SwissDataScienceCenter/renkulab-docker/workflows/Renku%20Docker%20Image%20CI/badge.svg)](https://github.com/SwissDataScienceCenter/renkulab-docker/actions?query=workflow%3A%22Renku+Docker+Image+CI%22)
+
 [![pullreminders](https://pullreminders.com/badge.svg)](https://pullreminders.com?ref=badge)
 
 # Renku Jupyter images
@@ -21,14 +22,14 @@ The basic Jupyter image with minimal dependencies.
 
 Currently with python 3.7.
 
-### r3.6.1
+### r
 
 Based on the rocker docker image: https://github.com/rocker-org/binder,
 chosen because rocker keeps a more up-to-date version of R than conda.
 Includes the R Jupyter kernel as well as RStudio. To access RStudio,
 simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
-Currently with R 3.6.1.
+By default with R 3.6.1.
 
 ### bioc3_10
 
