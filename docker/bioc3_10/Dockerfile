@@ -93,7 +93,7 @@ RUN python3 -m pip install -U pip && \
     jupyter labextension update @jupyterlab/hub-extension --no-build && \
     jupyter labextension install @jupyterlab/git --no-build && \
     jupyter labextension list && \
-    pip install jupyter-rsession-proxy && \
+    pip install jupyter-rsession-proxy==1.1 && \
     pip install jupyterlab-git && \
     jupyter serverextension enable --py jupyterlab_git && \
     jupyter lab build
@@ -109,6 +109,21 @@ RUN python3 -m pip install "pipx>=0.15.0.0" && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk && \
     pipx ensurepath
+
+# configure powerline
+COPY powerline.bashrc /tmp/powerline.bashrc
+COPY powerline.config /tmp/powerline.config
+
+RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
+    pip install powerline-shell && \
+    mkdir -p ~/.config/powerline-shell/ && \
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
+
+# Add user `rstudio` to sudoers (passwordless)
+USER root
+RUN echo "$NB_USER ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers && \
+    rm -rf /wheels
+USER $NB_USER
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
