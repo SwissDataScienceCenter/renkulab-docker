@@ -118,7 +118,7 @@ COPY powerline.config /tmp/powerline.config
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
     pip install powerline-shell && \
     mkdir -p ~/.config/powerline-shell/ && \
-    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json && \
     echo "source ~/.bashrc" >> ~/.bash_profile
 
 COPY entrypoint.sh /entrypoint.sh
