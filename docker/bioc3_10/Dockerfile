@@ -107,8 +107,19 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 ARG RENKU_PIP_SPEC="renku"
 RUN python3 -m pip install "pipx>=0.15.0.0" && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
-    pipx inject renku sentry-sdk && \
-    pipx ensurepath
+    pipx inject renku sentry-sdk
+#RUN  pipx ensurepath # this doesn't seem to be adding to the path :(
+RUN echo "export PATH=$PATH:/home/$NB_USER/.local/bin" >> ~/.bashrc
+
+# configure powerline
+COPY powerline.bashrc /tmp/powerline.bashrc
+COPY powerline.config /tmp/powerline.config
+
+RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
+    pip install powerline-shell && \
+    mkdir -p ~/.config/powerline-shell/ && \
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json
+    echo "source ~/.bashrc" >> ~/.bash_profile
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
