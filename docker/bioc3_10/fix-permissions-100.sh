@@ -20,10 +20,10 @@ set -e
 for d in "$@"; do
   find "$d" \
     ! \( \
-      -group $NB_GID \
+      -group 100 \
       -a -perm -g+rwX  \
     \) \
-    -exec chgrp $NB_GID {} \; \
+    -exec chgrp 100 {} \; \
     -exec chmod g+rwX {} \;
   # setuid,setgid *on directories only*
   find "$d" \
