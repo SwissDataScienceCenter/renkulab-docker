@@ -79,7 +79,7 @@ RUN conda install --quiet --yes \
     'nodejs>=6.11.5' \
     conda-build && \
     conda build purge-all  && \
-    #conda clean --all -f -y && \
+    conda clean --all -f -y && \
     npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
@@ -88,7 +88,7 @@ RUN jupyter notebook --generate-config && \
     pip install -U --no-cache-dir pip wheel
 
 RUN pip install --no-cache-dir \
-        jupyter-rsession-proxy \
+        "jupyter-rsession-proxy==1.1" \
         jupyterlab-git && \
     jupyter labextension install @jupyterlab/git && \
     jupyter serverextension enable --py jupyterlab_git
