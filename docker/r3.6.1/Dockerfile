@@ -63,6 +63,7 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86
 # set permissions in the conda directory to be editable by NB_USER
 ADD fix-permissions.sh /usr/local/bin
 RUN fix-permissions.sh ${CONDA_PATH}
+RUN fix-permissions.sh /usr/local/lib/R
 
 USER ${NB_USER}
 
@@ -71,15 +72,15 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
 # install the jupyter stack
-ARG JUPYTERHUB_VERSION=0.9.6
+ARG JUPYTERHUB_VERSION=1.1.0
 RUN conda install --quiet --yes \
     'notebook=6.0.0' \
     "jupyterhub=${JUPYTERHUB_VERSION}" \
-    'jupyterlab=1.2.1' \
+    'jupyterlab=1.2.6' \
     'nodejs>=6.11.5' \
     conda-build && \
     conda build purge-all  && \
-    #conda clean --all -f -y && \
+    conda clean --all -f -y && \
     npm cache clean --force
 
 RUN jupyter notebook --generate-config && \
@@ -88,7 +89,7 @@ RUN jupyter notebook --generate-config && \
     pip install -U --no-cache-dir pip wheel
 
 RUN pip install --no-cache-dir \
-        jupyter-rsession-proxy \
+        "jupyter-rsession-proxy==1.1" \
         jupyterlab-git && \
     jupyter labextension install @jupyterlab/git && \
     jupyter serverextension enable --py jupyterlab_git
@@ -102,8 +103,19 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 ARG RENKU_PIP_SPEC="renku"
 RUN python3 -m pip install "pipx>=0.15.0.0" && \
     pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
-    pipx inject renku sentry-sdk && \
-    pipx ensurepath
+    pipx inject renku sentry-sdk
+#RUN  pipx ensurepath # this doesn't seem to be adding to the path :(
+RUN echo "export PATH=$PATH:/home/$NB_USER/.local/bin" >> ~/.bashrc
+
+# configure powerline
+COPY powerline.bashrc /tmp/powerline.bashrc
+COPY powerline.config /tmp/powerline.config
+
+RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
+    pip install powerline-shell && \
+    mkdir -p ~/.config/powerline-shell/ && \
+    cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json && \
+    echo "source ~/.bashrc" >> ~/.bash_profile
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
