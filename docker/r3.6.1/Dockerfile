@@ -61,8 +61,9 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86
     ${CONDA_PATH}/bin/conda clean -afy
 
 # set permissions in the conda directory to be editable by NB_USER
-ADD fix-permissions-1000.sh /usr/local/bin
-RUN fix-permissions-1000.sh ${CONDA_PATH}
+ADD fix-permissions.sh /usr/local/bin
+RUN fix-permissions.sh ${CONDA_PATH}
+RUN fix-permissions.sh /usr/local/lib/R
 
 USER ${NB_USER}
 
@@ -115,14 +116,6 @@ RUN cat /tmp/powerline.bashrc >> ~/.bashrc && \
     mkdir -p ~/.config/powerline-shell/ && \
     cat /tmp/powerline.config >> ~/.config/powerline-shell/config.json && \
     echo "source ~/.bashrc" >> ~/.bash_profile
-
-# change the permissions
-# set permissions in the conda & R directory to be editable by NB_USER
-USER root
-ADD fix-permissions-100.sh /usr/local/bin
-RUN fix-permissions-100.sh ${CONDA_PATH}
-RUN fix-permissions-100.sh /usr/local/lib/R
-USER $NB_USER
 
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]

@@ -61,7 +61,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
 
-## CUDNN 7 
+## CUDNN 7
 ## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/devel/cudnn7
 ENV CUDNN_VERSION 7.6.0.64
 
@@ -73,11 +73,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
+# Add a new group with id 1000 and arbitrary name
+# Note: this is to standardize groups between the R and jupyter images
+RUN groupadd -g 1000 jovyan
+
 USER $NB_USER
 
 ## Tensorflow GPU
 RUN /opt/conda/bin/pip install tensorflow-gpu==1.14
 
-# Tensorboard jupyter(lab) extension 
+# Tensorboard jupyter(lab) extension
 RUN jupyter labextension install jupyterlab_tensorboard && \
     pip install jupyter-tensorboard==0.1.10

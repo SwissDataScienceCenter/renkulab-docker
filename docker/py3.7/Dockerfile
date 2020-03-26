@@ -41,6 +41,10 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
+# Add a new group with id 1000 and arbitrary name
+# Note: this is to standardize groups between the R and jupyter images
+RUN groupadd -g 1000 jovyan
+
 # switch to the notebook user
 USER $NB_USER
 
