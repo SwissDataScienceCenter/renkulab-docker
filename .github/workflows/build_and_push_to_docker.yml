@@ -54,7 +54,7 @@ jobs:
         fi
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
-        RENKU_VERSION: ${{ matrix.RENKU_VERSIONS }}
+        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
         DOCKER_NAME: "renku/renkulab"
         # All R versions available for rocker/rstudio
         RVERSIONS: >
