@@ -11,7 +11,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION: ["", "0.9.1", "0.10.0"]
+        RENKU_VERSION: ["", "0.9.1", "0.10.1"]
         EXTENSIONS: ["py3.7", "r3.6.1", "bioc3_10", "cuda9.2", "cuda10.0-tf1.14"]
 
     steps:
