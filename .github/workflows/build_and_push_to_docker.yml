@@ -14,7 +14,7 @@ jobs:
         RENKU_VERSION:
           - ""
           - "0.9.1"
-          - "0.10.0"
+          - "0.10.2"
         EXTENSIONS:
           - py3.7
           - r3.6.1
