@@ -60,6 +60,10 @@ RUN mkdir /etc/julia && \
     chown $NB_USER $JULIA_PKGDIR && \
     fix-permissions $JULIA_PKGDIR
 
+# Add a new group with id 1000 and arbitrary name
+# Note: this is to standardize groups between the R and jupyter images
+RUN groupadd -g 1000 jovyan
+
 # switch to the notebook user
 USER $NB_USER
 
