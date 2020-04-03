@@ -22,7 +22,7 @@ extensions = \
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
-JUPYTERHUB_VERSION?=0.9.6
+JUPYTERHUB_VERSION?=1.2
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for the empty version case:
