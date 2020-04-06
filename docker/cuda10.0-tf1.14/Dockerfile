@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/singleuser:latest
+ARG BASE_IMAGE=renku/renkulab:renku0.10.2-py3.7-0.6.1
 FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -72,10 +72,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/*
 
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
-
-# Add a new group with id 1000 and arbitrary name
-# Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 jovyan
 
 USER $NB_USER
 
