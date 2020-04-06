@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/singleuser:latest
+ARG BASE_IMAGE=renku/renkulab:renku0.10.2-py3.7-0.6.1
 FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -31,10 +31,6 @@ RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf && \
 
 ENV PATH /usr/local/nvidia/bin:/usr/local/cuda/bin:${PATH}
 ENV LD_LIBRARY_PATH /usr/local/nvidia/lib:/usr/local/nvidia/lib64
-
-# Add a new group with id 1000 and arbitrary name
-# Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 jovyan
 
 # nvidia-container-runtime
 ENV NVIDIA_VISIBLE_DEVICES all

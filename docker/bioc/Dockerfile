@@ -1,4 +1,4 @@
-ARG RELEASE=RELEASE_3_10
+ARG RELEASE=devel
 FROM bioconductor/bioconductor_docker:${RELEASE}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 

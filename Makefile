@@ -18,7 +18,7 @@
 
 extensions = \
 	py3.7 \
-	bioc3_10
+	bioc \
 	r \
 	cuda-9.2 \
 	cuda-10.0-tf-1.14
@@ -35,8 +35,10 @@ ifdef RENKU_VERSION
 	RENKU_TAG=-renku$(RENKU_VERSION)
 endif
 
-RVERSION?=3.6.1
+RVERSION?=3.6.3
+BIOC_VERSION?=devel
 R_TAG=-r$(RVERSION)
+BIOC_TAG=-bioc$(BIOC_VERSION)
 
 .PHONY: all
 
@@ -69,6 +71,15 @@ r:
 		--build-arg RVERSION=$(RVERSION) \
 		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) && \
 	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(R_TAG)
+
+bioc:
+	docker build docker/bioc \
+		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
+		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg RELEASE=$(BIOC_VERSION) \
+		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) && \
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(BIOC_TAG)
+
 
 %:
 	cd docker/$@ && \

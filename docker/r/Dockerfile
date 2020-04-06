@@ -1,4 +1,4 @@
-ARG RVERSION=3.6.1
+ARG RVERSION=3.6.3
 FROM rocker/rstudio:${RVERSION}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
