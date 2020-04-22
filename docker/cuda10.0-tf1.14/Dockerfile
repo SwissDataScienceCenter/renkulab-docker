@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/renkulab:renku0.10.2-py3.7-0.6.1
+ARG BASE_IMAGE=renku/renkulab:renku0.10.3-py3.7-0.6.2
 FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"

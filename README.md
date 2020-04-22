@@ -31,17 +31,17 @@ conventions to help you know which image to choose for your renku project:
 `renku/renkulab:renku[renku-python version]-[image flavor][image flavor version]-[tag|hash]`
 
 For example:
-`renku/renkulab:renku0.10.2-py3.7-1.6.1`
+`renku/renkulab:renku0.10.3-py3.7-0.6.2`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on Renkulab.
-* `renku[renku version]` (e.g. `renku0.10.2`): indicates the version of the
+* `renku[renku version]` (e.g. `renku0.10.3`): indicates the version of the
   renku CLI installed in the image. Note: if no version is present, it's the latest
   available development version.
 * `[image flavor][image flavor version]` (e.g. `r3.6.3`): image flavor refers either
   to the programming language installed in the environment, or the base image that
   extra dependencies are added to. See below for details about the available flavors.
-* `[tag|hash]` (e.g. `1.6.1`): the tag is a value given to a commit of the repository
+* `[tag|hash]` (e.g. `0.6.2`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
