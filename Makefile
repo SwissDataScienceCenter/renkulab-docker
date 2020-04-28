@@ -25,7 +25,7 @@ extensions = \
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
-JUPYTERHUB_VERSION?=1.2
+JUPYTERHUB_VERSION?=1.1.0
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for the empty version case:
@@ -85,6 +85,5 @@ bioc:
 	cd docker/$@ && \
 	docker build \
 		--build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
-		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)

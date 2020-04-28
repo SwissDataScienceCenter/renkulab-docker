@@ -1,5 +1,5 @@
 ARG RVERSION=3.6.3
-FROM rocker/rstudio:${RVERSION}
+FROM rocker/verse:${RVERSION}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
@@ -27,32 +27,34 @@ ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
-# install miniconda (https://github.com/ContinuumIO/docker-images/blob/master/miniconda3/debian/Dockerfile)
+# install dependencies
 RUN apt-get update --fix-missing && \
     apt-get install -yq --no-install-recommends \
-        bzip2 \
-        ca-certificates \
-        curl \
-        gnupg \
-        libglib2.0-0 \
-        libsm6 \
-        libxext6 \
-        libxrender1 \
-        wget \
-        vim && \
+    bzip2 \
+    ca-certificates \
+    curl && \
+    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+    apt-get update --fix-missing && \
+    apt-get install -yq --no-install-recommends \
+    git-lfs \
+    gnupg \
+    nodejs \
+    libglib2.0-0 \
+    libsm6 \
+    libxext6 \
+    libxrender1 \
+    wget \
+    vim && \
     apt-get purge && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# install git-lfs
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash && \
-    apt-get install git-lfs
-
+# install conda
 WORKDIR /tmp
-RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86_64.sh -O ~/miniconda.sh && \
+RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-py37_4.8.2-Linux-x86_64.sh -O ~/miniconda.sh && \
     /bin/bash ~/miniconda.sh -b -p ${CONDA_PATH} && \
     rm ~/miniconda.sh && \
-    ${CONDA_PATH}/bin/conda clean -tipsy && \
     ln -s ${CONDA_PATH}/etc/profile.d/conda.sh /etc/profile.d/conda.sh && \
     ${CONDA_PATH}/bin/conda config --system --append channels conda-forge && \
     ${CONDA_PATH}/bin/conda config --system --set auto_update_conda false && \
@@ -62,8 +64,8 @@ RUN wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-4.6.14-Linux-x86
 
 # set permissions in the conda directory to be editable by NB_USER
 ADD fix-permissions.sh /usr/local/bin
-RUN fix-permissions.sh ${CONDA_PATH}
-RUN fix-permissions.sh /usr/local/lib/R
+RUN fix-permissions.sh ${CONDA_PATH} && \
+    fix-permissions.sh /usr/local/lib/R
 
 USER ${NB_USER}
 
@@ -72,27 +74,23 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
 # install the jupyter stack
-ARG JUPYTERHUB_VERSION=1.1.0
-RUN conda install --quiet --yes \
-    'notebook=6.0.0' \
-    "jupyterhub=${JUPYTERHUB_VERSION}" \
-    'jupyterlab=1.2.6' \
-    'nodejs>=6.11.5' \
+COPY requirements.txt /tmp/requirements.txt
+RUN python3 -m pip install -U --no-cache-dir pip wheel && \
+    python3 -m pip install --quiet --no-cache-dir -r /tmp/requirements.txt && \
+    conda install --quiet --yes \
+    'jupyterlab=2.0.1' \
     conda-build && \
     conda build purge-all  && \
-    conda clean --all -f -y && \
-    npm cache clean --force
-
-RUN jupyter notebook --generate-config && \
+    jupyter labextension update @jupyterlab/hub-extension --no-build && \
+    jupyter labextension install --no-build @jupyterlab/toc \
+                                            jupyterlab-topbar-extension \
+                                            jupyterlab-system-monitor && \
+    jupyter lab build && \
+    npm cache clean --force && \
+    jupyter labextension list && \
+    jupyter notebook --generate-config && \
     rm -rf ${CONDA_PATH}/share/jupyter/lab/staging && \
-    rm -rf /home/$NB_USER/.cache/yarn && \
-    pip install -U --no-cache-dir pip wheel
-
-RUN pip install --no-cache-dir \
-        "jupyter-rsession-proxy==1.1" \
-        jupyterlab-git && \
-    jupyter labextension install @jupyterlab/git && \
-    jupyter serverextension enable --py jupyterlab_git
+    rm -rf /home/$NB_USER/.cache/yarn
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
@@ -101,8 +99,7 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 # install renku
 # the RENKU_PIP_SPEC should be e.g. "renku==0.5.2"
 ARG RENKU_PIP_SPEC="renku"
-RUN python3 -m pip install "pipx>=0.15.0.0" && \
-    pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
+RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre" && \
     pipx inject renku sentry-sdk
 #RUN  pipx ensurepath # this doesn't seem to be adding to the path :(
 RUN echo "export PATH=$PATH:/home/$NB_USER/.local/bin" >> ~/.bashrc

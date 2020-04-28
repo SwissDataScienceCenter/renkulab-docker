@@ -2,6 +2,6 @@ papermill<1.2.0
 requests>=2.20.0
 jupyterhub==1.1.0
 nbresuse==0.3.3
-jupyterlab-git==0.20.0rc0
 pipx>=0.15.0.0
-powerline-shell
+jupyter-rsession-proxy==1.1
+jupyterlab-git==0.20.0rc0
