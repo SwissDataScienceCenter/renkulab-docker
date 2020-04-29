@@ -51,7 +51,7 @@ USER $NB_USER
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install -U pip && \
-    pip install -r /tmp/requirements.txt && \
+    pip install --no-cache -r /tmp/requirements.txt && \
     jupyter labextension update @jupyterlab/hub-extension --no-build && \
     jupyter labextension install @jupyterlab/git --no-build && \
     jupyter labextension install @jupyterlab/toc --no-build && \
@@ -59,7 +59,9 @@ RUN python3 -m pip install -U pip && \
     jupyter labextension list && \
     pip install jupyterlab-git && \
     jupyter serverextension enable --py jupyterlab_git && \
-    jupyter lab build
+    jupyter lab build && \
+    npm cache clean --force && \
+    rm -rf /home/${NB_USER}/.cache
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
 RUN conda install gxx_linux-64

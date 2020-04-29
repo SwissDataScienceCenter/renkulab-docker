@@ -91,7 +91,7 @@ jobs:
         DOCKER_NAME: "renku/renkulab"
 
   build-r:
-
+    needs: build-py
     runs-on: ubuntu-latest
 
     strategy:
@@ -133,6 +133,7 @@ jobs:
         docker build docker/$EXTENSION \
           --build-arg VERSION=$RVERSION \
           --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
+          --build-arg RENKU_BASE="$DOCKER_NAME:renku$RENKU_VERSION-py3.7-$LABEL"
           --tag $DOCKER_NAME:$DOCKER_TAG
         docker push $DOCKER_NAME:$DOCKER_TAG
 
