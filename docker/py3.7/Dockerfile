@@ -42,8 +42,8 @@ USER $NB_USER
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache -U pip && \
     python3 -m pip install --no-cache -r /tmp/requirements.txt && \
-    jupyter labextension install @jupyterlab/toc --no-build && \
-    jupyter labextension install jupyterlab-topbar-extension jupyterlab-system-monitor && \
+    jupyter labextension install --no-build @jupyterlab/toc && \
+    jupyter labextension install --no-build jupyterlab-topbar-extension jupyterlab-system-monitor && \
     jupyter lab build && \
     jupyter labextension list && \
     npm cache clean --force && \
@@ -59,7 +59,7 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 ARG RENKU_PIP_SPEC="renku"
 RUN pipx install ${RENKU_PIP_SPEC} --pip-args="--pre --no-cache" && \
     pipx inject --pip-args="--no-cache" renku sentry-sdk && \
-    sh -c "pipx ensurepath"
+    echo "export PATH=\"$PATH:/home/${NB_USER}/.local/bin\"" >> /home/${NB_USER}/.bashrc
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
