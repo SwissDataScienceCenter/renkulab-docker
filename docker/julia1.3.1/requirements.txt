@@ -1,4 +1,0 @@
-papermill<1.2.0
-requests>=2.20.0
-jupyterlab==1.2.6
-jupyterhub==1.1.0
