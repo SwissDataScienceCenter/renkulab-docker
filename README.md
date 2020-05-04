@@ -92,6 +92,38 @@ Currently with julia 1.3.1.
 Build with Docker by running `docker build -t <name:tag> .` in the directory
 of the image you would like to build.
 
+## Adding renku to your own images
+
+If you already have a docker image with complicated dependencies that are needed
+for your work, you can get this up and running on renkulab by using one of our
+docker images in your build. We have two images that can be used in this way -
+one that is completely generic, and the other that is specific to rocker-based
+images.
+
+Assuming you are in the directory with the Dockerfile you would like to use, you
+can build the renkulab dependencies into it like this:
+
+```
+docker build -t <image-tag> \
+  --build-arg BASE_IMAGE=<base-image> \
+  https://github.com/SwissDataScienceCenter/renkulab-docker.git#docker/generic
+```
+
+where `image-tag` is some image name/tag you want to use and `base-image` is
+your existing image.
+
+If your own image is based on the rocker R distribution, you can do
+
+```
+docker build -t <image-tag> \
+  --build-arg BASE_IMAGE=<base-image> \
+  https://github.com/SwissDataScienceCenter/renkulab-docker.git#docker/r
+```
+
+
+
+
+
 ## Contributing
 
 If you have any suggestions for different languages or base images you would like

@@ -126,7 +126,6 @@ jobs:
 
         export DOCKER_TAG="$RVERSION-renku$RENKU_VERSION-$LABEL"
         docker build docker/r \
-          --build-arg VERSION=$RVERSION \
           --build-arg RENKU_BASE="$DOCKER_NAME-py3.7:renku$RENKU_VERSION-$LABEL" \
           --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
