@@ -22,5 +22,10 @@ git clone --depth 1 ${proto}${user}@${url}/${JUPYTERHUB_USER}/renku-env.git /tmp
 # append the contents of all the files to same files in ${HOME}
 find /tmp/renku-env -not -path '*.git*' -type f -print0 | xargs --null -I{} sh -c 'cat {} >> ${HOME}/$(basename "{}")' || true
 
+if [[ -v CI_PROJECT ]];
+then
+    ln -sf /work/${CI_PROJECT} ~/work
+fi
+
 # run the command
 $@

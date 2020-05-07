@@ -17,7 +17,6 @@
 # limitations under the License.
 
 extensions = \
-	py3.7 \
 	bioc \
 	r \
 	cuda-9.2 \
@@ -25,7 +24,6 @@ extensions = \
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
-JUPYTERHUB_VERSION?=1.2
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for the empty version case:
@@ -64,27 +62,26 @@ pull:
 		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
 	done
 
-r:
+r: py3.7
 	docker build docker/r \
 		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg RENKU_BASE=renku/renkulab-py3.7:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
 		--build-arg RVERSION=$(RVERSION) \
 		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) && \
 	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(R_TAG)
 
-bioc:
+bioc: py3.7
 	docker build docker/bioc \
 		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
-		--build-arg JUPYTERHUB_VERSION=$(JUPYTERHUB_VERSION) \
+		--build-arg RENKU_BASE=renku/renkulab-py3.7:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
 		--build-arg RELEASE=$(BIOC_VERSION) \
 		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) && \
 	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(BIOC_TAG)
 
 
-%:
+py3.7:
 	cd docker/$@ && \
 	docker build \
 		--build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
-		--build-arg BASE_IMAGE=$(DOCKER_PREFIX):$(DOCKER_LABEL)$(RENKU_TAG) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
