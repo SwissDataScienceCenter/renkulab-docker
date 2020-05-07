@@ -25,23 +25,24 @@ not available via the renku project templates, follow these steps:
 
 ## Naming Conventions
 
-Images in https://hub.docker.com/r/renku/renkulab/tags follow the following naming
-conventions to help you know which image to choose for your renku project:
+Images exist in on https://hub.docker.com in `renku/renkulab-*` repos, where `*` represents the 
+"flavor" (programming language or based image). Read the following naming conventions below to 
+select the image that's right for you:
 
-`renku/renkulab:renku[renku-python version]-[image flavor][image flavor version]-[tag|hash]`
+`renku/renkulab-[image flavor]:[image flavor version]-renku[renku-python version]-[tag|hash]`
 
 For example:
-`renku/renkulab:renku0.10.3-py3.7-0.6.2`
+`renku/renkulab-py:3.7-renku0.10.3-0.6.2`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on Renkulab.
-* `renku[renku version]` (e.g. `renku0.10.3`): indicates the version of the
-  renku CLI installed in the image. Note: if no version is present, it's the latest
-  available development version.
-* `[image flavor][image flavor version]` (e.g. `r3.6.3`): image flavor refers either
-  to the programming language installed in the environment, or the base image that
-  extra dependencies are added to. See below for details about the available flavors.
-* `[tag|hash]` (e.g. `0.6.2`): the tag is a value given to a commit of the repository
+* `-py`: indicates this is a python image flavor; either the programming language 
+  installed in the environment, or the base image that extra dependencies are added to.
+  See below for details about the available flavors.
+* `3.7`: indicates the version of python is 3.7
+* `renku0.10.3`: indicates the version of the renku CLI installed in the image.
+  Note: if no version is present, it's the latest available development version.
+* `0.6.2` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
@@ -52,7 +53,7 @@ For example:
 
 **Available via renku project templates**
 
-The basic Jupyter image with minimal dependencies. Based on https://hub.docker.com/r/jupyterhub/singleuser.
+The basic Jupyter image with minimal dependencies. Based on https://hub.docker.com/r/jupyter/base-notebook/.
 
 Currently with python 3.7.
 
@@ -60,8 +61,9 @@ Currently with python 3.7.
 
 **Available via renku project templates**
 
-Based on the rocker docker image: https://github.com/rocker-org/binder,
-chosen because rocker keeps a more up-to-date version of R than conda.
+Based on the rocker "verse" image: https://hub.docker.com/r/rocker/verse,
+chosen because rocker keeps a more up-to-date version of R than conda,
+and includes most of the software dependencies that R users use.
 Includes the R Jupyter kernel as well as RStudio. To access RStudio,
 simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
@@ -83,7 +85,7 @@ Based on the py3.7 with CUDA 10.0 and Tensorflow 1.14 installed.
 
 ### julia1.3.1
 
-The basic Jupyter image with Julia installed. Based on https://hub.docker.com/r/jupyterhub/singleuser.
+Based on the py3.7 image with julia installed.
 
 Currently with julia 1.3.1.
 
