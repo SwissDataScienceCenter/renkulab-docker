@@ -51,6 +51,8 @@ RUN python3 -m pip install --no-cache -U pip && \
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
 RUN conda install gxx_linux-64 && \
+    # jupyter sets channel priority to strict which often causes very long error messages
+    conda config --system --set channel_priority flexible && \
     conda clean --all -f -y
 
 # install renku-python

@@ -3,7 +3,7 @@ ARG RENKU_BASE=renku/renkulab-py3.7:latest
 ARG BASE_IMAGE=rocker/verse:3.6.3
 
 # define base images
-FROM ${RENKU_BASE} as renku_base
+FROM $RENKU_BASE as renku_base
 FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -41,7 +41,7 @@ RUN apt-get update --fix-missing && \
     curl \
     gpg-agent && \
     curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
+    apt-get update && \
     apt-get install -yq --no-install-recommends \
     git-lfs \
     gnupg \
