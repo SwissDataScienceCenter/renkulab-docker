@@ -13,7 +13,9 @@ contain a version of the [renku cli](https://github.com/SwissDataScienceCenter/r
 The basic python (py3.7) and basic R (r) images are available via
 [renku project templates](https://github.com/SwissDataScienceCenter/renku-project-template)
 that you select upon renku project creation on the renkulab platform, or locally
-via `renku init`. If you would like to use an image built from this repo that is
+via `renku init`.
+
+If you would like to use an image built from this repo that is
 not available via the renku project templates, follow these steps:
 
 * create your project with the minimal template that matches the programming
@@ -23,10 +25,14 @@ not available via the renku project templates, follow these steps:
   the images built from this repo. See "Naming Conventions" for how to choose
   which image to use
 
+If you would like to add the ability to launch RenkuLab interactive environments
+to your own pre-existing images, see the **Adding renku to your own images** section
+below.
+
 ## Naming Conventions
 
-Images exist in on https://hub.docker.com in `renku/renkulab-*` repos, where `*` represents the 
-"flavor" (programming language or based image). Read the following naming conventions below to 
+Images exist in on https://hub.docker.com in `renku/renkulab-*` repos, where `*` represents the
+"flavor" (programming language or based image). Read the following naming conventions below to
 select the image that's right for you:
 
 `renku/renkulab-[image flavor]:[image flavor version]-renku[renku-python version]-[tag|hash]`
@@ -36,7 +42,7 @@ For example:
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on Renkulab.
-* `-py`: indicates this is a python image flavor; either the programming language 
+* `-py`: indicates this is a python image flavor; either the programming language
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
 * `3.7`: indicates the version of python is 3.7
@@ -55,6 +61,8 @@ For example:
 
 The basic Jupyter image with minimal dependencies. Based on https://hub.docker.com/r/jupyter/base-notebook/.
 
+dockerhub: https://hub.docker.com/r/renku/renkulab-py/tags
+
 Currently with python 3.7.
 
 ### r
@@ -67,25 +75,35 @@ and includes most of the software dependencies that R users use.
 Includes the R Jupyter kernel as well as RStudio. To access RStudio,
 simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
-Several versions of R are available, including the latest 3.6.3.
+dockerhub: https://hub.docker.com/r/renku/renkulab-r/tags
+
+Several versions of R are available, including the latest, 4.0.
 
 ### bioc
 
 Based on the bioconductor docker image: https://github.com/Bioconductor/bioconductor_docker.
 
-Currently with bioconductor 3_10 & devel.
+dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
+
+Currently with bioconductor 3_11, 3_10 & devel.
 
 ### cuda9.2
 
 Based on the py3.7 image with CUDA 9.2 installed.
 
+dockerhub: https://hub.docker.com/r/renku/renkulab-cuda9.2/tags
+
 ### cuda10.0-tf1.14
 
 Based on the py3.7 with CUDA 10.0 and Tensorflow 1.14 installed.
 
+dockerhub: https://hub.docker.com/r/renku/renkulab-cuda10.0-tf1.14/tags
+
 ### julia1.3.1
 
 Based on the py3.7 image with julia installed.
+
+dockerhub: https://hub.docker.com/r/renku/renkulab-julia1.3.1/tags
 
 Currently with julia 1.3.1.
 
