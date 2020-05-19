@@ -1,5 +1,5 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py3.7:latest
+ARG RENKU_BASE=renku/renkulab-py:latest
 ARG BASE_IMAGE=python:slim-buster
 ARG NB_USER=jovyan
 

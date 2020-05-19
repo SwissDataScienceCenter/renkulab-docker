@@ -1,6 +1,6 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py3.7:latest
-ARG BASE_IMAGE=rocker/verse:3.6.3
+ARG RENKU_BASE=renku/renkulab-py:latest
+ARG BASE_IMAGE=rocker/verse:4.0.0-ubuntu18.04
 
 # define base images
 FROM $RENKU_BASE as renku_base
