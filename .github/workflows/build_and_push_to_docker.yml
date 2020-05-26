@@ -14,7 +14,7 @@ jobs:
         RENKU_VERSION:
           - ""
           - "0.9.1"
-          - "0.10.3"
+          - "0.10.4"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -55,7 +55,7 @@ jobs:
         RENKU_VERSION:
           - ""
           - "0.9.1"
-          - "0.10.3"
+          - "0.10.4"
         EXTENSIONS:
           - cuda9.2
           - cuda10.0-tf1.14
@@ -97,7 +97,7 @@ jobs:
         RENKU_VERSION:
           - ""
           - "0.9.1"
-          - "0.10.3"
+          - "0.10.4"
         RVERSIONS:
           - 3.5.2
           - 3.6.0
@@ -144,7 +144,7 @@ jobs:
       fail-fast: true
       matrix:
         RENKU_VERSION:
-          - "0.10.3"
+          - "0.10.4"
         RVERSIONS:
           - 3.6.3
           - 4.0.0
@@ -192,7 +192,7 @@ jobs:
         RENKU_VERSION:
           - ""
           - "0.9.1"
-          - "0.10.3"
+          - "0.10.4"
         RELEASES:
           - devel
           - RELEASE_3_10

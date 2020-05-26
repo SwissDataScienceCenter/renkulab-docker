@@ -10,7 +10,7 @@ contain a version of the [renku cli](https://github.com/SwissDataScienceCenter/r
 
 ## Usage
 
-The basic python (py3.7) and basic R (r) images are available via
+The basic python (renkulab-py) and basic R (renkulab-r) images are available via
 [renku project templates](https://github.com/SwissDataScienceCenter/renku-project-template)
 that you select upon renku project creation on the renkulab platform, or locally
 via `renku init`.
@@ -38,7 +38,7 @@ select the image that's right for you:
 `renku/renkulab-[image flavor]:[image flavor version]-renku[renku-python version]-[tag|hash]`
 
 For example:
-`renku/renkulab-py:3.7-renku0.10.3-0.6.2`
+`renku/renkulab-py:3.7-renku0.10.4-0.6.3`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on Renkulab.
@@ -46,9 +46,9 @@ For example:
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
 * `3.7`: indicates the version of python is 3.7
-* `renku0.10.3`: indicates the version of the renku CLI installed in the image.
+* `renku0.10.4`: indicates the version of the renku CLI installed in the image.
   Note: if no version is present, it's the latest available development version.
-* `0.6.2` (or `d572e9a`): the tag is a value given to a commit of the repository
+* `0.6.3` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
@@ -77,7 +77,7 @@ simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-r/tags
 
-Several versions of R are available, including the latest, 4.0.
+Several versions of R are available, including the latest, 4.0.0.
 
 ### bioc
 
