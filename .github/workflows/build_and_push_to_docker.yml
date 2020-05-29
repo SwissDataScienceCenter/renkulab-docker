@@ -10,11 +10,6 @@ jobs:
 
     strategy:
       fail-fast: true
-      matrix:
-        RENKU_VERSION:
-          - ""
-          - "0.9.1"
-          - "0.10.4"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -36,13 +31,12 @@ jobs:
           export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
         fi
 
-        export DOCKER_TAG="renku$RENKU_VERSION-$LABEL"
         docker build docker/py \
           --build-arg RENKU_PIP_SPEC=${RENKU_PIP_SPEC} \
-          --tag $DOCKER_NAME-py:3.7-$DOCKER_TAG
-        docker push $DOCKER_NAME-py:3.7-$DOCKER_TAG
+          --tag $DOCKER_NAME-py:3.7-$LABEL
+        docker push $DOCKER_NAME-py:3.7-$LABEL
       env:
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        RENKU_VERSION: "0.10.4"
         DOCKER_NAME: "renku/renkulab"
 
   build-py-ext:
@@ -52,10 +46,6 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION:
-          - ""
-          - "0.9.1"
-          - "0.10.4"
         EXTENSIONS:
           - cuda9.2
           - cuda10.0-tf1.14
@@ -77,14 +67,13 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="renku$RENKU_VERSION-$LABEL"
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.7-$DOCKER_TAG" \
-          --tag $DOCKER_NAME-$EXTENSION:$DOCKER_TAG
-        docker push $DOCKER_NAME-$EXTENSION:$DOCKER_TAG
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --tag $DOCKER_NAME-$EXTENSION:$LABEL
+        docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        RENKU_VERSION: "0.10.4"
         DOCKER_NAME: "renku/renkulab"
 
   build-r:
@@ -94,10 +83,6 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION:
-          - ""
-          - "0.9.1"
-          - "0.10.4"
         RVERSIONS:
           - 3.5.2
           - 3.6.0
@@ -117,21 +102,16 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        if [ -z $RENKU_VERSION ]; then
-          export RENKU_PIP_SPEC=renku
-        else
-          export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
-        fi
 
-        export DOCKER_TAG="$RVERSION-renku$RENKU_VERSION-$LABEL"
+        export DOCKER_TAG="$RVERSION-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-renku$RENKU_VERSION-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
           --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
       env:
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        RENKU_VERSION: "0.10.4"
         DOCKER_NAME: "renku/renkulab"
         # selected R versions available for rocker/rstudio
         RVERSION: ${{ matrix.RVERSIONS }}
@@ -143,8 +123,6 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION:
-          - "0.10.4"
         RVERSIONS:
           - 3.6.3
           - 4.0.0
@@ -163,21 +141,16 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        if [ -z $RENKU_VERSION ]; then
-          export RENKU_PIP_SPEC=renku
-        else
-          export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
-        fi
 
-        export DOCKER_TAG="$RVERSION-renku$RENKU_VERSION-$LABEL"
+        export DOCKER_TAG="$RVERSION-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-renku$RENKU_VERSION-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
           --build-arg BASE_IMAGE="rocker/verse:${RVERSION}-ubuntu18.04" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
       env:
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        RENKU_VERSION: "0.10.4"
         DOCKER_NAME: "renku/renkulab"
         # selected R versions available for rocker/rstudio
         RVERSION: ${{ matrix.RVERSIONS }}
@@ -189,10 +162,6 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RENKU_VERSION:
-          - ""
-          - "0.9.1"
-          - "0.10.4"
         RELEASES:
           - devel
           - RELEASE_3_10
@@ -212,20 +181,15 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        if [ -z $RENKU_VERSION ]; then
-          export RENKU_PIP_SPEC=renku
-        else
-          export RENKU_PIP_SPEC="renku==${RENKU_VERSION}"
-        fi
 
-        export DOCKER_TAG="$RELEASE-renku$RENKU_VERSION-$LABEL"
+        export DOCKER_TAG="$RELEASE-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-renku$RENKU_VERSION-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
           --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${RELEASE} \
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
 
       env:
-        RENKU_VERSION: ${{ matrix.RENKU_VERSION }}
+        RENKU_VERSION: "0.10.4"
         DOCKER_NAME: "renku/renkulab"
         RELEASE: ${{ matrix.RELEASES }}
