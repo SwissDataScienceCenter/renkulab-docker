@@ -31,14 +31,16 @@ below.
 
 ## Naming Conventions
 
-Images exist in on https://hub.docker.com in `renku/renkulab-*` repos, where `*` represents the
-"flavor" (programming language or based image). Read the following naming conventions below to
-select the image that's right for you:
+You can find these base images on
+[DockerHub](https://hub.docker.com/search?q=renku%2Frenkulab-&type=image) in
+`renku/renkulab-*` repositories, where `*` represents the "flavor" (programming
+language or base image). Read the following naming conventions below to select
+the image that's right for you:
 
-`renku/renkulab-[image flavor]:[image flavor version]-renku[renku-python version]-[tag|hash]`
+`renku/renkulab-[image flavor]:[image flavor version]-[tag|hash]`
 
 For example:
-`renku/renkulab-py:3.7-renku0.10.4-0.6.3`
+`renku/renkulab-py:3.7-0.6.4`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on Renkulab.
@@ -46,12 +48,18 @@ For example:
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
 * `3.7`: indicates the version of python is 3.7
-* `renku0.10.4`: indicates the version of the renku CLI installed in the image.
-  Note: if no version is present, it's the latest available development version.
-* `0.6.3` (or `d572e9a`): the tag is a value given to a commit of the repository
+* `0.6.4` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
+
+Note that the latest version of the `renku` CLI is always installed in the base images.
+This can easily be overriden by installing another version with `pipx` in the container
+or any Dockerfile that uses these images, e.g.
+
+```bash
+pipx install --force renku==<version>
+```
 
 ## Current images
 
