@@ -20,7 +20,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     libsm6 \
     libxext-dev \
     libxrender1 \
-    libyaml \
+    libyaml-0-2 \
     libyaml-dev \
     lmodern \
     musl-dev \
