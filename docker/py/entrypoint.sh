@@ -27,5 +27,8 @@ then
     ln -sf /work/${CI_PROJECT} ~/work
 fi
 
+# install git hooks
+renku githooks install
+
 # run the command
 $@
