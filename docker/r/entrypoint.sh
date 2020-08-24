@@ -38,7 +38,7 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 EOM
 fi
-mkdir -p /home/rstudio/.rstudio/projects_settings 
+mkdir -p /home/rstudio/.rstudio/projects_settings
 echo /home/rstudio/${CI_PROJECT}/${CI_PROJECT}.Rproj | tee /home/rstudio/.rstudio/projects_settings/next-session-project
 chown -R rstudio:root /home/rstudio/.rstudio/projects_settings
 
@@ -55,6 +55,9 @@ git clone --depth 1 ${proto}${user}@${url}/${JUPYTERHUB_USER}/renku-env.git /tmp
 
 # append the contents of all the files to same files in ${HOME}
 find /tmp/renku-env -not -path '*.git*' -type f -print0 | xargs --null -I{} sh -c 'cat {} >> ${HOME}/$(basename "{}")' || true
+
+# install git hooks
+~/.local/bin/renku githooks install || true
 
 # run the command
 $@
