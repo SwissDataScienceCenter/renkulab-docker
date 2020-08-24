@@ -28,7 +28,7 @@ then
 fi
 
 # install git hooks
-renku githooks install
+~/.local/bin/renku githooks install || true
 
 # run the command
 $@
