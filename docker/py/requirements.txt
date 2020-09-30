@@ -4,4 +4,4 @@ jupyterhub==1.1.0
 nbresuse==0.3.6
 jupyterlab-git==0.20.0
 pipx>=0.15.0.0
-powerline-shell
+powerline-shell==0.7.0
