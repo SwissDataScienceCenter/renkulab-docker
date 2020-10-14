@@ -8,8 +8,6 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: true
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -67,45 +65,6 @@ jobs:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
 
-  build-r:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        RVERSIONS:
-          - 3.5.2
-          - 3.6.0
-          - 3.6.1
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project rocker docker images
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        export DOCKER_TAG="$RVERSION-$LABEL"
-        docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
-          --tag $DOCKER_NAME-r:$DOCKER_TAG
-        docker push $DOCKER_NAME-r:$DOCKER_TAG
-
-      env:
-        DOCKER_NAME: "renku/renkulab"
-        # selected R versions available for rocker/rstudio
-        RVERSION: ${{ matrix.RVERSIONS }}
-
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
@@ -114,7 +73,6 @@ jobs:
       fail-fast: true
       matrix:
         RVERSIONS:
-          - 3.6.3
           - 4.0.0
     steps:
     - name: Docker Login
