@@ -28,6 +28,10 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 # without this being explicitly set
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
+# pin the version of RStudio
+ENV RSTUDIO_VERSION 1.2.5042
+RUN /rocker_scripts/install_rstudio.sh
+
 # Add Tini
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
