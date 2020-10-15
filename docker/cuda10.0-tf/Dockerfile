@@ -18,8 +18,8 @@ ENV CUDA_PKG_VERSION 10-0=$CUDA_VERSION-1
 
 # For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-cudart-$CUDA_PKG_VERSION \
-        cuda-compat-10-0 && \
+    cuda-cudart-$CUDA_PKG_VERSION \
+    cuda-compat-10-0 && \
     ln -s cuda-10.0 /usr/local/cuda && \
     rm -rf /var/lib/apt/lists/*
 
@@ -41,9 +41,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 ## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/runtime
 ENV NCCL_VERSION 2.4.2
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-libraries-$CUDA_PKG_VERSION \
-        cuda-nvtx-$CUDA_PKG_VERSION \
-        libnccl2=$NCCL_VERSION-1+cuda10.0 && \
+    cuda-libraries-$CUDA_PKG_VERSION \
+    cuda-nvtx-$CUDA_PKG_VERSION \
+    libnccl2=$NCCL_VERSION-1+cuda10.0 && \
     apt-mark hold libnccl2 && \
     rm -rf /var/lib/apt/lists/*
 
@@ -51,11 +51,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 ## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/devel
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        cuda-libraries-dev-$CUDA_PKG_VERSION \
-        cuda-nvml-dev-$CUDA_PKG_VERSION \
-        cuda-minimal-build-$CUDA_PKG_VERSION \
-        cuda-command-line-tools-$CUDA_PKG_VERSION \
-        libnccl-dev=$NCCL_VERSION-1+cuda10.0 && \
+    cuda-libraries-dev-$CUDA_PKG_VERSION \
+    cuda-nvml-dev-$CUDA_PKG_VERSION \
+    cuda-minimal-build-$CUDA_PKG_VERSION \
+    cuda-command-line-tools-$CUDA_PKG_VERSION \
+    libnccl-dev=$NCCL_VERSION-1+cuda10.0 && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
@@ -66,8 +66,8 @@ ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 ENV CUDNN_VERSION 7.6.0.64
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-            libcudnn7=$CUDNN_VERSION-1+cuda10.0 \
-            libcudnn7-dev=$CUDNN_VERSION-1+cuda10.0 && \
+    libcudnn7=$CUDNN_VERSION-1+cuda10.0 \
+    libcudnn7-dev=$CUDNN_VERSION-1+cuda10.0 && \
     apt-mark hold libcudnn7 && \
     rm -rf /var/lib/apt/lists/*
 
@@ -76,8 +76,10 @@ ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 USER $NB_USER
 
 ## Tensorflow GPU
-RUN /opt/conda/bin/pip install tensorflow-gpu==1.14
+ARG TENSORFLOW_VERSION=2.2.0
+ENV TENSORFLOW_VERSION $TENSORFLOW_VERSION
+RUN /opt/conda/bin/pip install tensorflow-gpu==${TENSORFLOW_VERSION}
 
 # Tensorboard jupyter(lab) extension
 RUN jupyter labextension install jupyterlab_tensorboard && \
-    pip install jupyter-tensorboard==0.1.10
+    pip install jupyter-tensorboard==0.2.0
