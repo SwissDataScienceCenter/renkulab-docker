@@ -24,8 +24,8 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:3.7-$LABEL
-        docker push $DOCKER_NAME-py:3.7-$LABEL
+        docker build docker/py --tag $DOCKER_NAME-py:3.8-$LABEL
+        docker push $DOCKER_NAME-py:3.8-$LABEL
       env:
         DOCKER_NAME: "renku/renkulab"
 
@@ -57,7 +57,7 @@ jobs:
         fi
 
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.8-$LABEL" \
           --tag $DOCKER_NAME-$EXTENSION:$LABEL
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
@@ -107,7 +107,7 @@ jobs:
       fail-fast: true
       matrix:
         RVERSIONS:
-          - 4.0.0
+          - 4.0.3
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -126,8 +126,8 @@ jobs:
 
         export DOCKER_TAG="$RVERSION-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}-ubuntu18.04" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
+          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
@@ -141,7 +141,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         RELEASES:
           - devel
@@ -165,7 +165,7 @@ jobs:
 
         export DOCKER_TAG="$RELEASE-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
           --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${RELEASE} \
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
