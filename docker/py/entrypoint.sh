@@ -24,6 +24,10 @@ find /tmp/renku-env -not -path '*.git*' -type f -print0 | xargs --null -I{} sh -
 
 if [[ -v CI_PROJECT ]];
 then
+    # set the global git credentials
+    git config --global credential.helper "store --file=/work/${CI_PROJECT}/.git/credentials"
+
+    # link to the home work directory
     ln -sf /work/${CI_PROJECT} ~/work
 fi
 
