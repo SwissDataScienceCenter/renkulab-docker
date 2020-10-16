@@ -33,10 +33,10 @@ ifdef RENKU_VERSION
 	RENKU_TAG=-renku$(RENKU_VERSION)
 endif
 
-RVERSION?=4.0.0
+RVERSION?=4.0.3
 BIOC_VERSION?=devel
 R_TAG=-r$(RVERSION)
-BIOC_TAG=-bioc$(BIOC_VERSION)
+BIOC_TAG=$(BIOC_VERSION)
 TENSORFLOW_VERSION?=2.2.0
 
 .PHONY: all
@@ -51,8 +51,8 @@ push:
 		if test "$$ext" != "" ; then \
 			ext=-$$ext; \
 		fi; \
-		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL)$(RENKU_TAG) ; \
-		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA) ; \
 	done
 
 pull:
@@ -87,7 +87,7 @@ py:
 cuda10: py
 	docker build docker/cuda10.0-tf \
 		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
-		--build-arg RENKU_BASE=renku/renkulab-py3.8:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
-		-t $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL)$(RENKU_TAG) && \
-	docker tag $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-cuda10.0-tf:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+		-t $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda10.0-tf:$(GIT_MASTER_HEAD_SHA)

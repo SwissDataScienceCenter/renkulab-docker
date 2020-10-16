@@ -26,6 +26,13 @@ jobs:
 
         docker build docker/py --tag $DOCKER_NAME-py:3.8-$LABEL
         docker push $DOCKER_NAME-py:3.8-$LABEL
+
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ]
+        then
+          docker tag $DOCKER_NAME-py:3.8-$LABEL $DOCKER_NAME-py:latest
+          docker push $DOCKER_NAME-py:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
 
@@ -132,6 +139,12 @@ jobs:
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ "$RVERSION" == "4.0.3" ]
+        then
+          docker tag $DOCKER_NAME-r:$DOCKER_TAG $DOCKER_NAME-r:latest
+          docker push $DOCKER_NAME-r:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
         # selected R versions available for rocker/rstudio
@@ -171,6 +184,12 @@ jobs:
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
 
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ "$RELEASE" == "devel" ]
+        then
+          docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
+          docker push $DOCKER_NAME-bioc:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
         RELEASE: ${{ matrix.RELEASES }}
