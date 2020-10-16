@@ -34,5 +34,15 @@ fi
 # install git hooks
 ~/.local/bin/renku githooks install || true
 
+# run the post-init script in the root directory (i.e. coming from the image)
+if [ -f "/post-init.sh" ]; then
+    /post-init.sh
+fi
+
+# run the post-init script in the project directory
+if [ -f "./post-init.sh" ]; then
+    ./post-init.sh
+fi
+
 # run the command
 $@
