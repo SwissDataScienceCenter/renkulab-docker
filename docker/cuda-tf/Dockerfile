@@ -13,14 +13,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends gnupg2 curl ca-
     apt-get purge --autoremove -y curl && \
     rm -rf /var/lib/apt/lists/*
 
-ENV CUDA_VERSION 10.0.130
-ENV CUDA_PKG_VERSION 10-0=$CUDA_VERSION-1
+ENV CUDA_VERSION 10.1.243
+ENV CUDA_PKG_VERSION 10-1=$CUDA_VERSION-1
 
 # For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cuda-cudart-$CUDA_PKG_VERSION \
-    cuda-compat-10-0 && \
-    ln -s cuda-10.0 /usr/local/cuda && \
+    cuda-compat-10-1 && \
+    ln -s cuda-10.1 /usr/local/cuda && \
     rm -rf /var/lib/apt/lists/*
 
 # Required for nvidia-docker v1
@@ -37,37 +37,34 @@ ENV NVIDIA_REQUIRE_CUDA "cuda>=10.0"
 
 RUN apt-get update && apt-get install -y --no-install-recommends apt-utils
 
-## cuda runtime
-## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/runtime
-ENV NCCL_VERSION 2.4.2
+## cuda runtime, devel and cudnn
+## see https://gitlab.com/nvidia/container-images/cuda/-/tree/master/dist/10.1/ubuntu18.04-x86_64
+
+ENV NCCL_VERSION 2.7.8
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cuda-libraries-$CUDA_PKG_VERSION \
     cuda-nvtx-$CUDA_PKG_VERSION \
-    libnccl2=$NCCL_VERSION-1+cuda10.0 && \
+    libnccl2=$NCCL_VERSION-1+cuda10.1 && \
     apt-mark hold libnccl2 && \
     rm -rf /var/lib/apt/lists/*
 
 ## cuda devel
-## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/devel
-
 RUN apt-get update && apt-get install -y --no-install-recommends \
     cuda-libraries-dev-$CUDA_PKG_VERSION \
     cuda-nvml-dev-$CUDA_PKG_VERSION \
     cuda-minimal-build-$CUDA_PKG_VERSION \
     cuda-command-line-tools-$CUDA_PKG_VERSION \
-    libnccl-dev=$NCCL_VERSION-1+cuda10.0 && \
+    libnccl-dev=$NCCL_VERSION-1+cuda10.1 && \
     rm -rf /var/lib/apt/lists/*
 
 ENV LIBRARY_PATH /usr/local/cuda/lib64/stubs
 
-
 ## CUDNN 7
-## https://gitlab.com/nvidia/container-images/cuda/blob/ubuntu18.04/10.0/devel/cudnn7
-ENV CUDNN_VERSION 7.6.0.64
+ENV CUDNN_VERSION 7.6.5.32
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libcudnn7=$CUDNN_VERSION-1+cuda10.0 \
-    libcudnn7-dev=$CUDNN_VERSION-1+cuda10.0 && \
+    libcudnn7=$CUDNN_VERSION-1+cuda10.1 \
+    libcudnn7-dev=$CUDNN_VERSION-1+cuda10.1 && \
     apt-mark hold libcudnn7 && \
     rm -rf /var/lib/apt/lists/*
 

@@ -45,7 +45,7 @@ jobs:
       matrix:
         EXTENSIONS:
           - cuda9.2
-          - cuda10.0-tf
+          - cuda-tf
           - julia1.3.1
 
     steps:

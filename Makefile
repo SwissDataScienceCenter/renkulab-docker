@@ -84,10 +84,10 @@ py:
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
 
-cuda10: py
-	docker build docker/cuda10.0-tf \
+cuda: py
+	docker build docker/cuda-tf \
 		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
-		-t $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-cuda10.0-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda10.0-tf:$(GIT_MASTER_HEAD_SHA)
+		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
