@@ -67,6 +67,7 @@ RUN apt-get update --fix-missing && \
 COPY --from=renku_base /opt/conda /opt/conda
 COPY --from=renku_base --chown=rstudio:rstudio \
     /home/jovyan/ /home/rstudio/
+COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 
 # set permissions of the R library directory to be editable by NB_USER
 ADD fix-permissions.sh /usr/local/bin
@@ -90,7 +91,7 @@ RUN R --quiet -e "install.packages('IRkernel')" && \
 
 RUN  echo "source ~/.bashrc" >> ~/.bash_profile
 
-COPY entrypoint.sh /entrypoint.sh
+COPY post-init.sh /post-init.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
 CMD [ "jupyterhub-singleuser" ]
 

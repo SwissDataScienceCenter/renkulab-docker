@@ -27,6 +27,21 @@ If you would like to add the ability to launch RenkuLab interactive environments
 to your own pre-existing images, see the **Adding renku to your own images** section
 below.
 
+
+## Container initialization
+
+Sometimes certain actions need to be performed on container start-up to prepare
+the environment. Some of these are carried out already in the `entrypoint.sh`
+script in the base image, but if you extend the image you may want to add your
+own. This can be done by adding a `post-init.sh` script to the root directory of
+the container. It must be executable by a non-privileged user because it will
+run with the user restrictions of the container.
+
+Projects using the base images may additionally place a `post-init.sh` script in
+the root directory of the _project_. This script will also run upon initialization
+of the container, but _after_ the `/entrypoint.sh` and `/post-init.sh` scripts.
+
+
 ## Naming Conventions
 
 You can find these base images on
@@ -145,10 +160,6 @@ docker build -t <image-tag> \
   --build-arg BASE_IMAGE=<base-image> \
   https://github.com/SwissDataScienceCenter/renkulab-docker.git#docker/r
 ```
-
-
-
-
 
 ## Contributing
 
