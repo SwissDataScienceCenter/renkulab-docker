@@ -60,9 +60,10 @@ RUN conda install gxx_linux-64 && \
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
+ENV PATH=$HOME/.local/bin:$PATH
+
 RUN pipx install --pip-args="--no-cache" renku && \
-    pipx inject --pip-args="--no-cache" renku sentry-sdk && \
-    echo "export PATH=\"$PATH:/home/${NB_USER}/.local/bin\"" >> /home/${NB_USER}/.bashrc
+    pipx inject --pip-args="--no-cache" renku sentry-sdk
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
