@@ -18,8 +18,9 @@ ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
 
-# prepend conda to PATH
-ENV PATH ${CONDA_PATH}/bin:$PATH
+# prepend conda and local/bin to PATH
+ENV PATH ~/.local/bin:${CONDA_PATH}/bin:$PATH
+
 # And set PATH for R! It doesn't read from the environment...
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
     echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh
