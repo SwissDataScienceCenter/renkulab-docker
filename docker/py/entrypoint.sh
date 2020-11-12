@@ -8,6 +8,16 @@ if [ -z "$(git config --global --get user.email)" ]; then
     git config --global user.email "$EMAIL"
 fi
 
+# configure global git credentials
+if [[ -v CI_PROJECT ]];
+then
+    # set the global git credentials
+    git config --global credential.helper "store --file=/work/${CI_PROJECT}/.git/credentials"
+
+    # link to the home work directory
+    ln -sf /work/${CI_PROJECT} ~/work
+fi
+
 #
 # copy the environment from renku-env repo
 #
@@ -17,19 +27,10 @@ proto=$(echo $GITLAB_URL | sed -e's,^\(.*://\).*,\1,g')
 url=$(echo ${GITLAB_URL/$proto/})
 user=$(echo ${CI_REPOSITORY_URL/$proto/} | grep @ | cut -d@ -f1)
 
-git clone --depth 1 ${proto}${user}@${url}/${JUPYTERHUB_USER}/renku-env.git /tmp/renku-env || true
+git clone --depth 1 ${GITLAB_URL}/${JUPYTERHUB_USER}/renku-env.git /tmp/renku-env || true
 
 # append the contents of all the files to same files in ${HOME}
 find /tmp/renku-env -not -path '*.git*' -type f -print0 | xargs --null -I{} sh -c 'cat {} >> ${HOME}/$(basename "{}")' || true
-
-if [[ -v CI_PROJECT ]];
-then
-    # set the global git credentials
-    git config --global credential.helper "store --file=/work/${CI_PROJECT}/.git/credentials"
-
-    # link to the home work directory
-    ln -sf /work/${CI_PROJECT} ~/work
-fi
 
 # install git hooks
 ~/.local/bin/renku githooks install || true
