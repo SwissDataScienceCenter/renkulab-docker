@@ -29,10 +29,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     python-dev \
     unzip \
     vim && \
-    wget https://github.com/cdr/code-server/releases/download/v3.6.2/code-server_3.6.2_amd64.deb && \
-    dpkg -i ./code-server*.deb && \
-    rm code-server_3.6.2_amd64.deb && \
-    apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
@@ -49,12 +45,9 @@ RUN python3 -m pip install --no-cache -U pip && \
     python3 -m pip install --no-cache -r /tmp/requirements.txt && \
     jupyter labextension install --no-build @jupyterlab/toc && \
     jupyter labextension install --no-build jupyterlab-topbar-extension jupyterlab-system-monitor && \
-    jupyter serverextension enable --py jupyter_server_proxy && \
-    jupyter labextension install --no-build @jupyterlab/server-proxy && \
     jupyter lab build && \
     jupyter labextension list && \
     npm cache clean --force && \
-    code-server --install-extension ms-python.python && \
     rm -rf /home/${NB_USER}/.cache
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
