@@ -112,6 +112,7 @@ jobs:
         RELEASES:
           - devel
           - RELEASE_3_11
+          - RELEASE_3_12
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
