@@ -1,9 +1,10 @@
-jupyterhub==1.2.2
-jupyterlab-git==0.23.3
-jupyterlab_server<2.0
 jupyter-server-proxy==1.6.0
-nbresuse==0.4.0
+jupyterhub==1.2.2
+jupyterlab_server~=2.0.0
+jupyterlab-git==0.23.3
+jupyterlab~=3.0.0
 nbclient<0.5.1
+nbresuse==0.4.0
 papermill==2.3.1
 pipx>=0.15.0.0
 powerline-shell==0.7.0
