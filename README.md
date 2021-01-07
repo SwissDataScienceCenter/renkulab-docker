@@ -1,16 +1,17 @@
 [![Renku Docker Image CI](https://github.com/SwissDataScienceCenter/renkulab-docker/workflows/Renku%20Docker%20Image%20CI/badge.svg)](https://github.com/SwissDataScienceCenter/renkulab-docker/actions?query=workflow%3A%22Renku+Docker+Image+CI%22)
 
-# Renkulab Docker Images
+# RenkuLab Docker Images
 
-Renkulab Docker Images contain minimal dependencies for launching interactive
-environments like Jupyterlab and RStudio from the Renku platform. They also each
+RenkuLab Docker images contain minimal dependencies for launching interactive
+environments like JupyterLab and RStudio from the Renku platform. They also each
 contain a version of the [renku cli](https://github.com/SwissDataScienceCenter/renku-python).
 
 ## Usage
 
-The basic python (renkulab-py) and basic R (renkulab-r) images are available via
+The basic python (renkulab-py), basic R (renkulab-r), and basic Julia (renkulab-julia)
+images are available via
 [renku project templates](https://github.com/SwissDataScienceCenter/renku-project-template)
-that you select upon renku project creation on the renkulab platform, or locally
+that you select upon renku project creation on the RenkuLab platform, or locally
 via `renku init`.
 
 If you would like to use an image built from this repo that is
@@ -56,7 +57,7 @@ For example:
 `renku/renkulab-py:3.7-0.6.4`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
-  from your project on Renkulab.
+  from your project on RenkuLab.
 * `-py`: indicates this is a python image flavor; either the programming language
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
@@ -66,8 +67,8 @@ For example:
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
 
-Note that the latest version of the `renku` CLI is always installed in the base images.
-This can easily be overriden by installing another version with `pipx` in the container
+Note that the base images include the specified version of the `renku` CLI.
+This can easily be overridden by installing another version with `pipx` in the container
 or any Dockerfile that uses these images, e.g.
 
 ```bash
@@ -76,7 +77,7 @@ pipx install --force renku==<version>
 
 ## Current images
 
-### py3.7
+### py
 
 **Available via renku project templates**
 
@@ -100,9 +101,19 @@ dockerhub: https://hub.docker.com/r/renku/renkulab-r/tags
 
 Several versions of R are available, including the latest, 4.0.0.
 
+### julia
+
+**Available via renku project templates**
+
+Based on the renkulab-py (python 3.7) image with julia installed.
+
+dockerhub: https://hub.docker.com/r/renku/renkulab-julia/tags
+
+Currently with julia 1.5.3
+
 ### bioc
 
-Based on the bioconductor docker image: https://github.com/Bioconductor/bioconductor_docker.
+Based on the bioconductor Docker image: https://github.com/Bioconductor/bioconductor_docker.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
 
@@ -120,13 +131,6 @@ Based on the py3.7 with CUDA 10.0 and Tensorflow 1.14 installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-cuda10.0-tf1.14/tags
 
-### julia1.3.1
-
-Based on the py3.7 image with julia installed.
-
-dockerhub: https://hub.docker.com/r/renku/renkulab-julia1.3.1/tags
-
-Currently with julia 1.3.1.
 
 ## Development
 
@@ -135,9 +139,9 @@ of the image you would like to build.
 
 ## Adding renku to your own images
 
-If you already have a docker image with complicated dependencies that are needed
-for your work, you can get this up and running on renkulab by using one of our
-docker images in your build. We have two images that can be used in this way -
+If you already have a Docker image with complicated dependencies that are needed
+for your work, you can get this up and running on RenkuLab by using one of our
+Docker images in your build. We have two images that can be used in this way -
 one that is completely generic, and the other that is specific to rocker-based
 images.
 
