@@ -39,7 +39,6 @@ jobs:
         EXTENSIONS:
           - cuda9.2
           - cuda10.0-tf1.14
-          - julia1.3.1
 
     steps:
     - name: Docker Login
@@ -64,6 +63,41 @@ jobs:
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
+
+  build-julia-ext:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        JULIAVERSIONS:
+          - 1.5.3
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project julia docker image extensions
+      run: |
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        export DOCKER_TAG="$JULIAVERSION-$LABEL"
+        docker build docker/julia \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --tag $DOCKER_NAME-julia:$DOCKER_TAG
+        docker push $DOCKER_NAME-julia:$DOCKER_TAG
+      env:
+        DOCKER_NAME: "renku/renkulab"
+        JULIAVERSION: ${{ matrix.JULIAVERSIONS }}
 
   build-r-ubuntu:
     needs: build-py
