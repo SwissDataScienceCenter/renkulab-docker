@@ -1,9 +1,9 @@
 #!/bin/sh
 
-VSCODE_VERSION=${VSCODE_VERSION:="3.6.2"}
+VSCODE_VERSION=${VSCODE_VERSION:="3.8.1"}
 
 # code-server installation
-wget https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server_3.6.2_amd64.deb
+wget https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server_${VSCODE_VERSION}_amd64.deb
 dpkg -i ./code-server*.deb
 rm code-server_3.6.2_amd64.deb
 apt-get clean
