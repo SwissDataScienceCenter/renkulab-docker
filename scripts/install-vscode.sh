@@ -13,4 +13,4 @@ chown -R 1000:1000 /home/${NB_USER}/.local/share
 # Jupyter support
 pip install git+https://github.com/betatim/vscode-binder
 jupyter serverextension enable --py jupyter_server_proxy && \
-jupyter labextension install --no-build @jupyterlab/server-proxy
+jupyter labextension install @jupyterlab/server-proxy
