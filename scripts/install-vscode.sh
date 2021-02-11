@@ -7,6 +7,7 @@ VSCODE_VERSION=${VSCODE_VERSION:="3.8.1"}
 # dpkg -i ./code-server*.deb
 # rm code-server_${VSCODE_VERSION}_amd64.deb
 # apt-get clean
+mkdir -p ~/.local/lib
 curl -fL https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server-${VSCODE_VERSION}-linux-amd64.tar.gz \
   | tar -C ~/.local/lib -xz 
 mv ~/.local/lib/code-server-${VSCODE_VERSION}-linux-amd64 ~/.local/lib/code-server-${VSCODE_VERSION}
