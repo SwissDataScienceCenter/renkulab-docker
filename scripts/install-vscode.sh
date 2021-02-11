@@ -3,10 +3,14 @@
 VSCODE_VERSION=${VSCODE_VERSION:="3.8.1"}
 
 # code-server installation
-wget https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server_${VSCODE_VERSION}_amd64.deb
-dpkg -i ./code-server*.deb
-rm code-server_${VSCODE_VERSION}_amd64.deb
-apt-get clean
+# wget https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server_${VSCODE_VERSION}_amd64.deb
+# dpkg -i ./code-server*.deb
+# rm code-server_${VSCODE_VERSION}_amd64.deb
+# apt-get clean
+curl -fL https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server-${VSCODE_VERSION}-linux-amd64.tar.gz \
+  | tar -C ~/.local/lib -xz 
+mv ~/.local/lib/code-server-${VSCODE_VERSION}-linux-amd64 ~/.local/lib/code-server-${VSCODE_VERSION}
+ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
 
 # Fix broken python plugin # https://github.com/cdr/code-server/issues/2341
 mkdir -p /home/{$NB_USER}/.local/share/code-server/
