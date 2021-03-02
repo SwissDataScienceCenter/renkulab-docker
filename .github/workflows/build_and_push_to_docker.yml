@@ -116,6 +116,7 @@ jobs:
       matrix:
         RVERSIONS:
           - 4.0.3
+          - 4.0.4
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -140,7 +141,7 @@ jobs:
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "$RVERSION" == "4.0.3" ]
+        if [ "$REF" == "refs/heads/master" ] && [ "$RVERSION" == "4.0.4" ]
         then
           docker tag $DOCKER_NAME-r:$DOCKER_TAG $DOCKER_NAME-r:latest
           docker push $DOCKER_NAME-r:latest

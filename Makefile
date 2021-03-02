@@ -65,14 +65,14 @@ pull:
 
 r: py
 	docker build docker/r \
-		--build-arg RENKU_BASE=renku/renkulab-py3.7:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
 		--build-arg RVERSION=$(RVERSION) \
 		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) && \
 	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(R_TAG)
 
 bioc: py
 	docker build docker/bioc \
-		--build-arg RENKU_BASE=renku/renkulab-py3.7:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
 		--build-arg RELEASE=$(BIOC_VERSION) \
 		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) && \
 	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(BIOC_TAG)
