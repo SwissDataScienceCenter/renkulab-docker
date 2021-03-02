@@ -1,5 +1,5 @@
 # Run with the RenkuKubeSpawner via JupyterHub
-ARG BASE_IMAGE=jupyter/base-notebook:feacdbfc2e89
+ARG BASE_IMAGE=jupyter/base-notebook:aec555e49be6
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
