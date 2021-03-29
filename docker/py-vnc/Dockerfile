@@ -25,8 +25,9 @@ RUN apt-get update \
     && find /var/log -type f -exec cp /dev/null \{\} \;
 
 # Get noVNC
-RUN cd /opt & \
+RUN cd /opt && \
     curl -sSfL https://github.com/novnc/noVNC/archive/v1.1.0.tar.gz | tar -zxf -
+
 
 # Patch novnc to use correct path to websockify (defaults to /)
 # Note if you use vnc.html you will need to patch ui.js to use the correct path
