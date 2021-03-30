@@ -46,7 +46,7 @@ jobs:
         EXTENSIONS:
           - cuda9.2
           - cuda-tf
-          - py-vnc
+          - vnc
 
     steps:
     - name: Docker Login
