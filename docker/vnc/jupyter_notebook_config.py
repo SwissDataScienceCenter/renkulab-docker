@@ -1,10 +1,8 @@
 import os
 
-# Use a safe launch of xfce4
 xstartup = 'dbus-launch xfce4-session'
 
 vnc_socket = os.path.join(os.getenv('HOME'), '.vnc', 'socket')
-
 c.ServerProxy.servers = {
     'vnc': {
         'command': [
@@ -26,11 +24,12 @@ c.ServerProxy.servers = {
         ],
         'absolute_url': False,
         'port': 5901,
-        'timeout': 30,
-        'mappath': {'/': '/vnc_lite.html'},
+        'timeout': 10,
+        'mappath': {'/': '/vnc_renku.html'},
         'launcher_entry': {
             'enabled': True,
             'title': 'VNC'
         }
     }
 }
+

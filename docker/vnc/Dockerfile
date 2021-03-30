@@ -24,23 +24,27 @@ RUN apt-get update \
     && rm -rf /tmp/* \
     && find /var/log -type f -exec cp /dev/null \{\} \;
 
-# Get noVNC
+#################################################################
+# Install noVNC
+
+ENV novnc_version=1.1.0
+
 RUN cd /opt && \
-    curl -sSfL https://github.com/novnc/noVNC/archive/v1.1.0.tar.gz | tar -zxf -
+    curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz | tar -zxf -
 
+RUN sed -i -e "s,'websockify',window.location.pathname.slice(1),g" /opt/noVNC-${novnc_version}/app/ui.js \
+    && chmod a+rX -R /opt/noVNC-${novnc_version}
 
-# Patch novnc to use correct path to websockify (defaults to /)
-# Note if you use vnc.html you will need to patch ui.js to use the correct path
-# and also to override localstorage which may store an incorrect path from a
-# different session. Also resize server instead of scaling client
-RUN sed -i.bak \
-    -e "s%\('path', 'websockify'\)%'path', window.location.pathname.replace(/[^/]*$/, '').substring(1) + 'websockify'); console.log('websockify path:' + path%" \
-    -re "s%rfb.scaleViewport = .+%rfb.resizeSession = readQueryVariable('resize', true);%" \
-    /opt/noVNC-1.1.0/vnc_lite.html
+COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
 
-# Install tigervnc to /usr/local
-RUN curl -sSfL 'https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-1.9.0.x86_64.tar.gz' | tar -zxf - -C /usr/local --strip=2
+#################################################################
+# Install TigerVNC
 
+ENV tigervnc_version=1.9.0
+
+RUN curl -sSfL https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-${tigervnc_version}.x86_64.tar.gz | tar -zxf - -C /usr/local --strip=2
+
+#################################################################
 # Install the jupyter extensions
 USER ${NB_USER}
 
