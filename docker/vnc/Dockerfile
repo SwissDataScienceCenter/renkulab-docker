@@ -54,3 +54,5 @@ RUN conda install jupyter-server-proxy numpy websockify -c conda-forge \
 
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
 
+COPY post-init.sh /post-init.sh
+
