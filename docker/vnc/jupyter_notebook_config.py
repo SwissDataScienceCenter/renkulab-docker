@@ -3,12 +3,15 @@ import os
 xstartup = 'dbus-launch xfce4-session'
 
 vnc_socket = os.path.join(os.getenv('HOME'), '.vnc', 'socket')
+
+noVNC_version = '1.1.0'
+
 c.ServerProxy.servers = {
     'vnc': {
         'command': [
             '/opt/conda/bin/websockify',
             '-v',
-            '--web', '/opt/noVNC-1.1.0',
+            '--web', '/opt/noVNC-' + noVNC_version,
             '--heartbeat', '30',
             '5901',
             '--unix-target', vnc_socket,
