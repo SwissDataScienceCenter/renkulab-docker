@@ -20,7 +20,8 @@ extensions = \
 	bioc \
 	r \
 	cuda-9.2 \
-	cuda-10.0-tf
+	cuda-10.0-tf \
+	vnc
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
@@ -91,3 +92,10 @@ cuda: py
 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
+	
+vnc: py
+	docker build docker/vnc \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) && \
+	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-vnc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+
