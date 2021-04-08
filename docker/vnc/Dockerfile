@@ -17,7 +17,8 @@ RUN apt-get update \
         xfce4-settings \
         xorg \
         xubuntu-icon-theme \
-        xterm \
+        gnome-terminal \
+        ttf-dejavu \
     && apt-get autoremove --purge \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
