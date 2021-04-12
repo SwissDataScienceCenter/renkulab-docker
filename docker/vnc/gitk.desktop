@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=2.31.1
+Name=gitk
+GenericName=gitk
+X-GNOME-FullName=gitk
+Comment=Graphical Visualization for Git
+Type=Application
+Categories=Git;Versioning;
+Exec=sh -c "cd /home/jovyan/work/${CI_PROJECT}; gitk"
+TryExec=gitk
+Terminal=false
+StartupNotify=false
+Icon=/home/jovyan/Desktop/.git_icon.png

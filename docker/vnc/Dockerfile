@@ -17,7 +17,11 @@ RUN apt-get update \
         xfce4-settings \
         xorg \
         xubuntu-icon-theme \
-        xterm \
+        gnome-terminal \
+        ttf-dejavu \
+        git-gui \
+        gitk \
+        emacs \
     && apt-get autoremove --purge \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
@@ -43,6 +47,16 @@ COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
 ENV tigervnc_version=1.9.0
 
 RUN curl -sSfL https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-${tigervnc_version}.x86_64.tar.gz | tar -zxf - -C /usr/local --strip=2
+
+#################################################################
+# Add desktop icons
+
+COPY Git-GUI.desktop /home/jovyan/Desktop/
+RUN chmod +x /home/jovyan/Desktop/Git-GUI.desktop
+
+COPY gitk.desktop /home/jovyan/Desktop/
+COPY .git_icon.png /home/jovyan/Desktop/
+RUN chmod +x /home/jovyan/Desktop/gitk.desktop
 
 #################################################################
 # Install the jupyter extensions
