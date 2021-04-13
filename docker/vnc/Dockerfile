@@ -59,6 +59,13 @@ COPY .git_icon.png /home/jovyan/Desktop/
 RUN chmod +x /home/jovyan/Desktop/gitk.desktop
 
 #################################################################
+# Add wallpaper and force the default to point to the renku one
+
+RUN mkdir -p /usr/share/backgrouns/renku/
+COPY renku_background_dots.png /usr/share/backgrounds/renku/
+RUN ln -s -f /usr/share/backgrounds/renku/renku_background_dots.png /usr/share/backgrounds/xfce/xfce-stripes.png
+
+#################################################################
 # Install the jupyter extensions
 USER ${NB_USER}
 
