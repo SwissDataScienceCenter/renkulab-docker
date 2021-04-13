@@ -61,7 +61,7 @@ RUN chmod +x /home/jovyan/Desktop/gitk.desktop
 #################################################################
 # Add wallpaper and force the default to point to the renku one
 
-RUN mkdir -p /usr/share/backgrouns/renku/
+RUN mkdir -p /usr/share/backgrounds/renku/
 COPY renku_background_dots.png /usr/share/backgrounds/renku/
 RUN ln -s -f /usr/share/backgrounds/renku/renku_background_dots.png /usr/share/backgrounds/xfce/xfce-stripes.png
 
@@ -76,4 +76,3 @@ RUN conda install jupyter-server-proxy numpy websockify -c conda-forge \
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
 
 COPY post-init.sh /post-init.sh
-
