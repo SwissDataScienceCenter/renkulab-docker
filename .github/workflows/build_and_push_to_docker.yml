@@ -24,8 +24,15 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:3.7-$LABEL
-        docker push $DOCKER_NAME-py:3.7-$LABEL
+        docker build docker/py --tag $DOCKER_NAME-py:3.8-$LABEL
+        docker push $DOCKER_NAME-py:3.8-$LABEL
+
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ]
+        then
+          docker tag $DOCKER_NAME-py:3.8-$LABEL $DOCKER_NAME-py:latest
+          docker push $DOCKER_NAME-py:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
 
@@ -38,8 +45,8 @@ jobs:
       matrix:
         EXTENSIONS:
           - cuda9.2
-          - cuda10.0-tf1.14
-          - julia1.3.1
+          - cuda-tf
+          - vnc
 
     steps:
     - name: Docker Login
@@ -58,12 +65,47 @@ jobs:
         fi
 
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.8-$LABEL" \
           --tag $DOCKER_NAME-$EXTENSION:$LABEL
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
+
+  build-julia-ext:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        JULIAVERSIONS:
+          - 1.5.3
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project julia docker image extensions
+      run: |
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        export DOCKER_TAG="$JULIAVERSION-$LABEL"
+        docker build docker/julia \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --tag $DOCKER_NAME-julia:$DOCKER_TAG
+        docker push $DOCKER_NAME-julia:$DOCKER_TAG
+      env:
+        DOCKER_NAME: "renku/renkulab"
+        JULIAVERSION: ${{ matrix.JULIAVERSIONS }}
 
   build-r-ubuntu:
     needs: build-py
@@ -73,7 +115,8 @@ jobs:
       fail-fast: true
       matrix:
         RVERSIONS:
-          - 4.0.0
+          - 4.0.3
+          - 4.0.4
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -92,11 +135,17 @@ jobs:
 
         export DOCKER_TAG="$RVERSION-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}-ubuntu18.04" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
+          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         docker push $DOCKER_NAME-r:$DOCKER_TAG
 
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ "$RVERSION" == "4.0.4" ]
+        then
+          docker tag $DOCKER_NAME-r:$DOCKER_TAG $DOCKER_NAME-r:latest
+          docker push $DOCKER_NAME-r:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
         # selected R versions available for rocker/rstudio
@@ -107,7 +156,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         RELEASES:
           - devel
@@ -131,11 +180,17 @@ jobs:
 
         export DOCKER_TAG="$RELEASE-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.7-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
           --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${RELEASE} \
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
 
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ "$RELEASE" == "devel" ]
+        then
+          docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
+          docker push $DOCKER_NAME-bioc:latest
+        fi
       env:
         DOCKER_NAME: "renku/renkulab"
         RELEASE: ${{ matrix.RELEASES }}

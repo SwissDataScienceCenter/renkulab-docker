@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=Git-GUI
+GenericName=Git-GUI
+X-GNOME-FullName=Git-GUI
+Comment=Graphical User Interface for Git
+Type=Application
+Categories=Git;Versioning;
+Exec=sh -c "cd /home/jovyan/work/${CI_PROJECT}; git gui"
+TryExec=git gui
+Terminal=false
+StartupNotify=false
+Icon=/usr/share/git-gui/lib/git-gui.ico
+StartupWMClass=Git-GUI-Main

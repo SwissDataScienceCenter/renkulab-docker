@@ -1,5 +1,5 @@
 # Run with the RenkuKubeSpawner via JupyterHub
-ARG BASE_IMAGE=jupyter/base-notebook:8fd7ada2a374
+ARG BASE_IMAGE=jupyter/base-notebook:aec555e49be6
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && apt-get install -yq --no-install-recommends \
     git \
-    git-lfs=2.8.0 \
+    git-lfs=2.12.0 \
     gnupg \
     graphviz \
     less \
