@@ -37,12 +37,12 @@ find /tmp/renku-env -not -path '*.git*' -type f -print0 | xargs --null -I{} sh -
 
 # run the post-init script in the root directory (i.e. coming from the image)
 if [ -f "/post-init.sh" ]; then
-    bash /post-init.sh
+    . /post-init.sh
 fi
 
 # run the post-init script in the project directory
 if [ -f "./post-init.sh" ]; then
-    bash ./post-init.sh
+    . ./post-init.sh
 fi
 
 # run the command
