@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/renkulab-py:3.7-0.7.3
+ARG BASE_IMAGE=renku/renkulab-py:latest
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -10,7 +10,7 @@ USER root
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
 # If this changes, you also need to change the checksum below
-ENV JULIA_VERSION=1.5.3
+ENV JULIA_VERSION=1.6.1
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
     cd /tmp && \
