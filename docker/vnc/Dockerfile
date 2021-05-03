@@ -46,7 +46,7 @@ COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
 
 ENV tigervnc_version=1.9.0
 
-RUN curl -sSfL https://github.com/accetto/tigervnc/releases/download/v${tigervnc_version}-mirror/tigervnc-${tigervnc_version}.x86_64.tar.gz | tar -zxf - -C /usr/local --strip=2
+RUN curl -sSfL https://sourceforge.net/projects/tigervnc/files/stable/${tigervnc_version}/tigervnc-${tigervnc_version}.x86_64.tar.gz/download | tar -zxf - -C /usr/local --strip=2
 
 #################################################################
 # Add desktop icons
