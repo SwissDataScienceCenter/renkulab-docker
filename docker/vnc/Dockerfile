@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/renkulab-py:latest
+ARG BASE_IMAGE=renku/renkulab-py:3.8-0.7.5
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -46,7 +46,7 @@ COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
 
 ENV tigervnc_version=1.9.0
 
-RUN curl -sSfL https://bintray.com/tigervnc/stable/download_file?file_path=tigervnc-${tigervnc_version}.x86_64.tar.gz | tar -zxf - -C /usr/local --strip=2
+RUN curl -sSfL https://github.com/accetto/tigervnc/releases/download/v${tigervnc_version}-mirror/tigervnc-${tigervnc_version}.x86_64.tar.gz | tar -zxf - -C /usr/local --strip=2
 
 #################################################################
 # Add desktop icons
