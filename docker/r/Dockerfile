@@ -66,6 +66,7 @@ RUN apt-get update --fix-missing && \
 
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
+COPY --from=renku_base --chown=rstudio:rstudio  /usr/local/bin/ /usr/local/bin/
 COPY --from=renku_base --chown=rstudio:rstudio \
     /home/jovyan/ /home/rstudio/
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
