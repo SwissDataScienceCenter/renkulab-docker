@@ -593,6 +593,11 @@ select:active {
 :root:not(.noVNC_connected) #noVNC_power_button {
   display: none;
 }
+
+#noVNC_power_button {
+  display: none;
+}
+
 #noVNC_power {
 }
 #noVNC_power_buttons {
