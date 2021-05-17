@@ -1019,7 +1019,7 @@ const UI = {
         /* UI.rfb.addEventListener("capabilities", UI.updatePowerButton); */
         UI.rfb.addEventListener("clipboard", UI.clipboardReceive);
         /* UI.rfb.addEventListener("bell", UI.bell); */
-        UI.rfb.addEventListener("desktopname", UI.updateDesktopName);
+        /* UI.rfb.addEventListener("desktopname", UI.updateDesktopName); */
         UI.rfb.clipViewport = UI.getSetting('view_clip');
         UI.rfb.scaleViewport = UI.getSetting('resize') === 'scale';
         UI.rfb.resizeSession = UI.getSetting('resize') === 'remote';
@@ -1578,14 +1578,14 @@ const UI = {
         if (UI.rfb.viewOnly) {
             document.getElementById('noVNC_keyboard_button')
                 .classList.add('noVNC_hidden');
-/*             document.getElementById('noVNC_toggle_extra_keys_button')
+            /* document.getElementById('noVNC_toggle_extra_keys_button')
                 .classList.add('noVNC_hidden'); */
             document.getElementById('noVNC_mouse_button' + UI.rfb.touchButton)
                 .classList.add('noVNC_hidden');
         } else {
             document.getElementById('noVNC_keyboard_button')
                 .classList.remove('noVNC_hidden');
-/*             document.getElementById('noVNC_toggle_extra_keys_button')
+            /* document.getElementById('noVNC_toggle_extra_keys_button')
                 .classList.remove('noVNC_hidden'); */
             document.getElementById('noVNC_mouse_button' + UI.rfb.touchButton)
                 .classList.remove('noVNC_hidden');
@@ -1604,7 +1604,8 @@ const UI = {
     updateDesktopName(e) {
         UI.desktopName = e.detail.name;
         // Display the desktop name in the document title
-        document.title = e.detail.name + " - noVNC";
+        /* document.title = e.detail.name + " - noVNC"; */
+        document.title = "Renku Desktop";
     },
 
     /* bell(e) {

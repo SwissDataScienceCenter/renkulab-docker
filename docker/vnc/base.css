@@ -869,21 +869,21 @@ select:active {
 /*Default noVNC logo.*/
 /* From: http://fonts.googleapis.com/css?family=Orbitron:700 */
 @font-face {
-  font-family: 'Orbitron';
+  font-family: 'CircularMedium';
   font-style: normal;
   font-weight: 700;
-  src: local('?'), url('Orbitron700.woff') format('woff'),
-                   url('Orbitron700.ttf') format('truetype');
+  src: local('CircularMedium.woff') format('woff'),
+       local('CircularMedium.ttf') format('truetype');
 }
 
 .noVNC_logo {
-  color:yellow;
-  font-family: 'Orbitron', 'OrbitronTTF', sans-serif;
+  color:rgb(0, 149, 104);
+  font-family: 'CircularMedium', 'CircularMediumTTF', sans-serif;
   line-height:90%;
   text-shadow: 0.1em 0.1em 0 black;
 }
 .noVNC_logo span{
-  color:green;
+  color:rgb(210, 106, 152);
 }
 
 #noVNC_bell {
