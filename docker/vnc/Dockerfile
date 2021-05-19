@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=renku/renkulab-py:3.8-0.7.5
+ARG BASE_IMAGE=renku/renkulab-py:3.8-0.7.6
 FROM ${BASE_IMAGE}
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -36,10 +36,14 @@ ENV novnc_version=1.1.0
 RUN cd /opt && \
     curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz | tar -zxf -
 
-RUN sed -i -e "s,'websockify',window.location.pathname.slice(1),g" /opt/noVNC-${novnc_version}/app/ui.js \
-    && chmod a+rX -R /opt/noVNC-${novnc_version}
+RUN chmod a+rX -R /opt/noVNC-${novnc_version}
 
 COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
+COPY --chown=root:root renku-48x48.png /opt/noVNC-${novnc_version}/app/images/icons
+
+COPY --chown=root:root ui.js /opt/noVNC-${novnc_version}/app/ui.js
+COPY --chown=root:root base.css /opt/noVNC-${novnc_version}/app/styles/base.css
+COPY --chown=root:root CircularMedium.* /opt/noVNC-${novnc_version}/app/styles/
 
 #################################################################
 # Install TigerVNC
