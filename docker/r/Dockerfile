@@ -1,5 +1,5 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py:latest
+ARG RENKU_BASE=renku/renkulab-py:3.8-0.7.6
 ARG BASE_IMAGE=rocker/verse:4.0.4
 
 # define base images
@@ -30,7 +30,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 1.2.5042
+ENV RSTUDIO_VERSION 1.3.959
 RUN /rocker_scripts/install_rstudio.sh
 
 # Add Tini
