@@ -117,6 +117,8 @@ jobs:
         RVERSIONS:
           - 4.0.3
           - 4.0.4
+          - 4.0.5
+          - 4.1.0
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
