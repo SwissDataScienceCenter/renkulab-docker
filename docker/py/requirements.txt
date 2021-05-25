@@ -8,3 +8,5 @@ papermill==2.3.1
 pipx>=0.15.0.0
 powerline-shell==0.7.0
 requests>=2.20.0
+notebook>=6.1.5 # not directly required, pinned by Snyk to avoid a vulnerability
+pygments>=2.7.4 # not directly required, pinned by Snyk to avoid a vulnerability
