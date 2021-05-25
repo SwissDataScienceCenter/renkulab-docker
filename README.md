@@ -77,6 +77,14 @@ pipx install --force renku==<version>
 
 ## Current images
 
+### Recent releases and the corresponding versions
+
+| Release | Release Date | Python | R            | Julia | Bioconductor | Cuda 9.2 | Cuda 10.0 TF 1.14 |
+|---------|--------------|--------|--------------|-------|--------------|----------|-------------------|
+| [0.7.6](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.6) | 10 May 2021 | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.6)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.6), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.6) | [1.6.1](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.6.1-0.7.6) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.6), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.6)   | -        | -                 |
+| [0.7.5](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.5) | 6 Apr 2021  | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.5)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.5), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.5) | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.5) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.5), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.5)   | -        | -                 |
+| [0.7.4](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.4) | 10 Feb 2021 | [3.7](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.4)    | [4.0.0](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.0-0.7.4)        | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.4) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.4), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.4)   | -        | -                 |
+
 ### py
 
 **Available via renku project templates**
@@ -84,8 +92,6 @@ pipx install --force renku==<version>
 The basic Jupyter image with minimal dependencies. Based on https://hub.docker.com/r/jupyter/base-notebook/.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-py/tags
-
-Currently with python 3.7.
 
 ### r
 
@@ -99,38 +105,33 @@ simply replace `/lab` or `/tree` with `/rstudio` in the URL.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-r/tags
 
-Several versions of R are available, including the latest, 4.0.0.
-
 ### julia
 
 **Available via renku project templates**
 
-Based on the renkulab-py (python 3.7) image with julia installed.
+Based on the renkulab-py (python 3.8) image with julia installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-julia/tags
 
-Currently with julia 1.5.3
-
 ### bioc
+
+**Available via renku project templates**
 
 Based on the bioconductor Docker image: https://github.com/Bioconductor/bioconductor_docker.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
 
-Currently with bioconductor 3_11, 3_10 & devel.
-
 ### cuda9.2
 
-Based on the py3.7 image with CUDA 9.2 installed.
+Based on the py3.8 image with CUDA 9.2 installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-cuda9.2/tags
 
 ### cuda10.0-tf1.14
 
-Based on the py3.7 with CUDA 10.0 and Tensorflow 1.14 installed.
+Based on the py3.8 with CUDA 10.0 and Tensorflow 1.14 installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-cuda10.0-tf1.14/tags
-
 
 ## Development
 
