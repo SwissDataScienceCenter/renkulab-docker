@@ -16,6 +16,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     git-lfs=2.12.0 \
     gnupg \
     graphviz \
+    jq \
     less \
     libsm6 \
     libxext-dev \
