@@ -51,6 +51,7 @@ RUN apt-get update --fix-missing && \
     apt-get install -yq --no-install-recommends \
     git-lfs \
     gnupg \
+    jq \
     nodejs \
     libglib2.0-0 \
     libsm6 \
