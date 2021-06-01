@@ -44,7 +44,6 @@ jobs:
       fail-fast: true
       matrix:
         EXTENSIONS:
-          - cuda9.2
           - cuda-tf
           - vnc
 

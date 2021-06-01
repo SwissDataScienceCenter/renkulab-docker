@@ -79,11 +79,11 @@ pipx install --force renku==<version>
 
 ### Recent releases and the corresponding versions
 
-| Release | Release Date | Python | R            | Julia | Bioconductor | Cuda 9.2 | Cuda 10.0 TF 1.14 |
-|---------|--------------|--------|--------------|-------|--------------|----------|-------------------|
-| [0.7.6](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.6) | 10 May 2021 | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.6)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.6), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.6) | [1.6.1](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.6.1-0.7.6) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.6), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.6)   | -        | -                 |
-| [0.7.5](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.5) | 6 Apr 2021  | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.5)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.5), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.5) | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.5) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.5), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.5)   | -        | -                 |
-| [0.7.4](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.4) | 10 Feb 2021 | [3.7](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.4)    | [4.0.0](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.0-0.7.4)        | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.4) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.4), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.4)   | -        | -                 |
+| Release | Release Date | Python | R            | Julia | Bioconductor | Cuda TF |
+|---------|--------------|--------|--------------|-------|--------------|---------|
+| [0.7.6](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.6) | 10 May 2021 | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.6)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.6), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.6) | [1.6.1](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.6.1-0.7.6) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.6), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.6)   |  [CUDA 11.0.3, TF 2.4](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags?page=1&ordering=last_updated&name=0.7.6)                 |
+| [0.7.5](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.5) | 6 Apr 2021  | [3.8](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.5)    | [4.0.3](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.3-0.7.5), [4.0.4](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.4-0.7.5) | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.5) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.5), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.5)   | [CUDA 11.0.3, TF 2.4](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags?page=1&ordering=last_updated&name=0.7.5)    |
+| [0.7.4](https://github.com/SwissDataScienceCenter/renkulab-docker/releases/tag/0.7.4) | 10 Feb 2021 | [3.7](https://hub.docker.com/r/renku/renkulab-py/tags?page=1&ordering=last_updated&name=0.7.4)    | [4.0.0](https://hub.docker.com/r/renku/renkulab-r/tags?page=1&ordering=last_updated&name=4.0.0-0.7.4)        | [1.5.3](https://hub.docker.com/r/renku/renkulab-julia/tags?page=1&ordering=last_updated&name=1.5.3-0.7.4) | [3.11](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_11-0.7.4), [3.12](https://hub.docker.com/r/renku/renkulab-bioc/tags?page=1&ordering=last_updated&name=RELEASE_3_12-0.7.4)   | -      |
 
 ### py
 
@@ -121,17 +121,11 @@ Based on the bioconductor Docker image: https://github.com/Bioconductor/biocondu
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
 
-### cuda9.2
+### cuda-tf
 
-Based on the py3.8 image with CUDA 9.2 installed.
+Based on the py3.8 with CUDA 11.0.3 and Tensorflow 2.4 installed.
 
-dockerhub: https://hub.docker.com/r/renku/renkulab-cuda9.2/tags
-
-### cuda10.0-tf1.14
-
-Based on the py3.8 with CUDA 10.0 and Tensorflow 1.14 installed.
-
-dockerhub: https://hub.docker.com/r/renku/renkulab-cuda10.0-tf1.14/tags
+dockerhub: https://hub.docker.com/r/renku/renkulab-cuda-tf/tags
 
 ## Development
 
