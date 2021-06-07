@@ -43,7 +43,7 @@ COPY --chown=root:root renku-48x48.png /opt/noVNC-${novnc_version}/app/images/ic
 
 COPY --chown=root:root ui.js /opt/noVNC-${novnc_version}/app/ui.js
 COPY --chown=root:root base.css /opt/noVNC-${novnc_version}/app/styles/base.css
-COPY --chown=root:root CircularMedium.* /opt/noVNC-${novnc_version}/app/styles/
+COPY --chown=root:root fonts /opt/noVNC-${novnc_version}/app/styles/fonts
 
 #################################################################
 # Install TigerVNC
