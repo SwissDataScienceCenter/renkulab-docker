@@ -890,6 +890,11 @@ select:active {
   color:rgb(210, 106, 152);
 }
 
+.noVNC_text {
+  color: rgb(255,255,255);
+  font-family: 'Calcutta', sans-serif;
+}
+
 #noVNC_bell {
   display: none;
 }
