@@ -123,9 +123,16 @@ dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
 
 ### cuda-tf
 
-Based on the py3.8 with CUDA 11.0.3 and Tensorflow 2.4 installed.
+Based on the renkulab-py (python 3.8) with CUDA 11.0.3 and Tensorflow 2.4 installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-cuda-tf/tags
+
+### vnc
+
+Based on the renkulab-py (python 3.8) with a full virtual desktop installed.
+It uses noVNC 1.1.0 and TigerVNC 1.9.0 with a Renku UI to deliver a Linux desktop.
+
+https://hub.docker.com/r/renku/renkulab-vnc/tags
 
 ## Development
 
