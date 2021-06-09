@@ -44,7 +44,6 @@ jobs:
       fail-fast: true
       matrix:
         EXTENSIONS:
-          - cuda9.2
           - cuda-tf
           - vnc
 
@@ -100,7 +99,7 @@ jobs:
 
         export DOCKER_TAG="$JULIAVERSION-$LABEL"
         docker build docker/julia \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.8-$LABEL" \
           --tag $DOCKER_NAME-julia:$DOCKER_TAG
         docker push $DOCKER_NAME-julia:$DOCKER_TAG
       env:
