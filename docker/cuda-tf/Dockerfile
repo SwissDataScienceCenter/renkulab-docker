@@ -90,7 +90,7 @@ RUN ln -s $(which python3) /usr/local/bin/python
 # Installs the latest version by default.
 USER $NB_USER
 ARG TF_PACKAGE=tensorflow-gpu
-ARG TF_PACKAGE_VERSION=2.4
+ARG TF_PACKAGE_VERSION=2.5.0
 RUN python3 -m pip install --no-cache-dir ${TF_PACKAGE}${TF_PACKAGE_VERSION:+==${TF_PACKAGE_VERSION}}
 
 # Tensorboard jupyter(lab) extension
