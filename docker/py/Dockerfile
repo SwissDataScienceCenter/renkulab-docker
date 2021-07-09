@@ -1,5 +1,5 @@
 # Run with the RenkuKubeSpawner via JupyterHub
-ARG BASE_IMAGE=jupyter/base-notebook:aec555e49be6
+ARG BASE_IMAGE=jupyter/base-notebook:lab-3.0.16
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -45,11 +45,9 @@ USER $NB_USER
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache -U pip && \
     python3 -m pip install --no-cache -r /tmp/requirements.txt && \
-    jupyter labextension install --no-build @jupyterlab/toc && \
-    jupyter labextension install --no-build jupyterlab-topbar-extension jupyterlab-system-monitor && \
-    jupyter lab build && \
-    jupyter labextension list && \
-    npm cache clean --force && \
+    # jupyter lab build && \
+    # jupyter labextension list && \
+    # npm cache clean --force && \
     rm -rf /home/${NB_USER}/.cache
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
