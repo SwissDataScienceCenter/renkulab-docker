@@ -17,10 +17,10 @@ jobs:
       - name: Build all images
         run: |
           docker build -t py docker/py/
-          docker build -t cuda-tf docker/cuda-tf/
-          docker build -t generic docker/generic/
-          docker build -t julia docker/julia/
-          docker build -t r docker/r/
+          docker build -t cuda-tf --build-arg BASE_IMAGE=py docker/cuda-tf/
+          docker build -t generic --build-arg RENKU_BASE=py  docker/generic/
+          docker build -t julia --build-arg BASE_IMAGE=py docker/julia/
+          docker build -t r --build-arg RENKU_BASE=py docker/r/
       - uses: cypress-io/github-action@v2
         with:
           working-directory: tests
