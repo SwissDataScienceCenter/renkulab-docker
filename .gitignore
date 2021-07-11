@@ -12,4 +12,10 @@
 # Ignore all local history of files
 .history
 
+## Node modules
+**/node_modules/*
+## Cypress
+tests/cypress/videos/*
+tests/cypress/screenshots/*
+
 # End of https://www.gitignore.io/api/visualstudiocode

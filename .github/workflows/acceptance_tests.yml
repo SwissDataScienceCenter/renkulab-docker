@@ -1,0 +1,44 @@
+name: Acceptance tests
+
+on:
+  pull_request:
+    types:
+    - opened
+    - edited
+    - synchronize
+    - reopened
+    - closed
+
+jobs:
+  acceptance-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build all images
+        run: |
+          docker build -t py docker/py/
+          docker build -t cuda-tf docker/cuda-tf/
+          docker build -t generic docker/generic/
+          docker build -t julia docker/julia/
+          docker build -t r docker/r/
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: tests
+          command: TEST_IMAGE_NAME="py" npx mocha test.js
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: tests
+          command: TEST_IMAGE_NAME="cuda-tf" npx mocha test.js
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: tests
+          command: TEST_IMAGE_NAME="generic" npx mocha test.js
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: tests
+          command: TEST_IMAGE_NAME="julia" npx mocha test.js
+      - uses: cypress-io/github-action@v2
+        with:
+          working-directory: tests
+          command: TEST_IMAGE_NAME="r" npx mocha test.js
+  
