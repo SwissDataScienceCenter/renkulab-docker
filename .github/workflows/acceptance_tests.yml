@@ -22,23 +22,33 @@ jobs:
           docker build -t julia --build-arg BASE_IMAGE=py docker/julia/
           docker build -t r --build-arg RENKU_BASE=py docker/r/
       - uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: py
         with:
           working-directory: tests
-          command: TEST_IMAGE_NAME="py" npx mocha test.js
+          command: npx mocha test.js
       - uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: cuda-tf
         with:
           working-directory: tests
-          command: TEST_IMAGE_NAME="cuda-tf" npx mocha test.js
+          command: npx mocha test.js
       - uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: generic
         with:
           working-directory: tests
-          command: TEST_IMAGE_NAME="generic" npx mocha test.js
+          command: npx mocha test.js
       - uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: julia
         with:
           working-directory: tests
-          command: TEST_IMAGE_NAME="julia" npx mocha test.js
+          command: npx mocha test.js
       - uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: r
         with:
           working-directory: tests
-          command: TEST_IMAGE_NAME="r" npx mocha test.js
+          command: npx mocha test.js
   
