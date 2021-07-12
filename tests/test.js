@@ -7,6 +7,7 @@ const imageName = process.env.TEST_IMAGE_NAME
 const port = 8888
 const url = `http://127.0.0.1:${port}/lab`
 const containerName = "testing-dockerlab-image"
+const user = process.env.TEST_USER_NAME
 
 function sleep(ms) {
   // shamelessly ripped off from https://stackoverflow.com/questions/951021/what-is-the-javascript-version-of-sleep
@@ -35,7 +36,7 @@ const checkStatusCode = async function (url) {
 describe(`Starting container with image ${imageName} and name ${containerName}`, function () {
   this.timeout(0);
   before(async function () {
-    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user jovyan --entrypoint tini ${imageName} -g -- start-notebook.sh --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.ip=0.0.0.0 --NotebookApp.ip=0.0.0.0 --ServerApp.token="" --NotebookApp.token="" --ServerApp.password=""  --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true" --ServerApp.disable_check_xsrf="true"`);
+    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user ${user} --entrypoint tini ${imageName} -g -- start-notebook.sh --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.ip=0.0.0.0 --NotebookApp.ip=0.0.0.0 --ServerApp.token="" --NotebookApp.token="" --ServerApp.password=""  --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true" --ServerApp.disable_check_xsrf="true"`);
     res = await checkStatusCode(url);
     console.log(`Container successfully started`)
   });

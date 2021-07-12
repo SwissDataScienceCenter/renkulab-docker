@@ -21,33 +21,43 @@ jobs:
           docker build -t generic --build-arg RENKU_BASE=py  docker/generic/
           docker build -t julia --build-arg BASE_IMAGE=py docker/julia/
           docker build -t r --build-arg RENKU_BASE=py docker/r/
-      - uses: cypress-io/github-action@v2
+      - name: Py Image Acceptance Tests
+        uses: cypress-io/github-action@v2
         env:
           TEST_IMAGE_NAME: py
+          TEST_USER_NAME: jovyan
         with:
           working-directory: tests
           command: npx mocha test.js
-      - uses: cypress-io/github-action@v2
+      - name: Cuda-tf Image Acceptance Tests
+        uses: cypress-io/github-action@v2
         env:
           TEST_IMAGE_NAME: cuda-tf
+          TEST_USER_NAME: jovyan
         with:
           working-directory: tests
           command: npx mocha test.js
-      - uses: cypress-io/github-action@v2
+      - name: Generic Image Acceptance Tests
+        uses: cypress-io/github-action@v2
         env:
           TEST_IMAGE_NAME: generic
+          TEST_USER_NAME: jovyan
         with:
           working-directory: tests
           command: npx mocha test.js
-      - uses: cypress-io/github-action@v2
+      - name: Julia Image Acceptance Tests
+        uses: cypress-io/github-action@v2
         env:
           TEST_IMAGE_NAME: julia
+          TEST_USER_NAME: jovyan
         with:
           working-directory: tests
           command: npx mocha test.js
-      - uses: cypress-io/github-action@v2
+      - name: R Image Acceptance Tests
+        uses: cypress-io/github-action@v2
         env:
           TEST_IMAGE_NAME: r
+          TEST_USER_NAME: rstudio
         with:
           working-directory: tests
           command: npx mocha test.js
