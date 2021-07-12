@@ -52,7 +52,7 @@ ENV PATH ${CONDA_PATH}/bin:$PATH
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
 COPY --from=renku_base /usr/bin/tini /usr/bin/tini
-COPY --from=renku_base /usr/local/bin/*sh /usr/local/bin/
+COPY --from=renku_base --chown=1000:1000 /usr/local/bin/*sh /usr/local/bin/
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 COPY --from=renku_base --chown=1000:1000 \
     /home/jovyan/ /home/${NB_USER}/

@@ -35,14 +35,14 @@ const checkStatusCode = async function (url) {
 describe(`Starting container with image ${imageName} and name ${containerName}`, function () {
   this.timeout(0);
   before(async function () {
-    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user jovyan --entrypoint tini ${imageName} -g -- start-notebook.sh --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.token="" --ServerApp.password="" --NotebookApp.token="" --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true"`);
+    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user jovyan --entrypoint tini ${imageName} -g -- start-notebook.sh --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.ip=0.0.0.0 --NotebookApp.ip=0.0.0.0 --ServerApp.token="" --NotebookApp.token="" --ServerApp.password=""  --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true" --ServerApp.disable_check_xsrf="true"`);
     res = await checkStatusCode(url);
     console.log(`Container successfully started`)
   });
   it('Should pass all acceptance tests', async function () {
     const {stdout, stderr, error} = await exec(`npx cypress run`);
     console.log(`\n\n--------------------------------------------Cypress stdout--------------------------------------------\n${stdout}`)
-    console.log(`\n\n--------------------------------------------Cypress stderr--------------------------------------------\n${stdout}`)
+    console.log(`\n\n--------------------------------------------Cypress stderr--------------------------------------------\n${stderr}`)
     console.log(`\n\n--------------------------------------------Cypress error--------------------------------------------\n${error}`)
     console.log(`\n\n-----------------------------------------------------------------------------------------------------\n`)
     assert.ok(!error)
