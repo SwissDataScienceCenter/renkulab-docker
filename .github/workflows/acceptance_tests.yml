@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build image
         run: |
-          if ["${{ matrix.build_arg }}" == ""]
+          if ['${{ matrix.build_arg }}' == '']
           then
           docker build -t ${{ matrix.image_name }} docker/${{ matrix.image_name }}/
           else
