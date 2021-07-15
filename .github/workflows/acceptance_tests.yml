@@ -8,6 +8,7 @@ on:
 jobs:
   local-registry:
     runs-on: ubuntu-latest
+    container: node:10.18-jessie
     services:
       registry:
         image: registry:2
