@@ -68,7 +68,8 @@ jobs:
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
           build-args: |
-            ${{ matrix.build_arg }}
+            RENKU_BASE=localhost:5000/py
+            BASE_IMAGE=localhost:5000/py
           push: true
       - name: Move Cache
         if: ${{ matrix.image_name != 'py' }}
