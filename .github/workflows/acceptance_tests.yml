@@ -8,12 +8,15 @@ on:
 jobs:
   local-registry:
     runs-on: ubuntu-latest
-    container: node:10.18-jessie
     services:
       registry:
         image: registry:2
         ports:
           - 5000:5000
+    steps:
+      - name: Confirm registry setup
+        run:
+          curl localhost:5000
   
   build-py-image:
     needs: local-registry
