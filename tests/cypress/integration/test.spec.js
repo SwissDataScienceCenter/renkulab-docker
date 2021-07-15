@@ -16,7 +16,7 @@ describe('Basic functionality', function() {
     cy.get('div.xterm-screen').click().type("touch new-file.txt{enter}")
   })
   it('Can see the new file in the file browser', function () {
-    cy.get('button[title="Refresh File List"]').click()
+    cy.get('button[title="Refresh File List"]').click().wait(2000)
     cy.get('li.jp-DirListing-item[title^="Name: new-file.txt"]')
   })
 })
