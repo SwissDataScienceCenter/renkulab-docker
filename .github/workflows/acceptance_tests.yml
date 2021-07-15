@@ -6,28 +6,18 @@ on:
     - synchronize
 
 jobs:
-  acceptance-tests:
-    strategy:
-      max-parallel: 1
-      matrix:
-        include:
-          - image_name: py
-            test_user: jovyan
-          - image_name: cuda-tf
-            build_arg: BASE_IMAGE=py
-            test_user: jovyan
-          - image_name: generic
-            build_arg: RENKU_BASE=py
-            test_user: jovyan
-          - image_name: julia
-            build_arg: BASE_IMAGE=py
-            test_user: jovyan
-          - image_name: r
-            build_arg: RENKU_BASE=py
-            test_user: jovyan
+  local-registry:
+    runs-on: ubuntu-latest
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+  
+  build-py-image:
+    needs: local-registry
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
         with:
@@ -44,22 +34,10 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           context: docker/py/
-          push: false
-          tags: py
+          tags: localhost:5000/py
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
-          load: true
-      - name: Build Test Image
-        if: ${{ matrix.image_name != 'py' }}
-        uses: docker/build-push-action@v2
-        with:
-          context: docker/${{ matrix.image_name }}/
-          push: false
-          tags: ${{ matrix.image_name }}
-          cache-from: type=local,src=/tmp/.buildx-cache
-          cache-to: type=local,dest=/tmp/.buildx-cache-new
-          build-args: ${{ matrix.build_arg }}
-          load: true
+          push: true
       - name: Move Cache
         # Temp fix
         # https://github.com/docker/build-push-action/issues/252
@@ -70,7 +48,63 @@ jobs:
       - name: Image Acceptance Tests
         uses: cypress-io/github-action@v2
         env:
-          TEST_IMAGE_NAME: ${{ matrix.image_name }}
+          TEST_IMAGE_NAME: localhost:5000/py
+          TEST_USER_NAME: jovyan
+        with:
+          working-directory: tests
+          command: npx mocha test.js
+
+  acceptance-tests:
+    needs: build-py-image
+    strategy:
+      matrix:
+        include:
+          - image_name: cuda-tf
+            build_arg: BASE_IMAGE=localhost:5000/py
+            test_user: jovyan
+          - image_name: generic
+            build_arg: RENKU_BASE=localhost:5000/py
+            test_user: jovyan
+          - image_name: julia
+            build_arg: BASE_IMAGE=localhost:5000/py
+            test_user: jovyan
+          - image_name: r
+            build_arg: RENKU_BASE=localhost:5000/py
+            test_user: jovyan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: |
+            network=host
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      - name: Build Test Image
+        uses: docker/build-push-action@v2
+        with:
+          context: docker/${{ matrix.image_name }}/
+          tags: localhost:5000/${{ matrix.image_name }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new
+          build-args: ${{ matrix.build_arg }}
+          push: true
+      - name: Move Cache
+        # Temp fix
+        # https://github.com/docker/build-push-action/issues/252
+        # https://github.com/moby/buildkit/issues/1896
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: localhost:5000/${{ matrix.image_name }}
           TEST_USER_NAME: ${{ matrix.test_user }}
         with:
           working-directory: tests
