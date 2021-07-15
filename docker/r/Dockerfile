@@ -33,6 +33,11 @@ ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 ENV RSTUDIO_VERSION 1.3.959
 RUN /rocker_scripts/install_rstudio.sh
 
+# Add Tini
+ENV TINI_VERSION v0.18.0
+ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
+RUN chmod +x /tini && ln -s /tini /usr/bin/
+
 # install dependencies
 RUN apt-get update --fix-missing && \
     apt-get install -yq --no-install-recommends \
@@ -53,7 +58,6 @@ RUN apt-get update --fix-missing && \
     libxext6 \
     libxrender1 \
     libzmq3-dev \
-    tini \
     wget \
     vim && \
     apt-get purge && \
