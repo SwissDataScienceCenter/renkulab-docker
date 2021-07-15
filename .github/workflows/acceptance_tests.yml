@@ -38,7 +38,7 @@ jobs:
             test_user: jovyan
           - image_name: r
             build_arg: RENKU_BASE=py
-            test_user: jovyan
+            test_user: rstudio
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

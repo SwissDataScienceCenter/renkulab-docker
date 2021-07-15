@@ -1,5 +1,5 @@
 # define build arguments
-ARG RENKU_BASE
+ARG RENKU_BASE=renku/renkulab-py:latest
 ARG BASE_IMAGE=rocker/verse:4.0.5
 
 # define base images
@@ -58,6 +58,7 @@ RUN apt-get update --fix-missing && \
     libxext6 \
     libxrender1 \
     libzmq3-dev \
+    tini \
     wget \
     vim && \
     apt-get purge && \
@@ -71,7 +72,6 @@ COPY --from=renku_base --chown=rstudio:rstudio  /usr/local/bin/ /usr/local/bin/
 COPY --from=renku_base --chown=rstudio:rstudio \
     /home/jovyan/ /home/rstudio/
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
-COPY --from=renku_base /usr/bin/tini /usr/bin/tini
 
 # set permissions of the R library directory to be editable by NB_USER
 ADD fix-permissions.sh /usr/local/bin
