@@ -67,7 +67,8 @@ jobs:
           tags: localhost:5000/${{ matrix.image_name }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
-          build-args: ${{ matrix.build_arg }}
+          build-args: |
+            ${{ matrix.build_arg }}
           push: true
       - name: Move Cache
         if: ${{ matrix.image_name != 'py' }}
