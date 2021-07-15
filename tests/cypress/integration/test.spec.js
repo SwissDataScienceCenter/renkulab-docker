@@ -11,4 +11,12 @@ describe('Basic functionality', function() {
   it('Can launch terminal', function() {
     cy.get('div.jp-LauncherCard[title="Start a new terminal session"]').click()
   })
+  it('Runs a command in the terminal to make new file', function () {
+    cy.get('canvas.xterm-link-layer')
+    cy.get('div.xterm-screen').click().type("touch new-file.txt{enter}")
+  })
+  it('Can see the new file in the file browser', function () {
+    cy.get('button[title="Refresh File List"]').click()
+    cy.get('li.jp-DirListing-item[title^="Name: new-file.txt"]')
+  })
 })
