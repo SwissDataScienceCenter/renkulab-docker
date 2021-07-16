@@ -35,6 +35,7 @@ RUN apt-get update --fix-missing && \
     libsm6 \
     libxext6 \
     libxrender1 \
+    tini \
     wget \
     vim && \
     apt-get purge && \
@@ -51,6 +52,7 @@ ENV PATH ${CONDA_PATH}/bin:$PATH
 
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
+COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 COPY --from=renku_base --chown=1000:1000 \
     /home/jovyan/ /home/${NB_USER}/
 

@@ -36,7 +36,7 @@ RUN /rocker_scripts/install_rstudio.sh
 # Add Tini
 ENV TINI_VERSION v0.18.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
+RUN chmod +x /tini && ln -s /tini /usr/bin/
 
 # install dependencies
 RUN apt-get update --fix-missing && \

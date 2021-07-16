@@ -1,0 +1,64 @@
+name: Acceptance tests
+
+on:
+  pull_request:
+    types:
+    - synchronize
+
+jobs:
+  build-base-python-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build Image
+        run: |
+          docker build -t py docker/py/
+          docker save py > /tmp/py.tar
+      - name: Upload Image Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: py
+          path: /tmp/py.tar
+
+  acceptance-tests:
+    needs: build-base-python-image
+    strategy:
+      matrix:
+        include:
+          - image_name: py
+            test_user: jovyan
+          - image_name: cuda-tf
+            build_arg: BASE_IMAGE=py
+            test_user: jovyan
+          - image_name: generic
+            build_arg: RENKU_BASE=py
+            test_user: jovyan
+          - image_name: julia
+            build_arg: BASE_IMAGE=py
+            test_user: jovyan
+          - image_name: r
+            build_arg: RENKU_BASE=py
+            test_user: rstudio
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Download Base Image
+        uses: actions/download-artifact@v2
+        with:
+          name: py
+          path: /tmp
+      - name: Load Base Image in Docker
+        run: |
+          docker load --input /tmp/py.tar
+      - name: Build images
+        if: ${{ matrix.image_name != 'py' }}
+        run: |
+          docker build -t ${{ matrix.image_name }} --build-arg ${{ matrix.build_arg }} docker/${{ matrix.image_name }}/
+      - name: Py Image Acceptance Tests
+        uses: cypress-io/github-action@v2
+        env:
+          TEST_IMAGE_NAME: ${{ matrix.image_name }}
+          TEST_USER_NAME: ${{ matrix.test_user }}
+        with:
+          working-directory: tests
+          command: npx mocha test.js
