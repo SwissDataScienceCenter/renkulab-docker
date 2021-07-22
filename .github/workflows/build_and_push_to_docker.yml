@@ -92,8 +92,8 @@ jobs:
         fi
 
         docker build docker/batch \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.8-$LABEL" \
-          --build-arg BASE_IMAGE="python:3.8-slim" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
+          --build-arg BASE_IMAGE="python:3.9-slim" \
           --tag $DOCKER_NAME-batch:$LABEL
         docker push $DOCKER_NAME-batch:$LABEL
       env:
