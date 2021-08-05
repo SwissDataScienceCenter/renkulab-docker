@@ -30,7 +30,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 1.3.1093
+ENV RSTUDIO_VERSION 1.4.1717
 RUN /rocker_scripts/install_rstudio.sh
 
 # Add Tini
@@ -75,6 +75,7 @@ COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 # set permissions of the R library directory to be editable by NB_USER
 ADD fix-permissions.sh /usr/local/bin
 RUN fix-permissions.sh /usr/local/lib/R && \
+    fix-permissions.sh /var/lib/rstudio-server && \
     chown 1000:1000 /opt/conda && \
     usermod -a -G users rstudio && \
     # this hack lets some of the setup from the base renku image work here
