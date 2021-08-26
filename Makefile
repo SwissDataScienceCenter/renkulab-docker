@@ -21,7 +21,8 @@ extensions = \
 	r \
 	cuda-9.2 \
 	cuda-10.0-tf \
-	vnc
+	vnc \
+	julia
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
@@ -99,3 +100,8 @@ vnc: py
 		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) && \
 	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-vnc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
 
+julia: py
+	docker build docker/julia \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)$(RENKU_TAG) && \
+	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
