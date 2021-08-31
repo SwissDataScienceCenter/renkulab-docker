@@ -22,6 +22,18 @@ then
 fi
 
 # install git hooks
+# we need to avoid a race condition where renku could try to install
+# the git hooks before the repo is actually cloned during the execution
+# of the entrypoint of the git sidecar
+if [[ -v GIT_CLONE_REPO && -v NOTEBOOK_DIR ]]
+then
+    while [[ ! -f ./.renku-repo-clone-complete ]]
+    do
+        echo "Waiting for repository to be cloned..."
+        sleep 1
+    done
+    rm ./.renku-repo-clone-complete
+fi
 ~/.local/bin/renku githooks install || true
 
 # run the post-init script in the root directory (i.e. coming from the image)
