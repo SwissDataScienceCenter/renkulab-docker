@@ -78,7 +78,9 @@ RUN fix-permissions.sh /usr/local/lib/R && \
     chown 1000:1000 /opt/conda && \
     usermod -a -G users rstudio && \
     # this hack lets some of the setup from the base renku image work here
-    ln -s /home/${NB_USER} /home/jovyan
+    ln -s /home/${NB_USER} /home/jovyan && \
+    # this allows rstudio to run in an iframe in the UI
+    echo "\nwww-frame-origin=same\n" >> /etc/rstudio/rserver.conf
 
 USER ${NB_USER}
 
