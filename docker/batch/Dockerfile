@@ -17,17 +17,17 @@ RUN apt-get update -y && \
     apt-get purge && \
     apt-get clean && \
     apt autoremove --yes && \
-    rm -rf /var/lib/apt/lists/* 
+    rm -rf /var/lib/apt/lists/*
 
-RUN pip install pipx
+# Install Renku python without pipx in a non-user location
+RUN python3 -m pip install --no-cache pipenv
+RUN virtualenv /share/.renku && \
+    . /share/.renku/bin/activate && \
+    pip install --no-cache renku && \
+    deactivate && \
+    ln -s /share/.renku/bin/renku /share/bin
 
-# override default locations of pipx and app installation
-ENV PIPX_BIN_DIR /share/bin
-ENV PIPX_HOME /share/pipx
 ENV PATH /share/bin:$PATH
-
-# install renku-python
-RUN pipx install --pip-args="--no-cache" renku
 
 # inject entrypoint.sh
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
