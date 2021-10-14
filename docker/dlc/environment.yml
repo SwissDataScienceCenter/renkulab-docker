@@ -1,0 +1,14 @@
+name: py38
+channels:
+  - defaults
+dependencies:
+  - python=3.8
+  - pip
+  - pip:
+    - ipykernel
+    - setuptools==43.0.0
+    - deeplabcut[gui]>=2.2.0.2
+    - numpy==1.19.5 
+    - decorator==4.4.2 
+    - tensorflow==2.5.0
+prefix: "/opt/conda/envs"

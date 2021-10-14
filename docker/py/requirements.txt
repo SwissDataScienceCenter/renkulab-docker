@@ -1,9 +1,0 @@
-jupyter-server-proxy~=3.1.0
-jupyterhub~=1.4.0
-jupyterlab-git==0.30.1
-jupyterlab-system-monitor~=0.8.0
-jupyterlab~=3.0.0
-papermill~=2.3.0
-pipx>=0.15.0.0
-powerline-shell~=0.7.0
-requests>=2.20.0
