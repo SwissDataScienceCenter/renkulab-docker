@@ -41,7 +41,7 @@ RUN apt-get update \
 
 
 # CUDNN Installation
-ENV CUDNN_VERSION=8.1.0.77
+ENV CUDNN_VERSION=8.1.0
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends libcudnn8=$CUDNN_VERSION-1+cuda11.0 libcudnn8-dev=$CUDNN_VERSION-1+cuda11.0 \
