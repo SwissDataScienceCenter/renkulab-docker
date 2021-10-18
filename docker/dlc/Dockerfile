@@ -6,12 +6,12 @@ FROM ${RENKU_BASE_IMAGE}
 USER root
 
 # CUDA
-ENV CUDA_VERSION=11.0.3
-ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda-11.0/lib64
+ENV CUDA_VERSION=11.4.0
+ENV LD_LIBRARY_PATH=/usr/local/nvidia/lib:/usr/local/nvidia/lib64:/usr/local/cuda-11.4/lib64
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV NVIDIA_REQUIRE_CUDA=cuda>=11.0 brand=tesla,driver>=418,driver<419 brand=tesla,driver>=440,driver<441 driver>=450
-ENV NCCL_VERSION=2.10.3
+ENV NVIDIA_REQUIRE_CUDA=cuda>=11.4 brand=tesla,driver>=418,driver<419 brand=tesla,driver>=440,driver<441 driver>=450
+ENV NCCL_VERSION=2.11.4
 ENV LIBRARY_PATH=/usr/local/cuda/lib64/stubs
 ENV PATH=/usr/local/nvidia/bin:/usr/local/cuda/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/conda/bin:/home/jovyan/.local/bin
     
@@ -23,28 +23,28 @@ RUN apt-get update \
     &&     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends cuda-cudart-11-0=11.0.221-1 cuda-compat-11-0 \
-    &&     ln -s cuda-11.1 /usr/local/cuda \
+    && apt-get install -y --no-install-recommends cuda-cudart-11-4=11.4.43-1 cuda-compat-11-4 \
+    &&     ln -s cuda-11.4 /usr/local/cuda \
     &&     rm -rf /var/lib/apt/lists/*
 
 RUN echo "/usr/local/nvidia/lib" >> /etc/ld.so.conf.d/nvidia.conf \
     &&     echo "/usr/local/nvidia/lib64" >> /etc/ld.so.conf.d/nvidia.conf
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends cuda-libraries-11-0=11.0.3-1 libnpp-11-0=11.1.0.245-1 cuda-nvtx-11-0=11.0.167-1 libcublas-11-0=11.2.0.252-1 libcusparse-11-0=11.1.1.245-1 libnccl2=$NCCL_VERSION-1+cuda11.0 \
+    && apt-get install -y --no-install-recommends cuda-libraries-11-4=11.4.0-1 libnpp-11-4=11.4.0.33-1 cuda-nvtx-11-4=11.4.43-1 libcublas-11-4=11.5.2.43-1 libcusparse-11-4=11.6.0.43-1 libnccl2=$NCCL_VERSION-1+cuda11.4 \
     &&     apt-mark hold libnccl2 \
     &&     rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libtinfo5 libncursesw5 cuda-cudart-dev-11-0=11.0.221-1 cuda-command-line-tools-11-0=11.0.3-1 cuda-minimal-build-11-0=11.0.3-1 cuda-libraries-dev-11-0=11.0.3-1 cuda-nvml-dev-11-0=11.0.167-1 libnpp-dev-11-0=11.1.0.245-1 libnccl-dev=2.10.3-1+cuda11.0 libcublas-dev-11-0=11.2.0.252-1 libcusparse-dev-11-0=11.1.1.245-1 \
+    && apt-get install -y --no-install-recommends libtinfo5 libncursesw5 cuda-cudart-dev-11-4=11.4.43-1 cuda-command-line-tools-11-4=11.4.0-1 cuda-minimal-build-11-4=11.4.0-1 cuda-libraries-dev-11-4=11.4.0-1 cuda-nvml-dev-11-4=11.4.43-1 libnpp-dev-11-4=11.4.0.33-1 libnccl-dev=2.11.4-1+cuda11.4 libcublas-dev-11-4=11.5.2.43-1 libcusparse-dev-11-4=11.6.0.43-1 \
     &&     rm -rf /var/lib/apt/lists/*
 
 
 # CUDNN Installation
-ENV CUDNN_VERSION=8.1.0.77
+ENV CUDNN_VERSION=8.2.2.26
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libcudnn8=$CUDNN_VERSION-1+cuda11.0 libcudnn8-dev=$CUDNN_VERSION-1+cuda11.0 \
+    && apt-get install -y --no-install-recommends libcudnn8=$CUDNN_VERSION-1+cuda11.4 libcudnn8-dev=$CUDNN_VERSION-1+cuda11.4 \
     &&     rm -rf /var/lib/apt/lists/*
 
 
@@ -58,7 +58,7 @@ RUN apt-get update \
     
 ENV DLClight=False
 
-RUN ln -s /usr/local/cuda-11.0/lib64/libcusolver.so.10 /usr/local/cuda-11.0/lib64/libcusolver.so.11
+# RUN ln -s /usr/local/cuda-11.0/lib64/libcusolver.so.10 /usr/local/cuda-11.0/lib64/libcusolver.so.11
 
 USER ${NB_USER}
 
