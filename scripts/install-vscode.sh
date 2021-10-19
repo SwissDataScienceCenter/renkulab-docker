@@ -16,6 +16,6 @@ code-server --install-extension ms-python.python
 pip install pylint
 
 # Jupyter support
-pip install git+https://github.com/betatim/vscode-binder
-jupyter serverextension enable --py jupyter_server_proxy
+pip install jupyter-vscode-proxy==0.1
+jupyter serverextension enable --sys-prefix jupyter_server_proxy
 jupyter labextension install @jupyterlab/server-proxy
