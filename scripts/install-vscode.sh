@@ -8,8 +8,7 @@ curl -fL https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}
   | tar -C ~/.local/lib -xz 
 mv ~/.local/lib/code-server-${VSCODE_VERSION}-linux-amd64 ~/.local/lib/code-server-${VSCODE_VERSION}
 mkdir -p ~/.local/bin
-PATH=$PATH:~/.local/bin
-export PATH
+export PATH="~/.local/bin/:$PATH"
 ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
 
 # python extension
