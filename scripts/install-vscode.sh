@@ -7,10 +7,12 @@ mkdir -p ~/.local/lib
 curl -fL https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server-${VSCODE_VERSION}-linux-amd64.tar.gz \
   | tar -C ~/.local/lib -xz 
 mv ~/.local/lib/code-server-${VSCODE_VERSION}-linux-amd64 ~/.local/lib/code-server-${VSCODE_VERSION}
-# ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
+mkdir -p ~/.local/bin
+PATH=$PATH:~/.local.bin
+ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
 
 # python extension
-~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server --install-extension ms-python.python
+code-server --install-extension ms-python.python
 pip install pylint
 
 # Jupyter support
