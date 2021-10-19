@@ -13,7 +13,7 @@ echo "export PATH=$PATH:~/.local/bin/" >> ~/.bashrc
 ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
 
 # python extension
-code-server --install-extension ms-python.python
+~/.local/bin/code-server --install-extension ms-python.python
 pip install pylint
 
 # Jupyter support
