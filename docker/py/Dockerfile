@@ -1,5 +1,5 @@
 # Run with the RenkuKubeSpawner via JupyterHub
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.0.16
+ARG BASE_IMAGE=jupyter/base-notebook:lab-3.2.1
 ARG RENKU_VERSION=0.16.2
 FROM $BASE_IMAGE as base
 
