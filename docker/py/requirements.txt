@@ -6,4 +6,5 @@ jupyterlab~=3.0.0
 papermill~=2.3.0
 powerline-shell~=0.7.0
 requests>=2.20.0
+setuptools==57.5.0
 virtualenv>=20.7.2
