@@ -29,6 +29,21 @@ RUN apt-get update \
     && find /var/log -type f -exec cp /dev/null \{\} \;
 
 #################################################################
+# Install additional Qt related libraries
+RUN apt-get update \
+    && apt-get install -yq --no-install-recommends \
+        libxcb-icccm4 \
+        libxcb-image0 \
+        libxcb-keysyms1 \
+        libxcb-randr0 \
+        libxcb-render-util0 \
+        libxcb-xkb1 \
+        libxkbcommon-x11-0 \
+    && apt-get autoremove --purge \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* 
+
+#################################################################
 # Install noVNC
 
 ENV novnc_version=1.1.0
