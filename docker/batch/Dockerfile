@@ -1,5 +1,5 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py:3.9-0.10.1
+ARG RENKU_BASE=renku/renkulab-py:latest
 ARG BASE_IMAGE=python:3.9-slim-buster
 ARG RENKU_VERSION=0.16.2
 
