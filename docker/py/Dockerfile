@@ -1,5 +1,6 @@
 # Run with the RenkuKubeSpawner via JupyterHub
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.0.16
+ARG BASE_IMAGE=jupyter/base-notebook:lab-3.2.1
+ARG RENKU_VERSION=0.16.2
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -61,10 +62,11 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 
 ENV PATH=$PATH:$HOME/.renku/bin
 
+ARG RENKU_VERSION
 RUN mkdir -p $HOME/.renku/bin && \
-    virtualenv $HOME/.renku/venv && \
+    virtualenv --pip 21.3.1 --setuptools 57.5.0 --wheel 0.36.2  --no-periodic-update $HOME/.renku/venv && \
     source $HOME/.renku/venv/bin/activate && \
-    pip install --no-cache renku sentry-sdk && \
+    pip install --no-cache renku==$RENKU_VERSION sentry-sdk && \
     deactivate && \
     ln -s $HOME/.renku/venv/bin/renku $HOME/.renku/bin/renku
 
