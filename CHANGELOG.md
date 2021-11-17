@@ -1,4 +1,14 @@
-#  (2021-09-27)
+#  (2021-11-17)
+
+
+
+## [0.10.2](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.1...0.10.2) (2021-11-17)
+
+
+### Bug Fixes
+
+* image build and bump base image version ([#197](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/197)) ([cddd6a9](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/cddd6a9904d1d30e30387e1829143ae763ad1bd7))
+* renku not found error ([#193](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/193)) ([5f9ee64](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/5f9ee642c46610b55be63e9b51b9e076e4211c4d))
 
 
 
