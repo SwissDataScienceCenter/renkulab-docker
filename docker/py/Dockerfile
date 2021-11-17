@@ -60,7 +60,7 @@ RUN conda install gxx_linux-64 && \
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
-ENV PATH=$PATH:$HOME/.renku/bin
+ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
 
 ARG RENKU_VERSION
 RUN mkdir -p $HOME/.renku/bin && \
