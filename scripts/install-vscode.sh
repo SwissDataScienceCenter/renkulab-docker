@@ -4,8 +4,9 @@ VSCODE_VERSION=${VSCODE_VERSION:="3.10.2"}
 
 # code-server installation
 mkdir -p ~/.local/lib
+mkdir -p ~/.local/bin
 curl -fL https://github.com/cdr/code-server/releases/download/v${VSCODE_VERSION}/code-server-${VSCODE_VERSION}-linux-amd64.tar.gz \
-  | tar -C ~/.local/lib -xz 
+  | tar -C ~/.local/lib -xz
 mv ~/.local/lib/code-server-${VSCODE_VERSION}-linux-amd64 ~/.local/lib/code-server-${VSCODE_VERSION}
 ln -s ~/.local/lib/code-server-${VSCODE_VERSION}/bin/code-server ~/.local/bin/code-server
 
