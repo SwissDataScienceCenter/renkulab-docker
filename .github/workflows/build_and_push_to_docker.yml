@@ -189,7 +189,7 @@ jobs:
       fail-fast: false
       matrix:
         RELEASES:
-          - devel
+        # - devel --> commented out until issues with RStudio versions are resolved
           - RELEASE_3_11
           - RELEASE_3_12
           # TODO: enable once compatibility issues are fixed - see #154 and #160
