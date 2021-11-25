@@ -1,6 +1,6 @@
 #!/bin/sh
 
-VSCODE_VERSION=${VSCODE_VERSION:="3.10.2"}
+VSCODE_VERSION=${VSCODE_VERSION:="3.12.0"}
 
 # code-server installation
 mkdir -p ~/.local/lib
