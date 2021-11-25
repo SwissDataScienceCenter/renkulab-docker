@@ -1,6 +1,10 @@
 #  (2021-11-17)
 
+## [0.10.3](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.2...0.10.3) (2021-11-25)
 
+### Bug Fixes
+
+* fix a PATH misconfiguration when installing VSCode ([#205](https://github.com/SwissDataScienceCenter/renkulab-docker/pull/205))
 
 ## [0.10.2](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.1...0.10.2) (2021-11-17)
 
@@ -249,6 +253,3 @@
 
 
 ## [0.3.2](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.3.1...0.3.2) (2018-11-28)
-
-
-
