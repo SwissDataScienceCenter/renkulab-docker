@@ -1,0 +1,44 @@
+name: Update default image in notebooks
+
+on:
+  release:
+    types: [published]
+  push:
+    tags:
+      - "*"
+
+jobs:
+  update-notebooks-default-image:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get release tag
+      run: |
+        echo "NEW_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+    - name: Get image name
+      run: |
+        echo "NEW_IMAGE=renku/renkulab-py:3.9-${{ env.NEW_VERSION }}" >> $GITHUB_ENV
+    - name: Check if image exists
+      run: | 
+        docker pull $NEW_IMAGE || ( echo "Cannot find image $NEW_IMAGE" && exit 1 )
+    - name: Intall yq
+      run: apt-get install yq
+    - name: Checkout code
+      uses: actions/checkout@v2
+      with:
+        repository: SwissDataScienceCenter/renku-notebooks
+        ref: master
+        fetch-depth: 1
+    - name: Update image version
+      run: |
+        yq eval '.defaultSessionImage = "${{ env.NEW_IMAGE }}"' renku-notebooks/helm-chart/renku-notebooks/values.yaml
+    - name: Submit PR
+      uses: peter-evans/create-pull-request@v3
+      with:
+        token: ${{ secrets.RENKUBOT_GITHUB_TOKEN }}
+        commit-message: "chore(app): Update default session image to ${{ env.NEW_IMAGE }}"
+        title: "chore(app): Update default session image to ${{ env.NEW_IMAGE }}"
+        branch: "chore-update-default-image-${{ env.NEW_VERSION }}"
+        delete-branch: true
+        author: "Renku Bot <renku@datascience.ch>"
+        committer: "Renku Bot <renku@datascience.ch>"
+        body: "Generated automatically on a new release in renkulab-docker to update the default image used when launching a user session."
