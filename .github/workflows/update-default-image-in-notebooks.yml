@@ -19,7 +19,7 @@ jobs:
         echo "NEW_IMAGE=renku/renkulab-py:3.9-${{ env.NEW_VERSION }}" >> $GITHUB_ENV
     - name: Check if image exists
       run: | 
-        docker pull $NEW_IMAGE || ( echo "Cannot find image $NEW_IMAGE" && exit 1 )
+        # docker pull $NEW_IMAGE || ( echo "Cannot find image $NEW_IMAGE" && exit 1 )
     - name: Intall yq
       run: apt-get install yq
     - name: Checkout code
