@@ -17,11 +17,10 @@ jobs:
     - name: Get image name
       run: |
         echo "NEW_IMAGE=renku/renkulab-py:3.9-${{ env.NEW_VERSION }}" >> $GITHUB_ENV
-    - name: Check if image exists
-      run: | 
-        # docker pull $NEW_IMAGE || ( echo "Cannot find image $NEW_IMAGE" && exit 1 )
     - name: Intall yq
-      run: sudo apt-get install yq
+      run: |
+        sudo wget https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -O /usr/bin/yq
+        sudo chmod +x /usr/bin/yq
     - name: Checkout code
       uses: actions/checkout@v2
       with:
