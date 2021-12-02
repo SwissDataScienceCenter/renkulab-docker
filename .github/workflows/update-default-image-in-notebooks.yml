@@ -21,7 +21,7 @@ jobs:
       run: | 
         # docker pull $NEW_IMAGE || ( echo "Cannot find image $NEW_IMAGE" && exit 1 )
     - name: Intall yq
-      run: apt-get install yq
+      run: sudo apt-get install yq
     - name: Checkout code
       uses: actions/checkout@v2
       with:
