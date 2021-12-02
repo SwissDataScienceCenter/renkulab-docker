@@ -17,10 +17,6 @@ jobs:
     - name: Get image name
       run: |
         echo "NEW_IMAGE=renku/renkulab-py:3.9-${{ env.NEW_VERSION }}" >> $GITHUB_ENV
-    - name: Intall yq
-      run: |
-        sudo wget https://github.com/mikefarah/yq/releases/download/v4.15.1/yq_linux_amd64 -O /usr/bin/yq
-        sudo chmod +x /usr/bin/yq
     - name: Checkout code
       uses: actions/checkout@v2
       with:
@@ -29,7 +25,7 @@ jobs:
         fetch-depth: 1
     - name: Update image version
       run: |
-        yq -i eval '.defaultSessionImage = "${{ env.NEW_IMAGE }}"' ./helm-chart/renku-notebooks/values.yaml
+        sed -e -i 's/defaultSessionImage:.*/defaultSessionImage: ${{ env.NEW_VNEW_IMAGEERSION }}/' ./helm-chart/renku-notebooks/values.yaml
     - name: Submit PR
       uses: peter-evans/create-pull-request@v3
       with:
