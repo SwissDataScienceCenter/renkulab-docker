@@ -23,7 +23,8 @@ ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
 
 # And set PATH for R! It doesn't read from the environment...
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
-    echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh
+    echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh && \
+    echo "RENKU_DISABLE_VERSION_CHECK=1" >> /usr/local/lib/R/etc/Renviron
 
 # The `rsession` binary that is called by nbrsessionproxy to start R doesn't seem to start
 # without this being explicitly set
