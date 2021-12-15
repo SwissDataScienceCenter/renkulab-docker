@@ -7,7 +7,7 @@ USER root
 SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # Install additional dependencies and nice-to-have packages
-RUN apt-get update && apt-get install -yq --no-install-recommends \
+RUN apt update && apt install -yq --no-install-recommends \
     build-essential \
     curl \
     git \
