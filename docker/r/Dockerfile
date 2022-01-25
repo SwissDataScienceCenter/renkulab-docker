@@ -89,7 +89,7 @@ USER ${NB_USER}
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-RUN pip install "jupyter-rsession-proxy==1.1"
+RUN pip install "jupyter-rsession-proxy==2.0.1"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
