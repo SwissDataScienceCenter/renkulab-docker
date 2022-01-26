@@ -31,8 +31,9 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 2021.09.2+382
-RUN /rocker_scripts/install_rstudio.sh
+# ENV RSTUDIO_VERSION 2021.09.2+382
+# RUN /rocker_scripts/install_rstudio.sh
+# This version of rocker should already have RStudio installed!
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
