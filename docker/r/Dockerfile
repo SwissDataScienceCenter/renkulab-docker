@@ -31,7 +31,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 1.4.1717-3 
+ENV RSTUDIO_VERSION 2021.09.2+382
 RUN /rocker_scripts/install_rstudio.sh
 
 # Add Tini
