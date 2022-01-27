@@ -8,6 +8,15 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: true
+      matrix:
+        BASE_IMAGE_TAG:
+          - lab-3.2.1
+          - python-3.9.7
+          - python-3.8.8
+          - python-3.7.6
+
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -24,17 +33,24 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:3.9-$LABEL
-        docker push $DOCKER_NAME-py:3.9-$LABEL
+        # This ensures the same image tags as before are built, in addition to new ones
+        if [[ $BASE_IMAGE_TAG == lab-* ]]; then
+          export LABEL_PREFIX=3.9
+        else
+          export LABEL_PREFIX=$BASE_IMAGE_TAG
+        fi
 
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ]
-        then
-          docker tag $DOCKER_NAME-py:3.9-$LABEL $DOCKER_NAME-py:latest
+        docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:$BASE_IMAGE_TAG"
+        docker push $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL
+
+        # on master push latest image - the lab-* image is tagged latest
+        if [ "$REF" == "refs/heads/master" ] && [ $VERISON == lab-* ]; then
+          docker tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL $DOCKER_NAME-py:latest
           docker push $DOCKER_NAME-py:latest
         fi
       env:
         DOCKER_NAME: "renku/renkulab"
+        BASE_IMAGE_TAG: ${{ matrix.BASE_IMAGE_TAG }}
 
   build-py-ext:
     needs: build-py
@@ -44,7 +60,6 @@ jobs:
       fail-fast: true
       matrix:
         EXTENSIONS:
-          - cuda-tf
           - vnc
 
     steps:
@@ -70,6 +85,100 @@ jobs:
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
+
+  build-cuda:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
+          - CUDA_VERSION: "10.1"
+            BASE_IMAGE: renku/renkulab-py:python-3.8.8
+          - CUDA_VERSION: "11.0"
+            BASE_IMAGE: renku/renkulab-py:python-3.8.8
+          - CUDA_VERSION: "11.2"
+            BASE_IMAGE: renku/renkulab-py:python-3.9.7
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project python-based docker image extensions
+      run: |
+        cd docker/cuda
+
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        docker build -f Dockerfile-$CUDA_VERSION . \
+          --build-arg BASE_IMAGE="$BASE_IMAGE-$LABEL" \
+          --tag $DOCKER_NAME-cuda:$CUDA_VERSION-$LABEL
+        docker push $DOCKER_NAME-cuda:$CUDA_VERSION-$LABEL
+
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ $CUDA_VERSION == "11.2" ]; then
+          docker tag $DOCKER_NAME-cuda:$LABEL_PREFIX-$LABEL $DOCKER_NAME-cuda:latest
+          docker push $DOCKER_NAME-cuda:latest
+        fi
+      env:
+        CUDA_VERSION: ${{ matrix.CUDA_VERSION }}
+        BASE_IMAGE: ${{ matrix.BASE_IMAGE }}
+        DOCKER_NAME: "renku/renkulab"
+
+  build-cuda-tf:
+    needs: build-cuda
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
+          - TF_VERSION: "2.3"
+            CUDA_VERSION: "10.1"
+          - TF_VERSION: "2.4"
+            CUDA_VERSION: "11.0"
+          - TF_VERSION: "2.7"
+            CUDA_VERSION: "11.2"
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project python-based docker image extensions
+      run: |
+        cd docker/cuda-tf
+
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        docker build . \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-cuda:$CUDA_VERSION-$LABEL" \
+          --build-arg TF_PACKAGE_VERSION="$TF_VERSION" \
+          --tag $DOCKER_NAME-cuda-tf:$CUDA_VERSION-tf-$TF_VERSION-$LABEL
+        docker push $DOCKER_NAME-cuda-tf:$CUDA_VERSION-tf-$TF_VERSION-$LABEL
+      env:
+        TF_VERSION: ${{ matrix.TF_VERSION }}
+        CUDA_VERSION: ${{ matrix.CUDA_VERSION }}
+        DOCKER_NAME: "renku/renkulab"
+
 
   build-py-batch:
     needs: build-py
