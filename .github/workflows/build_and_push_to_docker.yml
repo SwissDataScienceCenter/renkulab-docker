@@ -120,6 +120,7 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image extensions
+      id: build-image
       run: |
         cd docker/cuda
 
@@ -250,6 +251,7 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Build renku project julia docker image extensions
+      id: build-image
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
