@@ -39,7 +39,7 @@ const checkStatusCode = async function (url) {
 describe(`Starting container with image ${imageName} and name ${containerName}`, function () {
   this.timeout(0);
   before(async function () {
-    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user ${user} --entrypoint tini ${imageName} -g -- jupyter lab --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.ip=0.0.0.0 --NotebookApp.ip=0.0.0.0 --ServerApp.token="" --NotebookApp.token="" --ServerApp.password=""  --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true" --ServerApp.disable_check_xsrf="true"`);
+    await exec(`docker run -d -p ${port}:${port} --name ${containerName} --rm --user ${user} --entrypoint="tini" ${imageName} -g -- jupyter lab --ServerApp.port=${port} --NotebookApp.port=${port} --ServerApp.ip=0.0.0.0 --NotebookApp.ip=0.0.0.0 --ServerApp.token="" --NotebookApp.token="" --ServerApp.password=""  --NotebookApp.password="" --NotebookApp.disable_check_xsrf="true" --ServerApp.disable_check_xsrf="true"`);
     const {_, error} = await checkStatusCode(url);
     assert(!error)
   });

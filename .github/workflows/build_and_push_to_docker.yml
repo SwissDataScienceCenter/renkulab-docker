@@ -45,7 +45,6 @@ jobs:
         fi
 
         docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
-        docker push $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v2
