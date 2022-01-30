@@ -77,8 +77,6 @@ pipx install --force renku==<version>
 
 ## Current images
 
-### Recent releases and the corresponding versions
-
 | Image                                                                          | Description                                     | Base image                                                                                         |
 |--------------------------------------------------------------------------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------|
 | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)           | Basic Jupyter image with minimal dependencies   | [jupyter/base-notebook](https://hub.docker.com/r/jupyter/base-notebook/tags)                       |
