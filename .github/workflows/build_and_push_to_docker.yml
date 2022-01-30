@@ -107,7 +107,7 @@ jobs:
       fail-fast: true
       matrix:
         JULIAVERSIONS:
-          - 1.6.1
+          - 1.7.1
 
     steps:
     - name: Docker Login
