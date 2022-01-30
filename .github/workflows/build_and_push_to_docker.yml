@@ -161,8 +161,6 @@ jobs:
       matrix:
         include:
           # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
-          - TF_VERSION: "2.3"
-            CUDA_VERSION: "10.1"
           - TF_VERSION: "2.4"
             CUDA_VERSION: "11.0"
           - TF_VERSION: "2.7"
