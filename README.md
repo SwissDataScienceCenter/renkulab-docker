@@ -79,8 +79,18 @@ pipx install --force renku==<version>
 
 ### Recent releases and the corresponding versions
 
+| Image                                                                          | Description                                     | Base image                                                                                         |
+|--------------------------------------------------------------------------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------|
+| [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)           | Basic Jupyter image with minimal dependencies   | [jupyter/base-notebook](https://hub.docker.com/r/jupyter/base-notebook/tags)                       |
+| [renku/renkulab-r](https://hub.docker.com/r/renku/renkulab-r/tags)             | Basic Rstudio image                             | [rocker/verse](https://hub.docker.com/r/rocker/verse/tags)                                         |
+| [renku/renkulab-julia](https://hub.docker.com/r/renku/renkulab-julia/tags)     | Basic Julia image                               | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+| [renku/renkulab-bioc](https://hub.docker.com/r/renku/renkulab-bioc/tags)       | Bioconductor R image                            | [bioconductor/bioconductor_docker](https://hub.docker.com/r/bioconductor/bioconductor_docker/tags) |
+| [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)       | Cuda image with Python and minimal dependencies | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+| [renku/renkulab-cuda-tf](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags) | Cuda image with Python and Tensorflow           | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)                           |
+| [renku/renkulab-vnc](https://hub.docker.com/r/renku/renkulab-vnc/tags)         | VNC Image with Python                           | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+
 Please refer to the [release notes](https://github.com/SwissDataScienceCenter/renkulab-docker/releases) 
-for lists of released images and links to the images on Dockerhub.
+for more detailed lists of released images and specific links to Dockerhub.
 
 ### py
 
