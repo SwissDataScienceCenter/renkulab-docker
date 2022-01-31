@@ -98,7 +98,7 @@ jobs:
         fi
 
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-vnc:latest" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-vnc:$LABEL" \
           --tag $DOCKER_NAME-$EXTENSION:$LABEL
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
