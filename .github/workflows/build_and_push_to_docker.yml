@@ -2,11 +2,23 @@ name: Renku Docker Image CI
 
 on: [push]
 
+env:
+  DOCKER_NAME: "renku/renkulab"
+
 jobs:
 
   build-py:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        BASE_IMAGE_TAG:
+          - lab-3.2.1
+          - python-3.9.7
+          - python-3.8.8
+          - python-3.7.6
 
     steps:
     - name: Docker Login
@@ -17,6 +29,7 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker images
+      id: build-image
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -24,17 +37,32 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:3.9-$LABEL
-        docker push $DOCKER_NAME-py:3.9-$LABEL
+        # This ensures the same image tags as before are built, in addition to new ones
+        if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
+          export LABEL_PREFIX=3.9
+        else
+          export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
+        fi
 
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ]
-        then
-          docker tag $DOCKER_NAME-py:3.9-$LABEL $DOCKER_NAME-py:latest
+        docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
+        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v2
+      env:
+        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_USER_NAME: jovyan
+      with:
+        working-directory: tests
+        command: npx mocha test.js
+    - name: Push to docker
+      run: |
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+
+        # on master push latest image - the lab-* image is tagged latest
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-py:latest
           docker push $DOCKER_NAME-py:latest
         fi
-      env:
-        DOCKER_NAME: "renku/renkulab"
 
   build-py-ext:
     needs: build-py
@@ -44,7 +72,6 @@ jobs:
       fail-fast: true
       matrix:
         EXTENSIONS:
-          - cuda-tf
           - vnc
 
     steps:
@@ -69,7 +96,148 @@ jobs:
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
-        DOCKER_NAME: "renku/renkulab"
+
+  build-cuda:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
+          - CUDA_VERSION: "11.0"
+            PYTHON_VERSION: "3.8.8"
+            EXTRA_LIBRARIES: "libcusolver-11-2"
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-0=11.0.221-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-0"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.0.5.39-1+cuda11.0"
+          - CUDA_VERSION: "11.1"
+            PYTHON_VERSION: "3.8.8"
+            EXTRA_LIBRARIES: "libcusolver-11-2"
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-1=11.1.74-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-1"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.0.5.39-1+cuda11.1"
+          - CUDA_VERSION: "11.2"
+            PYTHON_VERSION: "3.9.7"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-2=11.2.152-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-2"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.1.1.33-1+cuda11.2"
+          - CUDA_VERSION: "11.3"
+            PYTHON_VERSION: "3.9.7"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-3=11.3.109-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-3"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.2.1.32-1+cuda11.3"
+          - CUDA_VERSION: "11.4"
+            PYTHON_VERSION: "3.9.7"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-4=11.4.148-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-4"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.2.4.15-1+cuda11.4"
+          - CUDA_VERSION: "11.5"
+            PYTHON_VERSION: "3.9.7"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-5=11.5.117-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-5"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.3.2.44-1+cuda11.5"
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project python-based docker image extensions
+      id: build-image
+      run: |
+        cd docker/cuda
+
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        docker build . \
+          --build-arg BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" \
+          --build-arg CUDA_VERSION="${{ matrix.CUDA_VERSION }}" \
+          --build-arg EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" \
+          --build-arg CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" \
+          --build-arg CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" \
+          --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
+          --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
+        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL"
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v2
+      env:
+        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_USER_NAME: jovyan
+      with:
+        working-directory: tests
+        command: npx mocha test.js
+    - name: Push to docker
+      run: |
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.CUDA_VERSION }}" == "11.5" ]; then
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-cuda:latest
+          docker push $DOCKER_NAME-cuda:latest
+        fi
+
+  build-cuda-tf:
+    needs: build-cuda
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
+          - TF_VERSION: "2.4"
+            CUDA_VERSION: "11.0"
+          - TF_VERSION: "2.7"
+            CUDA_VERSION: "11.2"
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project python-based docker image extensions
+      id: build-image
+      run: |
+        cd docker/cuda-tf
+
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        docker build . \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL" \
+          --build-arg TF_PACKAGE_VERSION="${{ matrix.TF_VERSION }}" \
+          --tag $DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL
+        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL"
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v2
+      env:
+        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_USER_NAME: jovyan
+      with:
+        working-directory: tests
+        command: npx mocha test.js
+    - name: Push to docker
+      run: |
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
   build-py-batch:
     needs: build-py
@@ -118,6 +286,7 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Build renku project julia docker image extensions
+      id: build-image
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -125,14 +294,22 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="$JULIAVERSION-$LABEL"
+        export DOCKER_TAG="${{ matrix.JULIAVERSIONS }}-$LABEL"
         docker build docker/julia \
           --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
           --tag $DOCKER_NAME-julia:$DOCKER_TAG
-        docker push $DOCKER_NAME-julia:$DOCKER_TAG
+        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-julia:$DOCKER_TAG"
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v2
       env:
-        DOCKER_NAME: "renku/renkulab"
-        JULIAVERSION: ${{ matrix.JULIAVERSIONS }}
+        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_USER_NAME: jovyan
+      with:
+        working-directory: tests
+        command: npx mocha test.js
+    - name: Push to docker
+      run: |
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
   build-r-ubuntu:
     needs: build-py
@@ -141,7 +318,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RVERSIONS:
+        RVERSION:
           - 4.0.3
           - 4.0.4
           - 4.0.5
@@ -156,6 +333,7 @@ jobs:
 
     - uses: actions/checkout@v2
     - name: Build renku project rocker docker images
+      id: build-image
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -163,23 +341,31 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="$RVERSION-$LABEL"
+        export DOCKER_TAG="${{ matrix.RVERSION }}-$LABEL"
         docker build docker/r \
           --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${RVERSION}" \
+          --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
-        docker push $DOCKER_NAME-r:$DOCKER_TAG
+        
+        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v2
+      env:
+        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_USER_NAME: rstudio
+      with:
+        working-directory: tests
+        command: npx mocha test.js
+    - name: Push to docker
+      run: |
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "$RVERSION" == "4.0.5" ]
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.0.5" ]
         then
-          docker tag $DOCKER_NAME-r:$DOCKER_TAG $DOCKER_NAME-r:latest
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-r:latest
           docker push $DOCKER_NAME-r:latest
         fi
-      env:
-        DOCKER_NAME: "renku/renkulab"
-        # selected R versions available for rocker/rstudio
-        RVERSION: ${{ matrix.RVERSIONS }}
 
   build-bioc:
     needs: build-py
@@ -188,7 +374,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        RELEASES:
+        RELEASE:
         # - devel --> commented out until issues with RStudio versions are resolved
           - RELEASE_3_11
           - RELEASE_3_12
@@ -210,19 +396,16 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="$RELEASE-$LABEL"
+        export DOCKER_TAG="${{ matrix.RELEASE }}-$LABEL"
         docker build docker/r \
           --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${RELEASE} \
+          --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${{ matrix.RELEASE }} \
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "$RELEASE" == "devel" ]
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
         then
           docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
           docker push $DOCKER_NAME-bioc:latest
         fi
-      env:
-        DOCKER_NAME: "renku/renkulab"
-        RELEASE: ${{ matrix.RELEASES }}
