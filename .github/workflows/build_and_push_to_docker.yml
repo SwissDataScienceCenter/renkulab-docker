@@ -46,6 +46,7 @@ jobs:
         EXTENSIONS:
           - cuda-tf
           - vnc
+          - matlab
 
     steps:
     - name: Docker Login
