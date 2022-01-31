@@ -6,7 +6,7 @@ ARG BASE_ML_INSTALL_LOC=/tmp/matlab-install-location
 
 # For finding latest versions of the base image see
 # https://github.com/SwissDataScienceCenter/renkulab-docker
-ARG RENKU_BASE_IMAGE=renku/renkulab-py:latest
+ARG BASE_IMAGE=renku/renkulab-py:latest
 
 # Replace "mathworks/matlab" with any Docker image that contains MATLAB
 # MATLAB should be available on the path in the Docker image
@@ -26,7 +26,7 @@ RUN export ML_INSTALL_LOC=$(which matlab) \
         echo "Proceeding with user provided path to MATLAB installation: ${BASE_ML_INSTALL_LOC}"; \
     fi
 
-FROM ${RENKU_BASE_IMAGE}
+FROM ${BASE_IMAGE}
 # Use Renku instead of the base notebook
 # FROM jupyter/base-notebook
 ARG BASE_ML_INSTALL_LOC
