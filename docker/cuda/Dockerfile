@@ -13,13 +13,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get purge --autoremove -y curl \
     && rm -rf /var/lib/apt/lists/*
 
-ENV CUDA_VERSION 11.2
+ARG CUDA_VERSION=11.2
+ENV CUDA_VERSION $CUDA_VERSION
+ARG CUDA_CUDART_PACKAGE=cuda-cudart-11-2=11.2.152-1
+ARG CUDA_COMPAT_PACKAGE=cuda-compat-11-2
+ARG EXTRA_LIBRARIES=""
 
 # For libraries in the cuda-compat-* package: https://docs.nvidia.com/cuda/eula/index.html#attachment-a
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cuda-cudart-11-2=11.2.152-1 \
-    cuda-compat-11-2 \
-    && ln -s cuda-11.2 /usr/local/cuda && \
+    $CUDA_CUDART_PACKAGE \
+    $CUDA_COMPAT_PACKAGE \
+    && ln -s cuda-${CUDA_VERSION} /usr/local/cuda && \
     rm -rf /var/lib/apt/lists/*
 
 # Required for nvidia-docker v1
@@ -38,10 +42,9 @@ ENV NVIDIA_REQUIRE_CUDA "cuda>=11.0 brand=tesla,driver>=418,driver<419 brand=tes
 # Install TensorFlow (from https://github.com/tensorflow/tensorflow/blob/master/tensorflow/tools/dockerfiles/dockerfiles/gpu.Dockerfile)
 #
 
-ARG CUDA=11.2
-ARG CUDNN=8.1.1.33
-ARG CUDNN_MAJOR_VERSION=8
+ARG CUDA=${CUDA_VERSION}
 ARG LIB_DIR_PREFIX=x86_64
+ARG LIBCUDNN_PACKAGE="libcudnn8=8.1.1.33-1+cuda11.2"
 
 # Needed for string substitution
 SHELL ["/bin/bash", "-c"]
@@ -55,8 +58,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libcurand-${CUDA/./-} \
     libcusolver-${CUDA/./-} \
     libcusparse-${CUDA/./-} \
+    $EXTRA_LIBRARIES \
     curl \
-    libcudnn8=${CUDNN}-1+cuda${CUDA} \
+    ${LIBCUDNN_PACKAGE} \
     libfreetype6-dev \
     libhdf5-serial-dev \
     libzmq3-dev \
