@@ -22,7 +22,7 @@ ENV CONDA_PATH /opt/conda
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
 
 # And set PATH for R! It doesn't read from the environment...
-RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
+RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
     echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh && \
     echo "RENKU_DISABLE_VERSION_CHECK=1" >> /usr/local/lib/R/etc/Renviron
 
