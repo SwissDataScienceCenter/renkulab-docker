@@ -31,8 +31,8 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 1.3.959
-RUN /rocker_scripts/install_rstudio.sh
+# ENV RSTUDIO_VERSION 1.3.959
+# RUN /rocker_scripts/install_rstudio.sh
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
@@ -89,7 +89,7 @@ USER ${NB_USER}
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-RUN pip install "jupyter-rsession-proxy==1.1"
+RUN pip install "jupyter-rsession-proxy==2.0.1"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
