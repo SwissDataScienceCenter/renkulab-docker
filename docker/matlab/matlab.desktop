@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=R2021b
+Name=MATLAB R2021b
+GenericName=MATLAB
+X-GNOME-FullName=MATLAB
+Comment=Multi-paradigm programming language and numeric computing environment
+Type=Application
+Categories=Programming;Science;Computing;
+Exec=/usr/local/bin/matlab
+TryExec=matlab
+Terminal=false
+StartupNotify=true
+Icon=/usr/local/MATLAB/bin/glnxa64/cef_resources/matlab_icon.png
+StartupWMClass=MATLAB-main

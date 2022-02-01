@@ -108,6 +108,9 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
+# Add MATLAB desktop icon
+COPY --chown=root:root matlab.desktop /home/jovyan/Desktop/
+RUN chmod +x /home/jovyan/Desktop/matlab.desktop
 
 # Switch back to notebook user
 USER ${NB_USER}
