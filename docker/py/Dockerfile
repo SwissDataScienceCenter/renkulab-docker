@@ -1,6 +1,5 @@
-# Run with the RenkuKubeSpawner via JupyterHub
 ARG BASE_IMAGE=jupyter/base-notebook:lab-3.2.1
-ARG RENKU_VERSION=0.16.2
+ARG RENKU_VERSION=1.0.4
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
