@@ -322,8 +322,7 @@ jobs:
           - 4.0.3
           - 4.0.4
           - 4.0.5
-          # TODO: enable once compatibility issues are fixed  - see #154 and #160
-          # - 4.1.0
+          - 4.1.0
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -375,11 +374,10 @@ jobs:
       fail-fast: false
       matrix:
         RELEASE:
-        # - devel --> commented out until issues with RStudio versions are resolved
+          - devel
           - RELEASE_3_11
           - RELEASE_3_12
-          # TODO: enable once compatibility issues are fixed - see #154 and #160
-          # - RELEASE_3_13
+          - RELEASE_3_13
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1

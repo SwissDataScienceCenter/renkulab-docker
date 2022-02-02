@@ -17,12 +17,16 @@ ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
+# Do not change the line below, by default the shell is /bin/sh -c
+# and /bin/sh -c does not work when you do source venv/bin/activate
+# in the reknu project template Dockerfile
+SHELL ["/bin/bash", "-c"]
 
 # prepend conda and local/bin to PATH
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
 
 # And set PATH for R! It doesn't read from the environment...
-RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
+RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
     echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh && \
     echo "RENKU_DISABLE_VERSION_CHECK=1" >> /usr/local/lib/R/etc/Renviron
 
@@ -31,9 +35,9 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-# ENV RSTUDIO_VERSION 2021.09.2+382
-# RUN /rocker_scripts/install_rstudio.sh
-# This version of rocker should already have RStudio installed!
+ARG RSTUDIO_VERSION="2021.09.2-382"
+ENV RSTUDIO_VERSION="$RSTUDIO_VERSION"
+RUN /rocker_scripts/install_rstudio.sh
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
@@ -82,7 +86,9 @@ RUN fix-permissions.sh /usr/local/lib/R && \
     # this hack lets some of the setup from the base renku image work here
     ln -s /home/${NB_USER} /home/jovyan && \
     # this allows rstudio to run in an iframe in the UI
-    echo "\nwww-frame-origin=same\n" >> /etc/rstudio/rserver.conf
+    echo "" >> /etc/rstudio/rserver.conf && \
+    echo "www-frame-origin=same" >> /etc/rstudio/rserver.conf && \
+    echo "" >> /etc/rstudio/rserver.conf
 
 USER ${NB_USER}
 
