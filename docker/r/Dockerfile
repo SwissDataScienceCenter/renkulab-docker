@@ -17,6 +17,7 @@ ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
+SHELL [ "/bin/bash", "-c" ]
 
 # prepend conda and local/bin to PATH
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
@@ -31,8 +32,8 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ARG RSTUDIO_VERSION
-ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2021.09.2-382}
+ARG RSTUDIO_VERSION_OVERRIDE="2021.09.2-382"
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
 RUN /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
 
 # Add Tini
