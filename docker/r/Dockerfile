@@ -36,8 +36,7 @@ ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
 ARG RSTUDIO_VERSION="2021.09.2-382"
-ENV RSTUDIO_VERSION="$RSTUDIO_VERSION"
-RUN /rocker_scripts/install_rstudio.sh
+RUN /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
