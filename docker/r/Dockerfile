@@ -17,10 +17,6 @@ ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
-# Do not change the line below, by default the shell is /bin/sh -c
-# and /bin/sh -c does not work when you do source venv/bin/activate
-# in the reknu project template Dockerfile
-SHELL ["/bin/bash", "-c"]
 
 # prepend conda and local/bin to PATH
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
@@ -35,7 +31,8 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ARG RSTUDIO_VERSION="2021.09.2-382"
+ARG RSTUDIO_VERSION
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION:-2021.09.2-382}
 RUN /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
 
 # Add Tini
