@@ -319,10 +319,10 @@ jobs:
       fail-fast: true
       matrix:
         RVERSION:
-          - 4.0.3
-          - 4.0.4
-          - 4.0.5
           - 4.1.0
+          - 4.1.1
+          - 4.1.2
+          - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -374,10 +374,9 @@ jobs:
       fail-fast: false
       matrix:
         RELEASE:
-          # - devel
-          - RELEASE_3_11
-          - RELEASE_3_12
           - RELEASE_3_13
+          - RELEASE_3_14
+          - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
