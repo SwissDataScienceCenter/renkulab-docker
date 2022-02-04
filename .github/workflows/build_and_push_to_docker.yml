@@ -322,6 +322,7 @@ jobs:
           - 4.1.0
           - 4.1.1
           - 4.1.2
+          - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -375,6 +376,7 @@ jobs:
         RELEASE:
           - RELEASE_3_13
           - RELEASE_3_14
+          - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1

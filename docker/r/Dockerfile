@@ -34,7 +34,11 @@ ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 # pin the version of RStudio
 ARG RSTUDIO_VERSION_OVERRIDE="2021.09.2-382"
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
-RUN /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
+# if rstudio and rstudio-server users are not deleted below, the installation
+# script fails when it installs rstudio and tries to add them back in
+RUN userdel rstudio-server && \
+    userdel rstudio && \
+    /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
