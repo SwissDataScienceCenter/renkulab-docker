@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=3.18
+Name=QGIS
+GenericName=QGIS
+X-GNOME-FullName=QGIS
+Comment=Geographic Information System Application
+Type=Application
+Categories=Geography;Science;Geospatial;
+Exec=/opt/conda/bin/qgis
+TryExec=/opt/conda/bin/qgis
+Terminal=false
+StartupNotify=true
+Icon=/usr/share/qgis/images/icons/qgis-icon-60x60.png
+StartupWMClass=QGIS-main
