@@ -248,6 +248,7 @@ jobs:
       matrix:
         VNC-EXTENSIONS:
           - matlab
+          - qgis
 
     steps:
     - name: Docker Login
@@ -272,41 +273,6 @@ jobs:
       env:
         EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
-  
-  build-vnc-ext:
-    needs: build-py-ext
-    runs-on: ubuntu-latest
-    
-    strategy:
-      fail-fast: true
-      matrix:
-        VNC-EXTENSIONS:
-          - qgis
-    
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project vnc-based docker image for extensions
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-vnc:$LABEL" \
-          --tag $DOCKER_NAME-$EXTENSION:$LABEL
-        docker push $DOCKER_NAME-$EXTENSION:$LABEL
-      env:
-        EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
-        DOCKER_NAME: "renku/renkulab"
-    
   
   build-py-batch:
     needs: build-py
