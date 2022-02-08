@@ -1,5 +1,5 @@
 ARG BASE_IMAGE=jupyter/base-notebook:lab-3.2.1
-ARG RENKU_VERSION=1.0.4
+ARG RENKU_VERSION=1.0.5
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
