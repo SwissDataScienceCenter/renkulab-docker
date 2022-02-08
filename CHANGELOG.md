@@ -1,3 +1,18 @@
+#  (2022-02-08)
+
+## [0.11.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.3...0.11.0)
+
+### Bug fixes
+
+* bumps Renku versions [#225](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/225)  [#226](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/226)
+
+### Features
+
+* add VNC-enabled images: MATLAB and QGIS: [#222](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/222), [#223](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/223)
+* rebuild CUDA based images and update versions [#222](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/222) [#224](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/224)
+* update Julia version to 1.7.1 [#221](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/221)
+* update R and RStudio versions [#218](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/218)
+
 #  (2021-11-17)
 
 ## [0.10.3](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.2...0.10.3) (2021-11-25)
