@@ -1,7 +1,7 @@
 # define build arguments
 ARG RENKU_BASE=renku/renkulab-py:latest
 ARG BASE_IMAGE=python:3.9-slim-buster
-ARG RENKU_VERSION=0.16.2
+ARG RENKU_VERSION=1.0.5
 
 # define base images
 FROM $RENKU_BASE as renku_base

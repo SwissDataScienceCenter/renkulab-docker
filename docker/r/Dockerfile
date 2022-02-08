@@ -1,6 +1,6 @@
 # define build arguments
 ARG RENKU_BASE=renku/renkulab-py:latest
-ARG BASE_IMAGE=rocker/verse:4.0.5
+ARG BASE_IMAGE=rocker/verse:4.1.2
 
 # define base images
 FROM $RENKU_BASE as renku_base
@@ -17,12 +17,13 @@ ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
+SHELL [ "/bin/bash", "-c" ]
 
 # prepend conda and local/bin to PATH
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
 
 # And set PATH for R! It doesn't read from the environment...
-RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
+RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
     echo "PATH=${PATH}" >> /etc/profile.d/set_path.sh && \
     echo "RENKU_DISABLE_VERSION_CHECK=1" >> /usr/local/lib/R/etc/Renviron
 
@@ -31,8 +32,13 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ENV RSTUDIO_VERSION 1.3.959
-RUN /rocker_scripts/install_rstudio.sh
+ARG RSTUDIO_VERSION_OVERRIDE="2021.09.2-382"
+ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
+# if rstudio and rstudio-server users are not deleted below, the installation
+# script fails when it installs rstudio and tries to add them back in
+RUN userdel rstudio-server && \
+    userdel rstudio && \
+    /rocker_scripts/install_rstudio.sh $RSTUDIO_VERSION
 
 # Add Tini
 ENV TINI_VERSION v0.18.0
@@ -81,7 +87,9 @@ RUN fix-permissions.sh /usr/local/lib/R && \
     # this hack lets some of the setup from the base renku image work here
     ln -s /home/${NB_USER} /home/jovyan && \
     # this allows rstudio to run in an iframe in the UI
-    echo "\nwww-frame-origin=same\n" >> /etc/rstudio/rserver.conf
+    echo "" >> /etc/rstudio/rserver.conf && \
+    echo "www-frame-origin=same" >> /etc/rstudio/rserver.conf && \
+    echo "" >> /etc/rstudio/rserver.conf
 
 USER ${NB_USER}
 
@@ -89,7 +97,7 @@ USER ${NB_USER}
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-RUN pip install "jupyter-rsession-proxy==1.1"
+RUN pip install "jupyter-rsession-proxy==2.0.1"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
