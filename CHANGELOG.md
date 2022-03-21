@@ -1,4 +1,9 @@
-#  (2022-02-08)
+## [0.11.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.0...0.11.1) (2022-03-21)
+
+### Bug Fixes
+
+* add renku cli to PATH in rstudio ([#232](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/232)) ([8cd44bb](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/8cd44bb9b63bdfb514726066cfdd2f451105dc2d))
+
 
 ## [0.11.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.3...0.11.0)
 
@@ -13,7 +18,6 @@
 * update Julia version to 1.7.1 [#221](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/221)
 * update R and RStudio versions [#218](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/218)
 
-#  (2021-11-17)
 
 ## [0.10.3](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.10.2...0.10.3) (2021-11-25)
 
