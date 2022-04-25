@@ -357,6 +357,7 @@ jobs:
           - 4.1.0
           - 4.1.1
           - 4.1.2
+          - 4.2.0
           - devel
     steps:
     - name: Docker Login
@@ -395,7 +396,7 @@ jobs:
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.0.5" ]
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
         then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-r:latest
           docker push $DOCKER_NAME-r:latest
