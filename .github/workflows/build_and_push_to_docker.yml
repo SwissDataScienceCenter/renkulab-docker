@@ -24,8 +24,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker images
@@ -78,8 +78,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image extensions
@@ -147,8 +147,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image extensions
@@ -207,8 +207,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image extensions
@@ -254,8 +254,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image extensions
@@ -282,8 +282,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project python-based docker image for batch execution
@@ -316,8 +316,8 @@ jobs:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project julia docker image extensions
@@ -357,13 +357,14 @@ jobs:
           - 4.1.0
           - 4.1.1
           - 4.1.2
+          - 4.2.0
           - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project rocker docker images
@@ -395,7 +396,7 @@ jobs:
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.0.5" ]
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
         then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-r:latest
           docker push $DOCKER_NAME-r:latest
@@ -409,15 +410,15 @@ jobs:
       fail-fast: false
       matrix:
         RELEASE:
-          - RELEASE_3_13
           - RELEASE_3_14
+          - RELEASE_3_15
           - devel
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v2
     - name: Build renku project bioconductor docker images

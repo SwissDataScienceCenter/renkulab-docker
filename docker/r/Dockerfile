@@ -1,6 +1,6 @@
 # define build arguments
 ARG RENKU_BASE=renku/renkulab-py:latest
-ARG BASE_IMAGE=rocker/verse:4.1.2
+ARG BASE_IMAGE=rocker/verse:4.2.0
 
 # define base images
 FROM $RENKU_BASE as renku_base
@@ -20,7 +20,7 @@ ENV CONDA_PATH /opt/conda
 SHELL [ "/bin/bash", "-c" ]
 
 # prepend conda and local/bin to PATH
-ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:$PATH
+ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:${HOME}/.renku/bin:$PATH
 
 # And set PATH for R! It doesn't read from the environment...
 RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
