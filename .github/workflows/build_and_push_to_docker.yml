@@ -353,12 +353,17 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        RVERSION:
-          - 4.1.0
-          - 4.1.1
-          - 4.1.2
-          - 4.2.0
-          - devel
+        include:
+          - RVERSION: 4.1.0
+            RSTUDIO_VERSION: 2021.09.2-382
+          - RVERSION: 4.1.1
+            RSTUDIO_VERSION: 2021.09.2-382
+          - RVERSION: 4.1.2
+            RSTUDIO_VERSION: 2021.09.2-382
+          - RVERSION: 4.2.0
+            RSTUDIO_VERSION: 2021.09.2-382
+          - RVERSION: devel
+            RSTUDIO_VERSION: 2022.02.3-492
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -380,6 +385,7 @@ jobs:
         docker build docker/r \
           --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
           --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
+          --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
         
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
