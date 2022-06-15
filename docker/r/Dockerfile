@@ -1,6 +1,6 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py:latest
-ARG BASE_IMAGE=rocker/verse:4.2.0
+ARG RENKU_BASE=renku/renkulab-py:3.9-d7394dd
+ARG BASE_IMAGE=rocker/verse:devel
 
 # define base images
 FROM $RENKU_BASE as renku_base
@@ -32,7 +32,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ARG RSTUDIO_VERSION_OVERRIDE="2021.09.2-382"
+ARG RSTUDIO_VERSION_OVERRIDE="2022.02.3-492"
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
 # if rstudio and rstudio-server users are not deleted below, the installation
 # script fails when it installs rstudio and tries to add them back in
@@ -52,7 +52,8 @@ RUN apt-get update --fix-missing && \
     ca-certificates \
     curl \
     gpg-agent && \
-    curl -sL https://deb.nodesource.com/setup_10.x | bash - && \
+    apt-get remove -y libnode-dev libnode72:amd64 || echo "Conflicting libraries do not exist, continuing..." && \
+    curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && \
     apt-get install -yq --no-install-recommends \
