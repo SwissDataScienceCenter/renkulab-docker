@@ -70,9 +70,6 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     deactivate && \
     ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
 
-
-RUN pip install numpy
-
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
 RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
