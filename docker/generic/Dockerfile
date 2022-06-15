@@ -11,6 +11,7 @@ ARG NB_USER
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 ENV NB_UID 1000
 ENV NB_GID 1000
@@ -40,7 +41,7 @@ RUN apt-get update --fix-missing && \
     vim && \
     apt-get purge && \
     apt-get clean && \
-    apt autoremove --yes && \
+    apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/*
 
 # handle the NB_USER setup

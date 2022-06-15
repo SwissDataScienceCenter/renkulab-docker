@@ -5,6 +5,7 @@ FROM $BASE_IMAGE as base
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # Install additional dependencies and nice-to-have packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
@@ -43,12 +44,12 @@ USER $NB_USER
 
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
 COPY requirements.txt /tmp/requirements.txt
-RUN python3 -m pip install --no-cache -U pip && \
-    python3 -m pip install --no-cache -r /tmp/requirements.txt && \
+RUN python3 -m pip install --no-cache-dir -U pip && \
+    python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
     # jupyter lab build && \
     # jupyter labextension list && \
     # npm cache clean --force && \
-    rm -rf /home/${NB_USER}/.cache
+    rm -rf "/home/${NB_USER}/.cache"
 
 # fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
 RUN conda install gxx_linux-64 && \
@@ -62,16 +63,16 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
 
 ARG RENKU_VERSION
-RUN mkdir -p $HOME/.renku/bin && \
-    virtualenv --pip 21.3.1 --setuptools 57.5.0 --wheel 0.36.2  --no-periodic-update $HOME/.renku/venv && \
-    source $HOME/.renku/venv/bin/activate && \
-    pip install --no-cache renku==$RENKU_VERSION sentry-sdk && \
+RUN mkdir -p "$HOME/.renku/bin" && \
+    virtualenv --pip 21.3.1 --setuptools 57.5.0 --wheel 0.36.2  --no-periodic-update "$HOME/.renku/venv" && \
+    source "$HOME/.renku/venv/bin/activate" && \
+    pip install --no-cache-dir "renku==$RENKU_VERSION" sentry-sdk && \
     deactivate && \
-    ln -s $HOME/.renku/venv/bin/renku $HOME/.renku/bin/renku
+    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
-RUN cat /home/$NB_USER/git-config.bashrc >> /home/$NB_USER/.bashrc && rm /home/$NB_USER/git-config.bashrc
+RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
 
 # configure powerline
 COPY --chown=1000:1000 powerline.bashrc /tmp/powerline.bashrc
@@ -82,4 +83,4 @@ RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
-CMD '/usr/local/bin/start-singleuser.sh'
+CMD [ "/usr/local/bin/start-singleuser.sh" ]
