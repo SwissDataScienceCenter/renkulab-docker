@@ -12,16 +12,16 @@ jobs:
       fail-fast: true
       matrix:
         DOCKERFILE_PATH:
-          - docker/py/Dockerfile
-          - docker/r/Dockerfile
-          - docker/cuda/Dockerfile
-          - docker/cuda-tf/Dockerfile
-          - docker/generic/Dockerfile
-          - docker/vnc/Dockerfile
-          - docker/matlab/Dockerfile
-          - docker/julia/Dockerfile
-          - docker/batch/Dockerfile
-          - docker/qgis/Dockerfile
+        - docker/py/Dockerfile
+        - docker/r/Dockerfile
+        - docker/cuda/Dockerfile
+        - docker/cuda-tf/Dockerfile
+        - docker/generic/Dockerfile
+        - docker/vnc/Dockerfile
+        - docker/matlab/Dockerfile
+        - docker/julia/Dockerfile
+        - docker/batch/Dockerfile
+        - docker/qgis/Dockerfile
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2 
