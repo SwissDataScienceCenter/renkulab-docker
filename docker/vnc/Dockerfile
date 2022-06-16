@@ -34,7 +34,7 @@ RUN apt-get update \
 
 ENV novnc_version=1.1.0
 
-RUN curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz -o noVNC-${novnc_version} | tar -zxf - && \
+RUN curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz | tar xvz -C /opt/ && \
     chmod a+rX -R /opt/noVNC-${novnc_version}
 
 COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
