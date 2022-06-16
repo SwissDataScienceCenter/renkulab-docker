@@ -355,13 +355,13 @@ jobs:
       matrix:
         include:
           - RVERSION: 4.1.0
-            RSTUDIO_VERSION: 2021.09.2-382
+            RSTUDIO_VERSION: 2022.02.3-492
           - RVERSION: 4.1.1
-            RSTUDIO_VERSION: 2021.09.2-382
+            RSTUDIO_VERSION: 2022.02.3-492
           - RVERSION: 4.1.2
-            RSTUDIO_VERSION: 2021.09.2-382
+            RSTUDIO_VERSION: 2022.02.3-492
           - RVERSION: 4.2.0
-            RSTUDIO_VERSION: 2021.09.2-382
+            RSTUDIO_VERSION: 2022.02.3-492
           - RVERSION: devel
             RSTUDIO_VERSION: 2022.02.3-492
     steps:
