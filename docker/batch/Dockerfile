@@ -9,23 +9,25 @@ FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
+
 # install dependencies
 RUN apt-get update -y && \
-    apt-get install -y curl && \
+    apt-get install --no-install-recommends -y curl && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update -y && \
-    apt-get install -y gcc git git-lfs nodejs && \
+    apt-get install --no-install-recommends -y gcc git git-lfs nodejs && \
     apt-get purge && \
     apt-get clean && \
-    apt autoremove --yes && \
+    apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Renku python without pipx in a non-user location
 ARG RENKU_VERSION
-RUN python3 -m pip install --no-cache pipenv
+RUN python3 -m pip install --no-cache-dir pipenv
 RUN virtualenv --pip 21.3.1 --setuptools 57.5.0 --wheel 0.36.2  --no-periodic-update /share/.renku && \
     . /share/.renku/bin/activate && \
-    pip install --no-cache renku==$RENKU_VERSION sentry-sdk && \
+    pip install --no-cache-dir renku==$RENKU_VERSION sentry-sdk && \
     deactivate && \
     mkdir /share/bin && \
     ln -s /share/.renku/bin/renku /share/bin
