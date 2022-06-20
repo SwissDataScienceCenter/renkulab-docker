@@ -17,7 +17,7 @@ ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
 ENV CONDA_PATH /opt/conda
-SHELL [ "/bin/bash", "-c" ]
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # prepend conda and local/bin to PATH
 ENV PATH ${HOME}/.local/bin:${CONDA_PATH}/bin:${HOME}/.renku/bin:$PATH
@@ -70,7 +70,7 @@ RUN apt-get update --fix-missing && \
     vim && \
     apt-get purge && \
     apt-get clean && \
-    apt autoremove --yes && \
+    apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/*
 
 # inject the renku-jupyter stack
@@ -81,7 +81,7 @@ COPY --from=renku_base --chown=rstudio:rstudio \
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 
 # set permissions of the R library directory to be editable by NB_USER
-ADD fix-permissions.sh /usr/local/bin
+COPY fix-permissions.sh /usr/local/bin
 RUN fix-permissions.sh /usr/local/lib/R && \
     chown 1000:1000 /opt/conda && \
     usermod -a -G users rstudio && \
@@ -98,7 +98,7 @@ USER ${NB_USER}
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc
 
-RUN pip install "jupyter-rsession-proxy==2.0.1"
+RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.0.1"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \

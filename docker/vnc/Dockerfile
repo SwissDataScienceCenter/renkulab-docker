@@ -4,6 +4,7 @@ FROM ${BASE_IMAGE}
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 RUN apt-get update \
     && apt-get install -yq --no-install-recommends \
@@ -33,10 +34,8 @@ RUN apt-get update \
 
 ENV novnc_version=1.1.0
 
-RUN cd /opt && \
-    curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz | tar -zxf -
-
-RUN chmod a+rX -R /opt/noVNC-${novnc_version}
+RUN curl -sSfL https://github.com/novnc/noVNC/archive/v${novnc_version}.tar.gz | tar xvz -C /opt/ && \
+    chmod a+rX -R /opt/noVNC-${novnc_version}
 
 COPY --chown=root:root vnc_renku.html /opt/noVNC-${novnc_version}
 COPY --chown=root:root renku-48x48.png /opt/noVNC-${novnc_version}/app/images/icons
@@ -54,20 +53,16 @@ RUN curl -sSfL https://sourceforge.net/projects/tigervnc/files/stable/${tigervnc
 
 #################################################################
 # Add desktop icons
-
-COPY Git-GUI.desktop /home/jovyan/Desktop/
-RUN chmod +x /home/jovyan/Desktop/Git-GUI.desktop
-
-COPY gitk.desktop /home/jovyan/Desktop/
-COPY .git_icon.png /home/jovyan/Desktop/
-RUN chmod +x /home/jovyan/Desktop/gitk.desktop
-
-#################################################################
 # Add wallpaper and force the default to point to the renku one
 
-RUN mkdir -p /usr/share/backgrounds/renku/
+COPY Git-GUI.desktop /home/jovyan/Desktop/
+COPY gitk.desktop /home/jovyan/Desktop/
+COPY .git_icon.png /home/jovyan/Desktop/
 COPY renku_background_dots.png /usr/share/backgrounds/renku/
-RUN ln -s -f /usr/share/backgrounds/renku/renku_background_dots.png /usr/share/backgrounds/xfce/xfce-stripes.png
+RUN chmod +x /home/jovyan/Desktop/gitk.desktop && \
+    chmod +x /home/jovyan/Desktop/Git-GUI.desktop && \
+    mkdir -p /usr/share/backgrounds/renku/ && \
+    ln -s -f /usr/share/backgrounds/renku/renku_background_dots.png /usr/share/backgrounds/xfce/xfce-stripes.png
 
 #################################################################
 # Install the jupyter extensions
