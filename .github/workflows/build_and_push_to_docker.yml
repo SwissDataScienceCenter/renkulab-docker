@@ -225,6 +225,8 @@ jobs:
             CUDA_VERSION: "11.0"
           - TF_VERSION: "2.7"
             CUDA_VERSION: "11.2"
+          - TF_VERSION: "2.9"
+            CUDA_VERSION: "11.2"
 
     steps:
     - name: Docker Login
