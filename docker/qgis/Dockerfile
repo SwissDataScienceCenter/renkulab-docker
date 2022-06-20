@@ -4,6 +4,7 @@ ARG BASE_IMAGE=renku/renkulab-vnc:latest
 FROM ${BASE_IMAGE}
 
 USER root
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # Install QGIS
 RUN apt-get update \

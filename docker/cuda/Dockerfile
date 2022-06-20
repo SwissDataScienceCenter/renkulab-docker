@@ -4,6 +4,8 @@ FROM $BASE_IMAGE
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
+SHELL ["/bin/bash", "-c", "-o", "pipefail"]
+
 # Install the CUDA "base"
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gnupg2 curl ca-certificates && \
@@ -48,8 +50,6 @@ ARG CUDA=${CUDA_VERSION}
 ARG LIB_DIR_PREFIX=x86_64
 ARG LIBCUDNN_PACKAGE="libcudnn8=8.1.1.33-1+cuda11.2"
 
-# Needed for string substitution
-SHELL ["/bin/bash", "-c"]
 # Pick up some TF dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -85,6 +85,6 @@ RUN ln -s /usr/local/cuda/lib64/stubs/libcuda.so /usr/local/cuda/lib64/stubs/lib
 ENV LANG C.UTF-8
 
 # Some TF tools expect a "python" binary
-RUN ln -s $(which python3) /usr/local/bin/python
+RUN ln -s "$(which python3)" /usr/local/bin/python
 
 USER $NB_USER

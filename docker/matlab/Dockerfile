@@ -15,6 +15,7 @@ ARG BASE_ML_INSTALL_LOC
 
 # Run code to locate a MATLAB install in the base image and softlink
 # to BASE_ML_INSTALL_LOC for a latter stage to copy 
+# hadolint ignore=SC2086
 RUN export ML_INSTALL_LOC=$(which matlab) \
     && if [ ! -z "$ML_INSTALL_LOC" ]; then \
         ML_INSTALL_LOC=$(dirname $(dirname $(readlink -f ${ML_INSTALL_LOC}))); \
