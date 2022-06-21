@@ -379,15 +379,7 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - RVERSION: 4.1.0
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.1.1
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.1.2
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.2.0
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: devel
+          - RVERSION: 3.4.3
             RSTUDIO_VERSION: 2022.02.3-492
     steps:
     - name: Docker Login
