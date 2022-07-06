@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && apt-get install -yq --no-install-recommends \
     git \
-    git-lfs=2.12.0 \
+    git-lfs=3.2.0 \
     gnupg \
     graphviz \
     jq \
