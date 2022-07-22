@@ -39,6 +39,7 @@ jobs:
       matrix:
         BASE_IMAGE_TAG:
           - lab-3.4.3
+          - python-3.10.5
           - python-3.9.7
           - python-3.8.8
           - python-3.7.6
@@ -62,7 +63,7 @@ jobs:
 
         # This ensures the same image tags as before are built, in addition to new ones
         if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
-          export LABEL_PREFIX=3.9
+          export LABEL_PREFIX=3.10
         else
           export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
         fi
