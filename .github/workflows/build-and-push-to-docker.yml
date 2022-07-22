@@ -112,7 +112,12 @@ jobs:
 
     - name: Push to docker
       run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+        docker buildx build \
+          --platform ${{env.DOCKER_PLATFORMS}} \
+          --tag ${{ steps.build-image.outputs.IMAGE_NAME }} \
+          --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}" \
+          --push \
+          docker/py
 
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
