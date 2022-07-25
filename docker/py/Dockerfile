@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.2.1
-ARG RENKU_VERSION=1.4.0
+ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.4
+ARG RENKU_VERSION=1.5.0
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && apt-get install -yq --no-install-recommends \
     git \
-    git-lfs=3.2.0 \
+    git-lfs=3.1.4 \
     gnupg \
     graphviz \
     jq \
