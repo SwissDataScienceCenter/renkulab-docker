@@ -10,7 +10,7 @@ updates:
   directory: "/docker/py"
   schedule:
     interval: daily
-  open-pull-request-limit: 10
+  open-pull-requests-limit: 10
 - package-ecosystem: docker
   directory: "/docker/r"
   schedule:
