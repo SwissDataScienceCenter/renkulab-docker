@@ -24,7 +24,7 @@ jobs:
         - docker/qgis/Dockerfile
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2 
+    - uses: actions/checkout@v2
     - uses: hadolint/hadolint-action@v2.0.0
       with:
         dockerfile: ${{ matrix.DOCKERFILE_PATH }}
@@ -38,8 +38,8 @@ jobs:
       fail-fast: true
       matrix:
         BASE_IMAGE_TAG:
-          - lab-3.2.1
-          - python-3.9.7
+          - lab-3.4.0
+          - python-3.9.12
           - python-3.8.8
           - python-3.7.6
 
@@ -142,25 +142,25 @@ jobs:
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-1"
             LIBCUDNN_PACKAGE: "libcudnn8=8.0.5.39-1+cuda11.1"
           - CUDA_VERSION: "11.2"
-            PYTHON_VERSION: "3.9.7"
+            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-2=11.2.152-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-2"
             LIBCUDNN_PACKAGE: "libcudnn8=8.1.1.33-1+cuda11.2"
           - CUDA_VERSION: "11.3"
-            PYTHON_VERSION: "3.9.7"
+            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-3=11.3.109-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-3"
             LIBCUDNN_PACKAGE: "libcudnn8=8.2.1.32-1+cuda11.3"
           - CUDA_VERSION: "11.4"
-            PYTHON_VERSION: "3.9.7"
+            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-4=11.4.148-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-4"
             LIBCUDNN_PACKAGE: "libcudnn8=8.2.4.15-1+cuda11.4"
           - CUDA_VERSION: "11.5"
-            PYTHON_VERSION: "3.9.7"
+            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-5=11.5.117-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-5"
@@ -298,7 +298,7 @@ jobs:
       env:
         EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
         DOCKER_NAME: "renku/renkulab"
-  
+
   build-py-batch:
     needs: build-py
     runs-on: ubuntu-latest
@@ -412,7 +412,7 @@ jobs:
           --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
           --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
-        
+
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v2

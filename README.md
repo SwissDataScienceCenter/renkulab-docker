@@ -87,7 +87,7 @@ pipx install --force renku==<version>
 | [renku/renkulab-cuda-tf](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags) | Cuda image with Python and Tensorflow           | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)                           |
 | [renku/renkulab-vnc](https://hub.docker.com/r/renku/renkulab-vnc/tags)         | VNC Image with Python                           | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
 
-Please refer to the [release notes](https://github.com/SwissDataScienceCenter/renkulab-docker/releases) 
+Please refer to the [release notes](https://github.com/SwissDataScienceCenter/renkulab-docker/releases)
 for more detailed lists of released images and specific links to Dockerhub.
 
 ### py
@@ -148,7 +148,9 @@ https://hub.docker.com/r/renku/renkulab-vnc/tags
 ## Development
 
 Build with Docker by running `docker build -t <name:tag> .` in the directory
-of the image you would like to build.
+of the image you would like to build. Note that on arm-based systems (e.g.
+Apple M1/M2) you may need to use the flag `--platform=linux/amd64` for the
+build because `git-lfs 3.2.0` is not available for the arm architecture.
 
 ## Adding renku to your own images
 
