@@ -62,7 +62,7 @@ jobs:
 
         # This ensures the same image tags as before are built, in addition to new ones
         if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
-          export LABEL_PREFIX=3.10
+          export LABEL_PREFIX=3.9
         else
           export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
         fi
@@ -114,7 +114,7 @@ jobs:
         fi
 
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.10-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
           --tag $DOCKER_NAME-$EXTENSION:$LABEL
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
@@ -320,8 +320,8 @@ jobs:
         fi
 
         docker build docker/batch \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.10-$LABEL" \
-          --build-arg BASE_IMAGE="python:3.10-slim-buster" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
+          --build-arg BASE_IMAGE="python:3.9-slim-buster" \
           --tag $DOCKER_NAME-batch:$LABEL
         docker push $DOCKER_NAME-batch:$LABEL
       env:
@@ -356,7 +356,7 @@ jobs:
 
         export DOCKER_TAG="${{ matrix.JULIAVERSIONS }}-$LABEL"
         docker build docker/julia \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.10-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
           --tag $DOCKER_NAME-julia:$DOCKER_TAG
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-julia:$DOCKER_TAG"
     - name: Image Acceptance Tests
@@ -408,7 +408,7 @@ jobs:
 
         export DOCKER_TAG="${{ matrix.RVERSION }}-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.10-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
           --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
           --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
@@ -462,7 +462,7 @@ jobs:
 
         export DOCKER_TAG="${{ matrix.RELEASE }}-$LABEL"
         docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.10-$LABEL" \
+          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
           --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${{ matrix.RELEASE }} \
           --tag $DOCKER_NAME-bioc:$DOCKER_TAG
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
