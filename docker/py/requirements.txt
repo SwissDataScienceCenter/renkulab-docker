@@ -1,7 +1,7 @@
 jupyter-server-proxy==3.2.1
 jupyterlab-git==0.38.0
 jupyterlab-system-monitor~=0.8.0
-papermill~=2.3.0
+papermill~=2.3.4
 powerline-shell~=0.7.0
 requests>=2.20.0
 virtualenv>=20.7.2
