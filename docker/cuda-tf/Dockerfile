@@ -20,4 +20,6 @@ SHELL ["/bin/bash", "-c"]
 USER $NB_USER
 ARG TF_PACKAGE=tensorflow-gpu
 ARG TF_PACKAGE_VERSION=2.5.0
-RUN python3 -m pip install --no-cache-dir ${TF_PACKAGE}${TF_PACKAGE_VERSION:+==${TF_PACKAGE_VERSION}}
+# Jupyter needs 'soft_unicode' from 'markupsafe' but 'soft_unicode' was
+# removed in versions of marksupsafe after 2.0.1
+RUN python3 -m pip install --no-cache-dir markupsafe==2.0.1 ${TF_PACKAGE}${TF_PACKAGE_VERSION:+==${TF_PACKAGE_VERSION}}
