@@ -1,3 +1,14 @@
+## [0.12.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.1...0.12.0) (2022-03-21)
+
+### Bug Fixes
+
+* build qgis image [#258](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/258)
+* build R images [#244](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/244)
+* reduce vulnerabilities [#214](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/214)
+
+### Features
+* update R version [#237](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/237)
+
 ## [0.11.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.0...0.11.1) (2022-03-21)
 
 ### Bug Fixes
