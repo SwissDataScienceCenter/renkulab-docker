@@ -1,4 +1,4 @@
-## [0.12.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.1...0.12.0) (2022-03-21)
+## [0.12.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.1...0.12.0) (2022-08-09)
 
 ### Bug Fixes
 
