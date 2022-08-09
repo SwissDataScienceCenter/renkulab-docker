@@ -12,7 +12,7 @@ RUN apt-get update \
         gnupg \
         software-properties-common \
         libqt5gui5 \
-    && wget -qO - https://qgis.org/downloads/qgis-2021.gpg.key | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/qgis-archive.gpg --import \
+    && wget -qO - https://qgis.org/downloads/qgis-2022.gpg.key | gpg --no-default-keyring --keyring gnupg-ring:/etc/apt/trusted.gpg.d/qgis-archive.gpg --import \
     && chmod a+r /etc/apt/trusted.gpg.d/qgis-archive.gpg \
     && add-apt-repository "deb https://qgis.org/ubuntu $(lsb_release -c -s) main" \
     && apt-get update \
