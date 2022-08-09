@@ -1,5 +1,8 @@
 ## [0.12.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.1...0.12.0) (2022-08-09)
 
+A number of underlying libraries and applications are updated in this version, including an upgrade to JupyterLab 
+3.4.0 - see [this PR](https://github.com/SwissDataScienceCenter/renkulab-docker/pull/251).
+
 ### Bug Fixes
 
 * build qgis image [#258](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/258)
