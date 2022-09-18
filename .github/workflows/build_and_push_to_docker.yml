@@ -70,13 +70,14 @@ jobs:
         docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       env:
         TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
         TEST_USER_NAME: jovyan
+        TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
-        command: npx mocha test.js
+        command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
@@ -195,13 +196,14 @@ jobs:
           --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL"
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       env:
         TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
         TEST_USER_NAME: jovyan
+        TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
-        command: npx mocha test.js
+        command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
@@ -253,13 +255,14 @@ jobs:
           --tag $DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL"
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       env:
         TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
         TEST_USER_NAME: jovyan
+        TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
-        command: npx mocha test.js
+        command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
@@ -360,13 +363,14 @@ jobs:
           --tag $DOCKER_NAME-julia:$DOCKER_TAG
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-julia:$DOCKER_TAG"
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       env:
         TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
         TEST_USER_NAME: jovyan
+        TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
-        command: npx mocha test.js
+        command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
@@ -415,13 +419,14 @@ jobs:
 
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
+      uses: cypress-io/github-action@v4
       env:
         TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
         TEST_USER_NAME: rstudio
       with:
         working-directory: tests
-        command: npx mocha test.js
+        command: npx mocha -r ts-node/register index.ts
+        TEST_SPEC: rstudio.cy.ts
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
