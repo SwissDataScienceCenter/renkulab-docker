@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.0
+ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.7
 ARG RENKU_VERSION=1.6.0
 FROM $BASE_IMAGE as base
 
