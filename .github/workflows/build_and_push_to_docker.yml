@@ -13,15 +13,7 @@ jobs:
       matrix:
         DOCKERFILE_PATH:
         - docker/py/Dockerfile
-        - docker/r/Dockerfile
-        - docker/cuda/Dockerfile
-        - docker/cuda-tf/Dockerfile
-        - docker/generic/Dockerfile
         - docker/vnc/Dockerfile
-        - docker/matlab/Dockerfile
-        - docker/julia/Dockerfile
-        - docker/batch/Dockerfile
-        - docker/qgis/Dockerfile
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -39,7 +31,7 @@ jobs:
       matrix:
         BASE_IMAGE_TAG:
           - lab-3.4.7
-          - python-3.9.12
+          - python-3.10.6
 
     steps:
     - name: Docker Login
@@ -65,7 +57,7 @@ jobs:
           export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
+        DOCKER_BUILDKIT=1 docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v2
@@ -112,219 +104,10 @@ jobs:
         fi
 
         docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
+          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.10-$LABEL" \
           --tag $DOCKER_NAME-$EXTENSION:$LABEL
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
 
   
-  build-vnc-ext:
-    needs: build-py-ext
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        VNC-EXTENSIONS:
-          - matlab
-          - qgis
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project python-based docker image extensions
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-vnc:$LABEL" \
-          --tag $DOCKER_NAME-$EXTENSION:$LABEL
-        docker push $DOCKER_NAME-$EXTENSION:$LABEL
-      env:
-        EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
-        DOCKER_NAME: "renku/renkulab"
-
-  build-py-batch:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project python-based docker image for batch execution
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        docker build docker/batch \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE="python:3.9-slim-buster" \
-          --tag $DOCKER_NAME-batch:$LABEL
-        docker push $DOCKER_NAME-batch:$LABEL
-      env:
-        DOCKER_NAME: "renku/renkulab"
-
-  build-julia-ext:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        JULIAVERSIONS:
-          - 1.7.1
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project julia docker image extensions
-      id: build-image
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        export DOCKER_TAG="${{ matrix.JULIAVERSIONS }}-$LABEL"
-        docker build docker/julia \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --tag $DOCKER_NAME-julia:$DOCKER_TAG
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-julia:$DOCKER_TAG"
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
-      env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
-        TEST_USER_NAME: jovyan
-      with:
-        working-directory: tests
-        command: npx mocha test.js
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
-  build-r-ubuntu:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          - RVERSION: 4.1.0
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.1.1
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.1.2
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: 4.2.0
-            RSTUDIO_VERSION: 2022.02.3-492
-          - RVERSION: devel
-            RSTUDIO_VERSION: 2022.02.3-492
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project rocker docker images
-      id: build-image
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        export DOCKER_TAG="${{ matrix.RVERSION }}-$LABEL"
-        docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
-          --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
-          --tag $DOCKER_NAME-r:$DOCKER_TAG
-
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v2
-      env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
-        TEST_USER_NAME: rstudio
-      with:
-        working-directory: tests
-        command: npx mocha test.js
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
-        then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-r:latest
-          docker push $DOCKER_NAME-r:latest
-        fi
-
-  build-bioc:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        RELEASE:
-          - RELEASE_3_14
-          - RELEASE_3_15
-          - devel
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project bioconductor docker images
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        export DOCKER_TAG="${{ matrix.RELEASE }}-$LABEL"
-        docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${{ matrix.RELEASE }} \
-          --tag $DOCKER_NAME-bioc:$DOCKER_TAG
-        docker push $DOCKER_NAME-bioc:$DOCKER_TAG
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
-        then
-          docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
-          docker push $DOCKER_NAME-bioc:latest
-        fi
