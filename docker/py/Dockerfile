@@ -9,7 +9,7 @@ SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # Install additional dependencies and nice-to-have packages
 RUN apt-get update && \
-    apt-get install software-properties-common -y && \
+    apt-get install -yq --no-install-recommends software-properties-common -y && \
     add-apt-repository 'ppa:deadsnakes/ppa' && \
     apt-get install -yq --no-install-recommends \
     build-essential \
