@@ -8,7 +8,10 @@ USER root
 SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # Install additional dependencies and nice-to-have packages
-RUN apt-get update && apt-get install -yq --no-install-recommends \
+RUN apt-get update && \
+    apt-get install software-properties-common -y && \
+    add-apt-repository 'ppa:deadsnakes/ppa' && \
+    apt-get install -yq --no-install-recommends \
     build-essential \
     curl && \
     curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
@@ -28,12 +31,15 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     musl-dev \
     nano \
     netcat \
-    python-dev \
+    powerline \
+    python-dev-is-python3 \
+    python3-pip \
     unzip \
     vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+
 
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images
@@ -80,7 +86,7 @@ COPY --chown=1000:1000 powerline.config /home/${NB_USER}/.config/powerline-shell
 
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 
-COPY entrypoint.sh /entrypoint.sh
+COPY --chmod=555  entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
 CMD [ "/usr/local/bin/start-singleuser.sh" ]
