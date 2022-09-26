@@ -28,7 +28,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     musl-dev \
     nano \
     netcat \
-    python-dev \
     unzip \
     vim && \
     apt-get clean && \
