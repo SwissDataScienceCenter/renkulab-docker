@@ -19,3 +19,4 @@ tests/cypress/videos/*
 tests/cypress/screenshots/*
 
 # End of https://www.gitignore.io/api/visualstudiocode
+.DS_Store
