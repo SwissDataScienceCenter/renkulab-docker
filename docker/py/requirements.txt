@@ -1,4 +1,4 @@
-jupyter-server-proxy==3.2.1
+jupyter-server-proxy==3.2.2
 jupyterlab-git==0.38.0
 jupyterlab-system-monitor~=0.8.0
 papermill~=2.3.4
