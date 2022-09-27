@@ -1,3 +1,8 @@
+## [0.13.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.12.0...0.13.0) (2022-09-28)
+
+This release adds a new image with Python 3.10, updates to libraries and improvements to the
+acceptance tests we run in our CI pipelines.
+
 ## [0.12.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.11.1...0.12.0) (2022-08-09)
 
 A number of underlying libraries and applications are updated in this version, including an upgrade to JupyterLab 
