@@ -1,3 +1,12 @@
+## [0.13.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.13.0...0.13.1) (2022-10-25)
+
+This release fixes a problem with the jupyter library nbconvert that is used internally by jupyter
+servers and notebooks.
+
+### Bug Fixes
+
+* broken nbconvert ([#271](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/271)) ([b356456](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/b3564568e802dbf9ca96a64cd3fdf88b719415f7))
+
 ## [0.13.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.12.0...0.13.0) (2022-09-28)
 
 This release adds a new image with Python 3.10, updates to libraries and improvements to the
