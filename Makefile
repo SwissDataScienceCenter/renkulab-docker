@@ -17,6 +17,7 @@
 # limitations under the License.
 
 extensions = \
+	py \
 	bioc \
 	r \
 	cuda-9.2 \
@@ -27,13 +28,6 @@ extensions = \
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
-
-# for the empty version case:
-RENKU_PIP_SPEC="renku"
-ifdef RENKU_VERSION
-	RENKU_PIP_SPEC="renku==$(RENKU_VERSION)"
-	RENKU_TAG=-renku$(RENKU_VERSION)
-endif
 
 RVERSION?=4.0.4
 BIOC_VERSION?=devel
@@ -67,41 +61,44 @@ pull:
 
 r: py
 	docker build docker/r \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg RVERSION=$(RVERSION) \
-		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) && \
-	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(RENKU_TAG)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(R_TAG)
+		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) && \
+	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(R_TAG)
 
 bioc: py
 	docker build docker/bioc \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg RELEASE=$(BIOC_VERSION) \
-		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(RENKU_TAG)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)$(BIOC_TAG)
+		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) && \
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
 
 
 py:
-	cd docker/$@ && \
-	docker build \
-		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) . && \
-	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+	docker build -f docker/py/Dockerfile \
+		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) . && \
+	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
 
 cuda: py
 	docker build docker/cuda-tf \
-		--build-arg RENKU_PIP_SPEC=$(RENKU_PIP_SPEC) \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
-	
+
 vnc: py
 	docker build docker/vnc \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
-		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) && \
-	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-vnc:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-vnc:$(GIT_MASTER_HEAD_SHA)
 
 julia: py
 	docker build docker/julia \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG) \
-		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)$(RENKU_TAG) && \
-	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)$(RENKU_TAG) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)$(RENKU_TAG)
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)
+
+batch: py
+	docker build . -f docker/batch/Dockerfile \
+		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)

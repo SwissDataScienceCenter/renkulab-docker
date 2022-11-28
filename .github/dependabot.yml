@@ -4,16 +4,19 @@ updates:
   directory: "/docker/py"
   schedule:
     interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 5
 - package-ecosystem: "pip"
   directory: "/docker/py"
   schedule:
     interval: daily
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 5
+- package-ecosystem: "pip"
+  directory: "/renku-requirements"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 5
 - package-ecosystem: docker
   directory: "/docker/r"
   schedule:
     interval: daily
-    time: "04:00"
-  open-pull-requests-limit: 10
+  open-pull-requests-limit: 5
