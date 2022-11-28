@@ -23,7 +23,7 @@ RUN apt-get update -y && \
 
 # Install Renku python without pipx in a non-user location
 COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
-RUN python3 -m pip install virtualenv && \
+RUN python3 -m pip install --no-cache-dir virtualenv && \
     virtualenv --no-periodic-update /share/.renku && \
     . /share/.renku/bin/activate && \
     pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
