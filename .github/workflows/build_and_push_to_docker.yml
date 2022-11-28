@@ -68,7 +68,7 @@ jobs:
           export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
+        docker build . -f docker/py/Dockerfile --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
         echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -323,7 +323,7 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/batch \
+        docker build . -f docker/batch/Dockerfile \
           --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
           --build-arg BASE_IMAGE="python:3.9-slim-buster" \
           --tag $DOCKER_NAME-batch:$LABEL
