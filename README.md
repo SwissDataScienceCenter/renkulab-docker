@@ -54,14 +54,14 @@ the image that's right for you:
 `renku/renkulab-[image flavor]:[image flavor version]-[tag|hash]`
 
 For example:
-`renku/renkulab-py:python-3.8.8-0.11.0`
+`renku/renkulab-py:python-3.8.13-0.11.0`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on RenkuLab.
 * `-py`: indicates this is a python image flavor; either the programming language
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
-* `python-3.8.8`: indicates the version of python is 3.8.8
+* `python-3.8.13`: indicates the version of python is 3.8.13
 * `0.11.0` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the

@@ -41,7 +41,7 @@ jobs:
           - lab-3.4.0
           - python-3.10.6
           - python-3.9.12
-          - python-3.8.8
+          - python-3.8.13
           - python-3.7.6
 
     steps:
@@ -132,13 +132,13 @@ jobs:
         include:
           # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
           - CUDA_VERSION: "11.0"
-            PYTHON_VERSION: "3.8.8"
+            PYTHON_VERSION: "3.8.13"
             EXTRA_LIBRARIES: "libcusolver-11-2"
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-0=11.0.221-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-0"
             LIBCUDNN_PACKAGE: "libcudnn8=8.0.5.39-1+cuda11.0"
           - CUDA_VERSION: "11.1"
-            PYTHON_VERSION: "3.8.8"
+            PYTHON_VERSION: "3.8.13"
             EXTRA_LIBRARIES: "libcusolver-11-2"
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-1=11.1.74-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-1"
