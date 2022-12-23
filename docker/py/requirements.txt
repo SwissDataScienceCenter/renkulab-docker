@@ -1,5 +1,5 @@
 jupyter-server-proxy==3.2.2
-jupyterlab-git==0.40.1
+jupyterlab-git==0.41.0
 jupyterlab-system-monitor~=0.8.0
 papermill~=2.4.0
 powerline-shell~=0.7.0
