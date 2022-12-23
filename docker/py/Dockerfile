@@ -41,7 +41,7 @@ RUN groupadd -g 1000 jovyan
 USER $NB_USER
 
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
-COPY docker/py/requirements.txt /tmp/requirements.txt
+COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache-dir -U pip && \
     python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
     # jupyter lab build && \
@@ -70,16 +70,16 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
 
 # configure git
-COPY docker/py/git-config.bashrc /home/$NB_USER/
+COPY git-config.bashrc /home/$NB_USER/
 RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
 
 # configure powerline
-COPY --chown=1000:1000 docker/py/powerline.bashrc /tmp/powerline.bashrc
-COPY --chown=1000:1000 docker/py/powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
+COPY --chown=1000:1000 powerline.bashrc /tmp/powerline.bashrc
+COPY --chown=1000:1000 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
 
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 
-COPY docker/py/entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
 CMD [ "/usr/local/bin/start-singleuser.sh" ]

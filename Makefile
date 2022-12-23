@@ -75,8 +75,8 @@ bioc: py
 
 
 py:
-	docker build -f docker/py/Dockerfile \
-		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) . && \
+	docker build docker/py \
+		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
 
 cuda: py
@@ -99,6 +99,6 @@ julia: py
 	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)
 
 batch: py
-	docker build . -f docker/batch/Dockerfile \
+	docker build docker/batch \
 		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)

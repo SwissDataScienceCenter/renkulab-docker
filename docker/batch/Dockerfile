@@ -21,15 +21,15 @@ RUN apt-get update -y && \
     apt-get autoremove --yes && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Renku python without pipx in a non-user location
-COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
-RUN python3 -m pip install --no-cache-dir virtualenv && \
-    virtualenv --no-periodic-update /share/.renku && \
-    . /share/.renku/bin/activate && \
-    pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
-    deactivate && \
-    mkdir /share/bin && \
-    ln -s /share/.renku/bin/renku /share/bin
+# Install Renku from base python image
+
+COPY --from=renku_base /home/jovyan/.renku /share/.renku
+COPY --from=renku_base /opt/conda /opt/conda
+
+RUN mkdir /share/bin && \
+    ln -s /share/.renku/venv/bin/renku /share/bin && \
+    rm -rf /share/.renku/venv/bin/__pycache__ && \
+    sed -i 's/\/home\/jovyan/\/share/g' /share/.renku/venv/bin/*
 
 ENV PATH /share/bin:$PATH
 
