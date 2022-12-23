@@ -1,5 +1,4 @@
 ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.0
-ARG RENKU_VERSION=1.6.0
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -61,11 +60,12 @@ ENV RENKU_DISABLE_VERSION_CHECK 1
 
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
 
-ARG RENKU_VERSION
+COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
+
 RUN mkdir -p "$HOME/.renku/bin" && \
-    virtualenv --pip 21.3.1 --setuptools 57.5.0 --wheel 0.36.2  --no-periodic-update "$HOME/.renku/venv" && \
+    virtualenv --no-periodic-update "$HOME/.renku/venv" && \
     source "$HOME/.renku/venv/bin/activate" && \
-    pip install --no-cache-dir "renku==$RENKU_VERSION" sentry-sdk && \
+    pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
     deactivate && \
     ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
 
