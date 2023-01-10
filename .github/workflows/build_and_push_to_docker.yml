@@ -69,7 +69,8 @@ jobs:
         fi
 
         docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL"
+        echo "IMAGE_NAME=$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL" >> $GITHUB_OUTPUT
+        
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -167,6 +168,12 @@ jobs:
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-5=11.5.117-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-5"
             LIBCUDNN_PACKAGE: "libcudnn8=8.3.2.44-1+cuda11.5"
+          - CUDA_VERSION: "11.7"
+            PYTHON_VERSION: "3.9.12"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-7=11.7.60-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-7"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.5.0.96-1+cuda11.7"
 
     steps:
     - name: Docker Login
@@ -195,7 +202,8 @@ jobs:
           --build-arg CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" \
           --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
           --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL"
+        echo "IMAGE_NAME=$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL" >> $GITHUB_OUTPUT
+        
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -254,7 +262,8 @@ jobs:
           --build-arg BASE_IMAGE="$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL" \
           --build-arg TF_PACKAGE_VERSION="${{ matrix.TF_VERSION }}" \
           --tag $DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL"
+        echo "IMAGE_NAME=$DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL" >> $GITHUB_OUTPUT
+        
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -362,7 +371,8 @@ jobs:
         docker build docker/julia \
           --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
           --tag $DOCKER_NAME-julia:$DOCKER_TAG
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-julia:$DOCKER_TAG"
+        echo "IMAGE_NAME=$DOCKER_NAME-julia:$DOCKER_TAG" >> $GITHUB_OUTPUT
+        
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -418,7 +428,7 @@ jobs:
           --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
           --tag $DOCKER_NAME-r:$DOCKER_TAG
 
-        echo "::set-output name=IMAGE_NAME::$DOCKER_NAME-r:$DOCKER_TAG"
+        echo "IMAGE_NAME=$DOCKER_NAME-r:$DOCKER_TAG" >> $GITHUB_OUTPUT
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
