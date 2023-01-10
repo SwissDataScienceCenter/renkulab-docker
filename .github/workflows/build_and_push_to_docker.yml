@@ -167,6 +167,12 @@ jobs:
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-5=11.5.117-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-5"
             LIBCUDNN_PACKAGE: "libcudnn8=8.3.2.44-1+cuda11.5"
+          - CUDA_VERSION: "11.7"
+            PYTHON_VERSION: "3.9.12"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-7=11.7.60-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-7"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.5.0.96-1+cuda11.7"
 
     steps:
     - name: Docker Login
