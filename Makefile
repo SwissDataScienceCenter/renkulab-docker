@@ -18,12 +18,15 @@
 
 extensions = \
 	py \
-	bioc \
 	r \
-	cuda-9.2 \
-	cuda-10.0-tf \
+	cuda \
+	cuda-tf \
 	vnc \
-	julia
+	julia \
+	qgis \
+	matlab \
+	generic \
+	batch
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
@@ -59,6 +62,12 @@ pull:
 		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
 	done
 
+# all of the containers use this as a base
+py:
+	docker build docker/py \
+		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
+
 r: py
 	docker build docker/r \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
@@ -66,25 +75,19 @@ r: py
 		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) && \
 	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(R_TAG)
 
-bioc: py
-	docker build docker/bioc \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
-		--build-arg RELEASE=$(BIOC_VERSION) \
-		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
-
-
-py:
-	docker build docker/py \
-		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
-
 cuda: py
-	docker build docker/cuda-tf \
+	docker build docker/cuda \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
-		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
+		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
+	
+cuda-tf: py
+	docker build docker/cuda \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
+		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
 
 vnc: py
 	docker build docker/vnc \
@@ -98,7 +101,26 @@ julia: py
 		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)
 
+generic: py
+	docker build docker/generic \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_MASTER_HEAD_SHA)
+
+matlab: py
+	docker build docker/matlab \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		-t $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_MASTER_HEAD_SHA)
+
+qgis: py
+	docker build docker/qgis \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		-t $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) $(DOCKER_PREFIX)-qgis:$(GIT_MASTER_HEAD_SHA)
+
 batch: py
 	docker build docker/batch \
 		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)
+
