@@ -28,14 +28,19 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     nano \
     netcat \
     unzip \
-    vim && \
+    vim \
+    openssh-server && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 jovyan
+RUN groupadd -g 1000 jovyan && \
+    mkdir -p /opt/ssh/sshd_config.d && \
+    chown -R 1000:1000 /opt/ssh
+
+COPY sshd_config /opt/ssh/sshd_config
 
 # switch to the notebook user
 USER $NB_USER
@@ -67,7 +72,14 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     source "$HOME/.renku/venv/bin/activate" && \
     pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
     deactivate && \
-    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
+    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
+    mkdir -p "$HOME/.ssh" && \
+    touch "$HOME/.ssh/authorized_keys" && \
+    chmod 600 "$HOME/.ssh/authorized_keys" && \
+    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_ed25519_key
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
