@@ -16,3 +16,5 @@ PidFile /opt/ssh/sshd.pid
 AcceptEnv LANG LC_*
 
 Subsystem       sftp    /usr/lib/openssh/sftp-server
+
+AuthorizedKeysFile     ~/.ssh/authorized_keys /.ssh/authorized_keys

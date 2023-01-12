@@ -35,7 +35,7 @@ if [ -f "./post-init.sh" ]; then
 fi
 
 # Start the SHH daemon in the background
-/usr/sbin/sshd -D -f /opt/ssh/sshd_config -E /tmp/sshd.log &> /dev/null &
+/usr/sbin/sshd -f /opt/ssh/sshd_config -E /tmp/sshd.log &> /dev/null
 
 # run the command
 $@
