@@ -136,6 +136,6 @@ bioc: py
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)
 
 

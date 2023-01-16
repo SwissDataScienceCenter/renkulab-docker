@@ -502,7 +502,7 @@ jobs:
         export RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL"
         export BASE_IMAGE="bioconductor/bioconductor_docker:${{ matrix.RELEASE }}"
         make bioc
-        docker push $DOCKER_NAME-bioc:$DOCKER_TAG
+        docker push $DOCKER_PREFIX-bioc:$DOCKER_LABEL
 
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
