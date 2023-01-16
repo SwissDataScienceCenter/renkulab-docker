@@ -10,8 +10,6 @@ env:
   DOCKER_NAME: "renku/renkulab"
 
 jobs:
-
-jobs:
   build:
     name: Build docker images
     runs-on: ubuntu-latest

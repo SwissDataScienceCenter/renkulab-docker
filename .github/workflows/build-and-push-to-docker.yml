@@ -45,7 +45,6 @@ jobs:
           - python-3.10.6
           - python-3.9.12
           - python-3.8.13
-          - python-3.7.6
 
     steps:
     - name: Docker Login
@@ -89,6 +88,7 @@ jobs:
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
+
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
