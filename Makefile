@@ -127,7 +127,7 @@ vnc-qgis: vnc
 batch: py
 	docker build docker/batch \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
-		--build-arg BASE_IMAGE="python-3.9-slim-buster" \
+		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
 		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)
 
@@ -135,7 +135,7 @@ bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
-		--t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
+		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
 
 
