@@ -456,6 +456,7 @@ jobs:
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
+
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}

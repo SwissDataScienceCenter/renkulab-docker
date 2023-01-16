@@ -76,8 +76,8 @@ r: py
 	docker build docker/r \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
 		--build-arg RVERSION=$(RVERSION) \
-		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) && \
-	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)$(R_TAG) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)$(R_TAG)
+		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL) && \
+	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)
 
 cuda: py
 	docker build docker/cuda \
