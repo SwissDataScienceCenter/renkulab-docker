@@ -23,8 +23,8 @@ extensions = \
 	cuda-tf \
 	vnc \
 	julia \
-	qgis \
-	matlab \
+	vnc-qgis \
+	vnc-matlab \
 	generic \
 	batch
 
@@ -111,15 +111,15 @@ generic: py
 		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_MASTER_HEAD_SHA)
 
-matlab: py
+vnc-matlab: py
 	docker build docker/matlab \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
 		-t $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_MASTER_HEAD_SHA)
 
-qgis: py
+vnc-qgis: py
 	docker build docker/qgis \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
 		-t $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) $(DOCKER_PREFIX)-qgis:$(GIT_MASTER_HEAD_SHA)
 
