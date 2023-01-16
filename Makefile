@@ -26,7 +26,8 @@ extensions = \
 	vnc-qgis \
 	vnc-matlab \
 	generic \
-	batch
+	batch \
+	bioc
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
@@ -111,13 +112,13 @@ generic: py
 		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_MASTER_HEAD_SHA)
 
-vnc-matlab: py
+vnc-matlab: vnc
 	docker build docker/matlab \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
 		-t $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_MASTER_HEAD_SHA)
 
-vnc-qgis: py
+vnc-qgis: vnc
 	docker build docker/qgis \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
 		-t $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) && \
@@ -127,4 +128,11 @@ batch: py
 	docker build docker/batch \
 		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)
+
+bioc: py
+	docker build docker/r \
+		--build-arg RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL" \
+		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$BIOC_VERSION" \
+		--t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) && \
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)$(BIOC_TAG) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)$(BIOC_TAG)
 
