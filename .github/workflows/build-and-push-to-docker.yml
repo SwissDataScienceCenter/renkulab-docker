@@ -102,39 +102,6 @@ jobs:
           docker push $DOCKER_NAME-py:latest
         fi
 
-  build-py-ext:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        EXTENSIONS:
-          - vnc
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v2
-    - name: Build renku project python-based docker image extensions
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        docker build docker/$EXTENSION \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --tag $DOCKER_NAME-$EXTENSION:$LABEL
-        docker push $DOCKER_NAME-$EXTENSION:$LABEL
-      env:
-        EXTENSION: ${{ matrix.EXTENSIONS }}
-
   build-cuda:
     needs: build-py
     runs-on: ubuntu-latest
@@ -288,6 +255,47 @@ jobs:
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+
+  build-py-ext:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        EXTENSIONS:
+          - vnc
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v2
+    - name: Build renku project python-based docker image extensions
+      run: |
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        # needed by the makefile
+        export DOCKER_PREFIX="renku/renkulab"    
+        export DOCKER_LABEL="${LABEL}"
+        # this is required by the makefile
+        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        make vnc 
+        docker push $DOCKER_NAME-$EXTENSION:$LABEL
+        # docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
+        # docker build docker/$EXTENSION \
+        #   --build-arg BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL" \
+        #   --tag $DOCKER_NAME-$EXTENSION:$LABEL
+        # docker push $DOCKER_NAME-$EXTENSION:$LABEL
+      env:
+        EXTENSION: ${{ matrix.EXTENSIONS }}
 
   build-vnc-ext:
     needs: build-py-ext
