@@ -339,11 +339,15 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        docker build docker/batch \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE="python:3.9-slim-buster" \
-          --tag $DOCKER_NAME-batch:$LABEL
-        docker push $DOCKER_NAME-batch:$LABEL
+        # needed by the makefile
+        export DOCKER_PREFIX="renku/renkulab"    
+        export DOCKER_LABEL="$LABEL"
+        # this is required by the makefile
+        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        export RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL"
+        export BASE_IMAGE="python:3.9-slim-buster" 
+        make batch
+        echo "IMAGE_NAME=$DOCKER_NAME-batch:$DOCKER_LABEL" >> $GITHUB_OUTPUT
       env:
         DOCKER_NAME: "renku/renkulab"
 
@@ -431,14 +435,17 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="${{ matrix.RVERSION }}-$LABEL"
-        docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" \
-          --build-arg RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}" \
-          --tag $DOCKER_NAME-r:$DOCKER_TAG
+        # needed by the makefile
+        export DOCKER_PREFIX="renku/renkulab"    
+        export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
+        # this is required by the makefile
+        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        export RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL"
+        export BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
+        export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
+        make r
+        echo "IMAGE_NAME=$DOCKER_NAME-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
 
-        echo "IMAGE_NAME=$DOCKER_NAME-r:$DOCKER_TAG" >> $GITHUB_OUTPUT
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -487,11 +494,14 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_TAG="${{ matrix.RELEASE }}-$LABEL"
-        docker build docker/r \
-          --build-arg RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL" \
-          --build-arg BASE_IMAGE=bioconductor/bioconductor_docker:${{ matrix.RELEASE }} \
-          --tag $DOCKER_NAME-bioc:$DOCKER_TAG
+        # needed by the makefile
+        export DOCKER_PREFIX="renku/renkulab"    
+        export DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
+        # this is required by the makefile
+        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        export RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL"
+        export BASE_IMAGE="bioconductor/bioconductor_docker:${{ matrix.RELEASE }}"
+        make bioc
         docker push $DOCKER_NAME-bioc:$DOCKER_TAG
 
         # on master push latest image
@@ -500,3 +510,4 @@ jobs:
           docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
           docker push $DOCKER_NAME-bioc:latest
         fi
+
