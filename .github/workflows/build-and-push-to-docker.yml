@@ -6,7 +6,7 @@ on:
   #    paths-ignore: ['Makefile', 'docker/**']
   push:
       branches: ['*']
-      paths-ignore: ['Makefile', 'docker/**']
+      paths: ['Makefile', 'docker/**']
 
 env:
   DOCKER_NAME: "renku/renkulab"
