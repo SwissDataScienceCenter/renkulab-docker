@@ -1,0 +1,19 @@
+name: Renku Docker Image CI
+
+  # on: [push]
+on:
+  pull_request:
+    branches: [master]
+    paths-ignore: ['Makefile', 'docker/**']
+
+env:
+  DOCKER_NAME: "renku/renkulab"
+
+jobs:
+
+jobs:
+  build:
+    name: Build docker images
+    runs-on: ubuntu-latest
+    steps:
+      - run: 'echo "No docker image build required" '

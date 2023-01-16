@@ -1,6 +1,9 @@
 name: Renku Docker Image CI
 
-on: [push]
+on: 
+  pull_request:
+    branches: [master]
+    paths: ['Makefile', 'docker/**']
 
 env:
   DOCKER_NAME: "renku/renkulab"
@@ -68,9 +71,15 @@ jobs:
           export LABEL_PREFIX=${{ matrix.BASE_IMAGE_TAG }}
         fi
 
-        docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
-        echo "IMAGE_NAME=$DOCKER_NAME-py:$LABEL_PREFIX-$LABEL" >> $GITHUB_OUTPUT
-        
+        # needed by the makefile
+        export DOCKER_PREFIX="renkulab/renku"    
+        export DOCKER_LABEL="${LABEL_PREFIX}-${LABEL}"
+        # this is required by the makefile
+        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        make py 
+        # docker build docker/py --tag $DOCKER_NAME-py:$LABEL_PREFIX-$LABEL --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}"
+        echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${DOCKER_LABEL}" >> $GITHUB_OUTPUT
+
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:

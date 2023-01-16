@@ -37,6 +37,7 @@ BIOC_VERSION?=devel
 R_TAG=-r$(RVERSION)
 BIOC_TAG=$(BIOC_VERSION)
 TENSORFLOW_VERSION?=2.2.0
+BASE_IMAGE_TAG?=lab-3.4.0
 
 .PHONY: all
 
@@ -65,8 +66,10 @@ pull:
 # all of the containers use this as a base
 py:
 	docker build docker/py \
+		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
 		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(BASE_IMAGE_TAG)-$(GIT_MASTER_HEAD_SHA)
 
 r: py
 	docker build docker/r \
@@ -82,12 +85,13 @@ cuda: py
 		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
 	
-cuda-tf: py
-	docker build docker/cuda \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
-		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
-		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
+# The cuda-tf dockerfile does not seem to be maintained
+# cuda-tf: py
+# 	docker build docker/cuda-tf \
+# 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+# 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
+# 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
+# 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
 
 vnc: py
 	docker build docker/vnc \
