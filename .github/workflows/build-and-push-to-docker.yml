@@ -1,9 +1,12 @@
 name: Renku Docker Image CI
 
 on: 
-  pull_request:
-    branches: [master]
-    paths: ['Makefile', 'docker/**']
+  #  pull_request:
+  #    branches: [master]
+  #    paths-ignore: ['Makefile', 'docker/**']
+  push:
+      branches: ['*']
+      paths-ignore: ['Makefile', 'docker/**']
 
 env:
   DOCKER_NAME: "renku/renkulab"
@@ -71,7 +74,7 @@ jobs:
         fi
 
         # needed by the makefile
-        export DOCKER_PREFIX="renkulab/renku"    
+        export DOCKER_PREFIX="renku/renkulab"    
         export DOCKER_LABEL="${LABEL_PREFIX}-${LABEL}"
         # this is required by the makefile
         export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
