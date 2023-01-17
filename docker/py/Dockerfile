@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 jovyan && \
+RUN groupadd -g 1000 $NB_USER && \
     mkdir -p /opt/ssh/sshd_config.d && \
     chown -R 1000:1000 /opt/ssh
 

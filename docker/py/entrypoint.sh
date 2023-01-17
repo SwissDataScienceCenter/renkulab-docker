@@ -34,6 +34,14 @@ if [ -f "./post-init.sh" ]; then
     . ./post-init.sh
 fi
 
+# inject ssh public keys if any exist
+if [ -f "./.ssh/authorized_keys" ]; then
+    echo >> ~/.ssh/authorized_keys
+    cat ./.ssh/authorized_keys >> ~/.ssh/authorized_keys
+    echo >> ~/.ssh/authorized_keys
+    chmod 600 ~/.ssh/authorized_keys
+fi
+
 # Start the SHH daemon in the background
 /usr/sbin/sshd -f /opt/ssh/sshd_config -E /tmp/sshd.log &> /dev/null
 
