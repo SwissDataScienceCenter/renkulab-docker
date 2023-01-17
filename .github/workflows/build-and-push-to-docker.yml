@@ -163,6 +163,8 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
+        export DOCKER_PREFIX="renku/renkulab"    
+        export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
         export BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" 
         export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
@@ -170,15 +172,7 @@ jobs:
         export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
         make cuda
-        #docker build . \
-        #  --build-arg BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" \
-        #  --build-arg CUDA_VERSION="${{ matrix.CUDA_VERSION }}" \
-        #  --build-arg EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" \
-        #  --build-arg CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" \
-        #  --build-arg CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" \
-        #  --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
-        #  --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
-        echo "IMAGE_NAME=$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_NAME-cuda:$DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
