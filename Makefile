@@ -31,7 +31,7 @@ extensions = \
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
-GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
+GIT_COMMIT_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
 RVERSION?=4.2.0
 BIOC_VERSION?=devel
@@ -39,6 +39,7 @@ R_TAG=-r$(RVERSION)
 BIOC_TAG=$(BIOC_VERSION)
 TENSORFLOW_VERSION?=2.2.0
 BASE_IMAGE_TAG?=lab-3.4.0
+RENKU_PYTHON_BASE_IMAGE_TAG?=lab-3.4.0
 
 # cuda defaults - these should be updated from time to time
 CUDA_VERSION?=11.7
@@ -55,15 +56,18 @@ all: $(extensions)
 login:
 	@echo "${DOCKER_PASSWORD}" | docker login -u="${DOCKER_USERNAME}" --password-stdin ${DOCKER_REGISTRY}
 
+# push assumes that all images are identified by as ext:DOCKER_LABEL
+# and ext:(COMMIT_HASH). DOCKER_LABEL defaults to `latest`.
 push:
 	for ext in "" $(extensions) ; do \
 		if test "$$ext" != "" ; then \
 			ext=-$$ext; \
 		fi; \
 		docker push $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
-		docker push $(DOCKER_PREFIX)$$ext:$(GIT_MASTER_HEAD_SHA) ; \
+		docker push $(DOCKER_PREFIX)$$ext:$(GIT_COMMIT_SHA) ; \
 	done
 
+# pull will pull down latest images for all extensions.
 pull:
 	for ext in "" $(extensions) ; do \
 		if test "$$ext" != "" ; then \
@@ -72,31 +76,30 @@ pull:
 		docker pull $(DOCKER_PREFIX)$$ext:$(DOCKER_LABEL) ; \
 	done
 
-# all of the containers use this as a base
+# all of the containers use this as a base. It is assumed that the following
+# are defined:
+# BASE_IMAGE_TAG: used to identify the jupyter base notebook to build from
+# RENKU_PYTHON_BASE_TAG: used to tag the resulting image
 py:
 	docker build docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
-		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(GIT_MASTER_HEAD_SHA)
-	docker tag $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL) $(DOCKER_PREFIX)-$@:$(BASE_IMAGE_TAG)-$(GIT_MASTER_HEAD_SHA)
+		-t $(DOCKER_PREFIX)-$@:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) 
 
 r: py
 	docker build docker/r \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
 		--build-arg RVERSION=$(RVERSION) \
-		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-r:$(DOCKER_LABEL) $(DOCKER_PREFIX)-r:$(GIT_MASTER_HEAD_SHA)
+		-t $(DOCKER_PREFIX)-r:$(RVERSION)-$(GIT_COMMIT_SHA)
 
 cuda: py
 	docker build docker/cuda \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(PYTHON-VERSION)-$(GIT_MASTER_HEAD_SHA) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
 		--build-arg CUDA_VERSION=$(CUDA_VERSION) \
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
 		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
-		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
+		-t $(DOCKER_PREFIX)-cuda:$(CUDA_VERSION)-$(GIT_COMMIT_SHA)
 
         # docker build . \
         #   --build-arg BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" \
@@ -110,53 +113,53 @@ cuda: py
 # The cuda-tf dockerfile does not seem to be maintained
 # cuda-tf: py
 # 	docker build docker/cuda-tf \
-# 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+# 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
 # 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
 # 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
-# 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_MASTER_HEAD_SHA)
+# 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_COMMIT_SHA)
 
 vnc: py
 	docker build docker/vnc \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG) \
 		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-vnc:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
 
 julia: py
 	docker build docker/julia \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
 		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_COMMIT_SHA)
 
 generic: py
 	docker build docker/generic \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
 		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_COMMIT_SHA)
 
 vnc-matlab: vnc
 	docker build docker/matlab \
-		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		-t $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA)
 
 vnc-qgis: vnc
 	docker build docker/qgis \
-		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_MASTER_HEAD_SHA) \
+		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		-t $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) $(DOCKER_PREFIX)-qgis:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA)
 
 batch: py
 	docker build docker/batch \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
 		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
 		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA)
 
 bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_MASTER_HEAD_SHA)
+	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
 
 

@@ -165,6 +165,7 @@ jobs:
 
         export DOCKER_PREFIX="renku/renkulab"    
         export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
+        export PYTHON_VERSION="${{ matrix.PYTHON_VERSION }}"
         export RENKU_BASE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" 
         export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
