@@ -155,6 +155,8 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project python-based docker image extensions
       id: build-image
+      env:
+        DOCKER_PREFIX: "renku/renkulab"    
       run: |
         # cd docker/cuda
 
@@ -164,10 +166,9 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
 
-        export DOCKER_PREFIX="renku/renkulab"    
         export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
         export PYTHON_VERSION="${{ matrix.PYTHON_VERSION }}"
-        export RENKU_BASE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" 
+        export CUDA_BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" 
         export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
@@ -194,58 +195,6 @@ jobs:
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-cuda:latest
           docker push $DOCKER_NAME-cuda:latest
         fi
-
-  build-cuda-tf:
-    needs: build-cuda
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: true
-      matrix:
-        include:
-          # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
-          - TF_VERSION: "2.7"
-            CUDA_VERSION: "11.2"
-          - TF_VERSION: "2.9"
-            CUDA_VERSION: "11.2"
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v3
-    - name: Build renku project python-based docker image extensions
-      id: build-image
-      run: |
-        cd docker/cuda-tf
-
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        docker build . \
-          --build-arg BASE_IMAGE="$DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL" \
-          --build-arg TF_PACKAGE_VERSION="${{ matrix.TF_VERSION }}" \
-          --tag $DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL
-        echo "IMAGE_NAME=$DOCKER_NAME-cuda-tf:${{ matrix.CUDA_VERSION }}-tf-${{ matrix.TF_VERSION }}-$LABEL" >> $GITHUB_OUTPUT
-        
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
-      env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
   build-py-ext:
     needs: build-py

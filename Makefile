@@ -20,7 +20,6 @@ extensions = \
 	py \
 	r \
 	cuda \
-	cuda-tf \
 	vnc \
 	julia \
 	vnc-qgis \
@@ -33,15 +32,20 @@ DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
 GIT_COMMIT_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
-RVERSION?=4.2.0
-BIOC_VERSION?=devel
-R_TAG=-r$(RVERSION)
-BIOC_TAG=$(BIOC_VERSION)
-TENSORFLOW_VERSION?=2.2.0
+# for building the base image
 BASE_IMAGE_TAG?=lab-3.4.0
 RENKU_PYTHON_BASE_IMAGE_TAG?=3.9
 
+# for building the r container
+RVERSION?=4.2.0
+TENSORFLOW_VERSION?=2.2.0
+
+# for building the julia container
 JULIAVERSION?=1.7.1
+
+# for building the bioconductor container
+BIOC_VERSION?=devel
+BIOC_TAG=$(BIOC_VERSION)
 
 # cuda defaults - these should be updated from time to time
 CUDA_VERSION?=11.7
@@ -93,9 +97,12 @@ r: py
 		--build-arg RVERSION=$(RVERSION) \
 		-t $(DOCKER_PREFIX)-r:$(RVERSION)-$(GIT_COMMIT_SHA)
 
+# BASE_IMAGE was used for all the docker files, but if there are dependencies,
+# it can be expected to mean different things in different contexts; hence
+# CUDA_BASE_IMAGE was introduced here
 cuda: py
 	docker build docker/cuda \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		--build-arg CUDA_BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
 		--build-arg CUDA_VERSION=$(CUDA_VERSION) \
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
@@ -112,14 +119,6 @@ cuda: py
         #   --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
         #   --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
 	
-# The cuda-tf dockerfile does not seem to be maintained
-# cuda-tf: py
-# 	docker build docker/cuda-tf \
-# 		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
-# 		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
-# 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
-# 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_COMMIT_SHA)
-
 # this image is just tagged with the commit hash
 vnc: py
 	docker build docker/vnc \
