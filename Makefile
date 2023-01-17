@@ -39,7 +39,9 @@ R_TAG=-r$(RVERSION)
 BIOC_TAG=$(BIOC_VERSION)
 TENSORFLOW_VERSION?=2.2.0
 BASE_IMAGE_TAG?=lab-3.4.0
-RENKU_PYTHON_BASE_IMAGE_TAG?=lab-3.4.0
+RENKU_PYTHON_BASE_IMAGE_TAG?=3.9
+
+JULIAVERSION?=1.7.1
 
 # cuda defaults - these should be updated from time to time
 CUDA_VERSION?=11.7
@@ -118,17 +120,17 @@ cuda: py
 # 		-t $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) && \
 # 	docker tag $(DOCKER_PREFIX)-cuda-tf:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda-tf:$(GIT_COMMIT_SHA)
 
+# this image is just tagged with the commit hash
 vnc: py
 	docker build docker/vnc \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG) \
-		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		-t $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
 
+# this image is tagged with the julia version and the commit hash
 julia: py
 	docker build docker/julia \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL) $(DOCKER_PREFIX)-julia:$(GIT_COMMIT_SHA)
+		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		-t $(DOCKER_PREFIX)-julia:$(JULIAVERSION)-$(GIT_COMMIT_SHA)
 
 generic: py
 	docker build docker/generic \
@@ -136,17 +138,16 @@ generic: py
 		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_COMMIT_SHA)
 
+# this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-matlab: vnc
 	docker build docker/matlab \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-matlab:$(DOCKER_LABEL) $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA) 
 
 vnc-qgis: vnc
 	docker build docker/qgis \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-qgis:$(DOCKER_LABEL) $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA) 
 
 batch: py
 	docker build docker/batch \

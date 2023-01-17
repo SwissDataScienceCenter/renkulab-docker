@@ -384,8 +384,9 @@ jobs:
         # needed by the makefile
         export DOCKER_PREFIX="renku/renkulab"    
         export DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
+        export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
         # this is required by the makefile
-        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
+        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL"
         make julia
         echo "IMAGE_NAME=$DOCKER_NAME-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
