@@ -440,10 +440,12 @@ jobs:
 
         # needed by the makefile
         export DOCKER_PREFIX="renku/renkulab"    
+        export RVERSION="${{ matrix.RVERSION }}"
         export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
+        export RENKU_PYTHON_BASE_IMAGE_TAG="3.9"
         # this is required by the makefile
-        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL"
+        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
+        # export RENKU_BASE="$DOCKER_NAME-py:3.9-$LABEL"
         export BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
         make r

@@ -162,3 +162,4 @@ bioc: py
 		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
 
+
