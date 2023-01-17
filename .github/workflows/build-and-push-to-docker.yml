@@ -155,7 +155,7 @@ jobs:
     - name: Build renku project python-based docker image extensions
       id: build-image
       run: |
-        cd docker/cuda
+        # cd docker/cuda
 
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
