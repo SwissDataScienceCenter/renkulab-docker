@@ -33,12 +33,20 @@ DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
 GIT_MASTER_HEAD_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
 
-RVERSION?=4.0.4
+RVERSION?=4.2.0
 BIOC_VERSION?=devel
 R_TAG=-r$(RVERSION)
 BIOC_TAG=$(BIOC_VERSION)
 TENSORFLOW_VERSION?=2.2.0
 BASE_IMAGE_TAG?=lab-3.4.0
+
+# cuda defaults - these should be updated from time to time
+CUDA_VERSION?=11.7
+PYTHON_VERSION?=3.9.12
+EXTRA_LIBRARIES?=
+CUDA_CUDART_PACKAGE?=cuda-cudart-11-7=11.7.60-1"
+CUDA_COMPAT_PACKAGE?=cuda-compat-11-7
+LIBCUDNN_PACKAGE?=libcudnn8=8.5.0.96-1+cuda11.7
 
 .PHONY: all
 
@@ -81,10 +89,23 @@ r: py
 
 cuda: py
 	docker build docker/cuda \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(GIT_MASTER_HEAD_SHA) \
-		--build-arg TENSORFLOW_VERSION=$(TENSORFLOW_VERSION) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(PYTHON-VERSION)-$(GIT_MASTER_HEAD_SHA) \
+		--build-arg CUDA_VERSION=$(CUDA_VERSION) \
+		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
+		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
+		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
+		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
 		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) && \
 	docker tag $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL) $(DOCKER_PREFIX)-cuda:$(GIT_MASTER_HEAD_SHA)
+
+        # docker build . \
+        #   --build-arg BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" \
+        #   --build-arg CUDA_VERSION="${{ matrix.CUDA_VERSION }}" \
+        #   --build-arg EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" \
+        #   --build-arg CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" \
+        #   --build-arg CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" \
+        #   --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
+        #   --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
 	
 # The cuda-tf dockerfile does not seem to be maintained
 # cuda-tf: py
