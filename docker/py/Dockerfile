@@ -76,10 +76,10 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     mkdir -p "$HOME/.ssh" && \
     touch "$HOME/.ssh/authorized_keys" && \
     chmod 600 "$HOME/.ssh/authorized_keys" && \
-    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_dsa_key && \
-    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_rsa_key && \
-    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_ecdsa_key && \
-    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_ed25519_key && \
+    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key && \
     echo $'if (tty -s); then\n\
     source ~/.renku/venv/bin/activate\n\
     export PATH=/opt/conda/bin:$PATH\n\
