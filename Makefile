@@ -24,13 +24,12 @@ extensions = \
 	julia \
 	vnc-qgis \
 	vnc-matlab \
-	generic \
 	batch \
 	bioc
 
 DOCKER_PREFIX?=renku/renkulab
 DOCKER_LABEL?=latest
-GIT_COMMIT_SHA:=$(shell git rev-parse --short=7 --verify HEAD)
+GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
 BASE_IMAGE_TAG?=lab-3.4.0
@@ -51,7 +50,7 @@ BIOC_TAG=$(BIOC_VERSION)
 CUDA_VERSION?=11.7
 PYTHON_VERSION?=3.9.12
 EXTRA_LIBRARIES?=
-CUDA_CUDART_PACKAGE?=cuda-cudart-11-7=11.7.60-1"
+CUDA_CUDART_PACKAGE?=cuda-cudart-11-7=11.7.60-1
 CUDA_COMPAT_PACKAGE?=cuda-compat-11-7
 LIBCUDNN_PACKAGE?=libcudnn8=8.5.0.96-1+cuda11.7
 
@@ -131,12 +130,6 @@ julia: py
 		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
 		-t $(DOCKER_PREFIX)-julia:$(JULIAVERSION)-$(GIT_COMMIT_SHA)
 
-generic: py
-	docker build docker/generic \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-generic:$(DOCKER_LABEL) $(DOCKER_PREFIX)-generic:$(GIT_COMMIT_SHA)
-
 # this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-matlab: vnc
 	docker build docker/matlab \
@@ -150,16 +143,14 @@ vnc-qgis: vnc
 
 batch: py
 	docker build docker/batch \
-		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
+		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
-		-t $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-batch:$(DOCKER_LABEL) $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA) 
 
 bioc: py
 	docker build docker/r \
-		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(LABEL)" \
+		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
-		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) && \
-	docker tag $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL) $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
 
 
