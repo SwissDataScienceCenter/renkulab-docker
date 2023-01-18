@@ -238,6 +238,7 @@ jobs:
     - name: Build renku project python-based docker image extensions
       env:
         DOCKER_PREFIX: renku/renkulab    
+        EXTENSION: ${{ matrix.EXTENSIONS }}
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -250,8 +251,6 @@ jobs:
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make vnc 
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
-      env:
-        EXTENSION: ${{ matrix.EXTENSIONS }}
 
   build-vnc-ext:
     needs: build-py-ext
@@ -275,6 +274,8 @@ jobs:
     - name: Build renku project python-based docker image extensions
       env:
         DOCKER_PREFIX: renku/renkulab    
+        EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
+        DOCKER_NAME: "renku/renkulab"
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -290,9 +291,6 @@ jobs:
         # the makrfile accordingly
         make vnc-$EXTENSION
         docker push $DOCKER_NAME-$EXTENSION:$LABEL
-      env:
-        EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
-        DOCKER_NAME: "renku/renkulab"
 
   build-py-batch:
     needs: build-py

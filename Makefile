@@ -153,4 +153,3 @@ bioc: py
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		-t $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
 
-
