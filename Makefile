@@ -151,5 +151,5 @@ bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
-		-t $(DOCKER_PREFIX)-bioc:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-bioc:$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
 

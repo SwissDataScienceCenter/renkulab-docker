@@ -475,6 +475,7 @@ jobs:
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL"
         export BASE_IMAGE="bioconductor/bioconductor_docker:${{ matrix.RELEASE }}"
+        export BIOC_VERSION="${{ matrix.RELEASE }}"
         make bioc
         docker push $DOCKER_PREFIX-bioc:$DOCKER_LABEL
 
