@@ -36,7 +36,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 $NB_USER && \
+RUN groupadd -g 1000 "$NB_USER" && \
     mkdir -p /opt/ssh/sshd_config.d && \
     chown -R 1000:1000 /opt/ssh
 
@@ -76,6 +76,7 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     mkdir -p "$HOME/.ssh" && \
     touch "$HOME/.ssh/authorized_keys" && \
     chmod 600 "$HOME/.ssh/authorized_keys" && \
+    mkdir -p /opt/ssh/ssh_host_keys && \
     ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
     ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
     ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
