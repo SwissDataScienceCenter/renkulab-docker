@@ -88,12 +88,14 @@ pull:
 py:
 	docker build docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-$@:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) 
 
 r: py
 	docker build docker/r \
 		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
 		--build-arg RVERSION=$(RVERSION) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-r:$(RVERSION)-$(GIT_COMMIT_SHA)
 
 # BASE_IMAGE was used for all the docker files, but if there are dependencies,
@@ -107,49 +109,47 @@ cuda: py
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
 		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-cuda:$(CUDA_VERSION)-$(GIT_COMMIT_SHA)
 
-        # docker build . \
-        #   --build-arg BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" \
-        #   --build-arg CUDA_VERSION="${{ matrix.CUDA_VERSION }}" \
-        #   --build-arg EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" \
-        #   --build-arg CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" \
-        #   --build-arg CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" \
-        #   --build-arg LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" \
-        #   --tag $DOCKER_NAME-cuda:${{ matrix.CUDA_VERSION }}-$LABEL
-	
 # this image is just tagged with the commit hash
 vnc: py
 	docker build docker/vnc \
 		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
 
 # this image is tagged with the julia version and the commit hash
 julia: py
 	docker build docker/julia \
 		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-julia:$(JULIAVERSION)-$(GIT_COMMIT_SHA)
 
 # this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-matlab: vnc
 	docker build docker/matlab \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA) 
 
 vnc-qgis: vnc
 	docker build docker/qgis \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA) 
 
 batch: py
 	docker build docker/batch \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA) 
 
 bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
+		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-bioc:$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
 

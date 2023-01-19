@@ -23,13 +23,7 @@
 
 name: Renku Docker Image CI
 
-on: 
-  #  pull_request:
-  #    branches: [master]
-  #    paths-ignore: ['Makefile', 'docker/**']
-  push:
-      branches: ['*']
-      paths: ['Makefile', 'docker/**']
+on: [push]
 
 env:
   DOCKER_NAME: "renku/renkulab"

@@ -11,6 +11,11 @@ The images are available on
 are automatically built from this repo via github actions (see the `.github`
 folder for more).
 
+Images are updated from time to time; we try to keep them reasonably current
+with modern python versions, cuda/torch versions and R versions. Typically, this
+involves updating our github actions to include new versions and occasionally
+updating the `Makefile` to modify what it builds by default.
+
 ## Usage
 
 The basic python (renkulab-py), basic R (renkulab-r), and basic Julia (renkulab-julia)
