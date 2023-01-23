@@ -1,10 +1,10 @@
 # This set of github actions is used to automatically build the
-# docker images for all of the containers we support. Thie build
+# docker images for all of the containers we support. The build
 # process is quite long as it involves building quite a few
 # container images (maybe 20-30). We have considered trying to
 # reduce this build time but it's a bit non trivial in our
 # current configuration - the obvious q is to, say, detect if
-# there are changes to eg docker/cuda and only build the cuda
+# there are changes to e.g. docker/cuda and only build the cuda
 # images in this case. The problem with this is that building the
 # cuda images involves building the base python image, so we would
 # build that, push it and tag it and then we would end up with a
@@ -17,9 +17,9 @@
 # they interact and what we're trying to achieve.
 #
 # It's probbaly worth noting here that the same action is used multiple
-# times with multiple input parameters in the `matrix` varaiable to
+# times with multiple input parameters in the `matrix` variable to
 # build different versions of the container; these parameters are then
-# pass on to the makefile.
+# passed on to the makefile.
 
 name: Renku Docker Image CI
 
