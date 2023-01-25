@@ -6,6 +6,16 @@ RenkuLab Docker images contain minimal dependencies for launching interactive
 environments like JupyterLab and RStudio from the Renku platform. They also each
 contain a version of the [renku cli](https://github.com/SwissDataScienceCenter/renku-python).
 
+The images are available on
+[DockerHub](https://hub.docker.com/search?q=renku%2Frenkulab-&type=image)and
+are automatically built from this repo via github actions (see the `.github`
+folder for more).
+
+Images are updated from time to time; we try to keep them reasonably current
+with modern python versions, cuda/torch versions and R versions. Typically, this
+involves updating our github actions to include new versions and occasionally
+updating the `Makefile` to modify what it builds by default.
+
 ## Usage
 
 The basic python (renkulab-py), basic R (renkulab-r), and basic Julia (renkulab-julia)
@@ -82,10 +92,11 @@ pipx install --force renku==<version>
 | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)           | Basic Jupyter image with minimal dependencies   | [jupyter/base-notebook](https://hub.docker.com/r/jupyter/base-notebook/tags)                       |
 | [renku/renkulab-r](https://hub.docker.com/r/renku/renkulab-r/tags)             | Basic Rstudio image                             | [rocker/verse](https://hub.docker.com/r/rocker/verse/tags)                                         |
 | [renku/renkulab-julia](https://hub.docker.com/r/renku/renkulab-julia/tags)     | Basic Julia image                               | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
-| [renku/renkulab-bioc](https://hub.docker.com/r/renku/renkulab-bioc/tags)       | Bioconductor R image                            | [bioconductor/bioconductor_docker](https://hub.docker.com/r/bioconductor/bioconductor_docker/tags) |
 | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)       | Cuda image with Python and minimal dependencies | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
 | [renku/renkulab-cuda-tf](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags) | Cuda image with Python and Tensorflow           | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)                           |
 | [renku/renkulab-vnc](https://hub.docker.com/r/renku/renkulab-vnc/tags)         | VNC Image with Python                           | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+| [renku/renkulab-matlab](https://hub.docker.com/r/renku/renkulab-matlab/tags)   | VNC Image with Matlab                           | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+| [renku/renkulab-qgis](https://hub.docker.com/r/renku/renkulab-qgis/tags)       | VNC Image with QGIS                             | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
 
 Please refer to the [release notes](https://github.com/SwissDataScienceCenter/renkulab-docker/releases)
 for more detailed lists of released images and specific links to Dockerhub.
@@ -118,14 +129,6 @@ Based on the renkulab-py (python 3.9) image with julia installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-julia/tags
 
-### bioc
-
-**Available via renku project templates**
-
-Based on the bioconductor Docker image: https://github.com/Bioconductor/bioconductor_docker.
-
-dockerhub: https://hub.docker.com/r/renku/renkulab-bioc/tags
-
 ### cuda
 
 Based on the renkulab-py with different versions of python and CUDA installed.
@@ -145,10 +148,34 @@ It uses noVNC 1.1.0 and TigerVNC 1.9.0 with a Renku UI to deliver a Linux deskto
 
 https://hub.docker.com/r/renku/renkulab-vnc/tags
 
+### matlab
+
+A full virtual desktop as above with matlab installed.
+
+https://hub.docker.com/r/renku/renkulab-matlab/tags
+
+### qgis
+
+A full virtual desktop as above with QGIS  installed.
+
+https://hub.docker.com/r/renku/renkulab-qgis/tags
+
 ## Development
 
-Build with Docker by running `docker build -t <name:tag> .` in the directory
-of the image you would like to build.
+### Building images using `make`
+
+A `Makefile` is provided in this directory which can be used to build the
+images locally; you can build all images using `make all` or can build
+individual images as required. `make` targets are also provided for pushing
+and pulling images if needed.
+
+### Building images using `docker`
+
+It may be necessary to build individual images directly with `docker`; this
+is done by running `docker build -t <name:tag> .` in the directory of the 
+image you would like to build. Note that on arm-based systems (e.g. Apple 
+M1/M2) you may need to use the flag `--platform=linux/amd64` for the
+build because `git-lfs 3.2.0` is not available for the arm architecture.
 
 ## Adding renku to your own images
 
