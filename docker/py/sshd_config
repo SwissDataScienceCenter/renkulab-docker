@@ -12,7 +12,7 @@ UsePAM no
 
 X11Forwarding yes
 PrintMotd no
-PidFile /opt/ssh/sshd.pid
+PidFile /opt/ssh/pid/sshd.pid
 
 AcceptEnv LANG LC_*
 

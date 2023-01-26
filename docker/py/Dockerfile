@@ -35,7 +35,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
 # Setup ssh keys
-RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys && \
+RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys /opt/ssh/pid && \
     ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
     ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
     ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
@@ -45,7 +45,8 @@ RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys && \
 COPY sshd_config /opt/ssh/sshd_config
 
 RUN chown -R 0:100 /opt/ssh/ && \
-    chmod -R u=rwX,g=rX,o= /opt/ssh
+    chmod -R u=rwX,g=rX,o= /opt/ssh && \
+    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid
 
 # switch to the notebook user
 USER $NB_USER
