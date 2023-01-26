@@ -43,7 +43,7 @@ if [ -f "./.ssh/authorized_keys" ]; then
 fi
 
 # Start the SHH daemon in the background
-/usr/sbin/sshd -f /opt/ssh/sshd_config -E /tmp/sshd.log &> /dev/null
+/usr/sbin/sshd -f /opt/ssh/sshd_config -E /tmp/sshd.log
 
 # run the command
 $@

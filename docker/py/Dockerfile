@@ -37,10 +37,18 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images
 RUN groupadd -g 1000 "$NB_USER" && \
-    mkdir -p /opt/ssh/sshd_config.d && \
-    chown -R 1000:1000 /opt/ssh
+    usermod -G 1000 "$NB_USER" && \
+    mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys && \
+    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key
+
 
 COPY sshd_config /opt/ssh/sshd_config
+
+RUN chown -R 0:1000 /opt/ssh/ && \
+    chmod -R u=rwX,g=rX,o= /opt/ssh
 
 # switch to the notebook user
 USER $NB_USER
@@ -60,6 +68,11 @@ RUN conda install gxx_linux-64 && \
     conda config --system --set channel_priority flexible && \
     conda clean --all -f -y
 
+# setup sshd
+RUN mkdir -p "$HOME/.ssh" && \
+    touch "$HOME/.ssh/authorized_keys" && \
+    chmod u=rw,g=,o= "$HOME/.ssh/authorized_keys"
+
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
@@ -73,14 +86,6 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
     deactivate && \
     ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
-    mkdir -p "$HOME/.ssh" && \
-    touch "$HOME/.ssh/authorized_keys" && \
-    chmod 600 "$HOME/.ssh/authorized_keys" && \
-    mkdir -p /opt/ssh/ssh_host_keys && \
-    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
-    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
-    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
-    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key && \
     echo $'if (tty -s); then\n\
     source ~/.renku/venv/bin/activate\n\
     export PATH=/opt/conda/bin:$PATH\n\
