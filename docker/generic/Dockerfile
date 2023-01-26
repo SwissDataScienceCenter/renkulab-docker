@@ -14,7 +14,7 @@ USER root
 SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 ENV NB_UID 1000
-ENV NB_GID 1000
+ENV NB_GID 100
 ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
@@ -54,7 +54,7 @@ ENV PATH ${CONDA_PATH}/bin:$PATH
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
-COPY --from=renku_base --chown=1000:1000 \
+COPY --from=renku_base --chown=1000:100 \
     /home/jovyan/ /home/${NB_USER}/
 
 WORKDIR $HOME

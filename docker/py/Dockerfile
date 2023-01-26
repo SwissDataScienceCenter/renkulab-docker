@@ -34,11 +34,8 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
 
-# Add a new group with id 1000 and arbitrary name
-# Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 "$NB_USER" && \
-    usermod -G 1000 "$NB_USER" && \
-    mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys && \
+# Setup ssh keys
+RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys && \
     ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
     ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
     ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
@@ -47,7 +44,7 @@ RUN groupadd -g 1000 "$NB_USER" && \
 
 COPY sshd_config /opt/ssh/sshd_config
 
-RUN chown -R 0:1000 /opt/ssh/ && \
+RUN chown -R 0:100 /opt/ssh/ && \
     chmod -R u=rwX,g=rX,o= /opt/ssh
 
 # switch to the notebook user
@@ -97,8 +94,8 @@ COPY git-config.bashrc /home/$NB_USER/
 RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
 
 # configure powerline
-COPY --chown=1000:1000 powerline.bashrc /tmp/powerline.bashrc
-COPY --chown=1000:1000 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
+COPY --chown=1000:100 powerline.bashrc /tmp/powerline.bashrc
+COPY --chown=1000:100 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
 
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 
