@@ -1,11 +1,12 @@
+bleach>5.0.0
+certifi>=2022.12.7 # not directly required, pinned by Snyk to avoid a vulnerability
+Jinja2<3.1 # because of https://github.com/jupyter/nbconvert/issues/1742
 jupyter-server-proxy==3.2.2
 jupyterlab-git==0.41.0
 jupyterlab-system-monitor~=0.8.0
+mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
 papermill~=2.4.0
 powerline-shell~=0.7.0
 requests>=2.20.0
-virtualenv>=20.7.2
-mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
-Jinja2<3.1 # because of https://github.com/jupyter/nbconvert/issues/1742
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
-certifi>=2022.12.7 # not directly required, pinned by Snyk to avoid a vulnerability
+virtualenv>=20.7.2
