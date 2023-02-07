@@ -9,11 +9,8 @@ SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 # Install additional dependencies and nice-to-have packages
 RUN apt-get update && apt-get install -yq --no-install-recommends \
     build-essential \
-    curl && \
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
-    apt-get update && apt-get install -yq --no-install-recommends \
+    curl \
     git \
-    git-lfs=3.2.0 \
     gnupg \
     graphviz \
     jq \
@@ -31,7 +28,11 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     vim && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
-    ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1
+    ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
+    wget -q https://github.com/git-lfs/git-lfs/releases/download/v3.3.0/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -P /tmp && \
+    tar -zxvf /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -C /tmp && \
+    /tmp/git-lfs-3.3.0/install.sh && \
+    rm -rf /tmp/git-lfs*
 
 # Add a new group with id 1000 and arbitrary name
 # Note: this is to standardize groups between the R and jupyter images

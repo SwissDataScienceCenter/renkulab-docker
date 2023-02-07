@@ -52,12 +52,10 @@ RUN apt-get update --fix-missing && \
     ca-certificates \
     curl \
     gpg-agent && \
-    apt-get remove -y libnode-dev libnode72:amd64 || echo "Conflicting libraries do not exist, continuing..." && \
+    apt-get remove -y libnode-dev libnode72:"$(dpkg --print-architecture)" || echo "Conflicting libraries do not exist, continuing..." && \
     curl -sL https://deb.nodesource.com/setup_16.x | bash - && \
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
     apt-get update && \
     apt-get install -yq --no-install-recommends \
-    git-lfs \
     gnupg \
     jq \
     nodejs \
@@ -66,12 +64,15 @@ RUN apt-get update --fix-missing && \
     libxext6 \
     libxrender1 \
     libzmq3-dev \
-    wget \
     vim && \
     apt-get purge && \
     apt-get clean && \
     apt-get autoremove --yes && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    curl -L -s https://github.com/git-lfs/git-lfs/releases/download/v3.3.0/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -o /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz && \
+    tar -zxvf /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -C /tmp && \
+    /tmp/git-lfs-3.3.0/install.sh && \
+    rm -rf /tmp/git-lfs*
 
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda

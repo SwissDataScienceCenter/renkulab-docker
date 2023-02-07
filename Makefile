@@ -88,8 +88,7 @@ pull:
 py:
 	docker build docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-$@:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) 
+		-t $(DOCKER_PREFIX)-$@:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA)
 
 r: py
 	docker build docker/r \
@@ -116,7 +115,6 @@ cuda: py
 vnc: py
 	docker build docker/vnc \
 		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
-		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
 
 # this image is tagged with the julia version and the commit hash
@@ -130,21 +128,19 @@ julia: py
 vnc-matlab: vnc
 	docker build docker/matlab \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA) 
+		-t $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA)
 
 vnc-qgis: vnc
 	docker build docker/qgis \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA) 
+		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA)
 
 batch: py
 	docker build docker/batch \
 		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
 		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA) 
+		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA)
 
 bioc: py
 	docker build docker/r \
@@ -152,4 +148,3 @@ bioc: py
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-bioc:$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
-
