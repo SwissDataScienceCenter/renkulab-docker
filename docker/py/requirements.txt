@@ -10,3 +10,4 @@ powerline-shell~=0.7.0
 requests>=2.20.0
 setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability
 virtualenv>=20.7.2
+ipython>=8.10.0 # not directly required, pinned by Snyk to avoid a vulnerability
