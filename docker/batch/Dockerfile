@@ -12,14 +12,15 @@ SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # install dependencies
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y curl && \
-    curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
-    apt-get update -y && \
-    apt-get install --no-install-recommends -y gcc git git-lfs nodejs libc6-dev && \
+    apt-get install --no-install-recommends -y curl wget git && \
     apt-get purge && \
     apt-get clean && \
     apt-get autoremove --yes && \
-    rm -rf /var/lib/apt/lists/*
+    rm -rf /var/lib/apt/lists/* && \
+    wget -q https://github.com/git-lfs/git-lfs/releases/download/v3.3.0/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -P /tmp && \
+    tar -zxvf /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -C /tmp && \
+    /tmp/git-lfs-3.3.0/install.sh && \
+    rm -rf /tmp/git-lfs*
 
 # Install Renku from base python image
 
