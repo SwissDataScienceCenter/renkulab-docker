@@ -25,7 +25,8 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     nano \
     netcat \
     unzip \
-    vim && \
+    vim \
+    openssh-server && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
@@ -34,9 +35,19 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     /tmp/git-lfs-3.3.0/install.sh && \
     rm -rf /tmp/git-lfs*
 
-# Add a new group with id 1000 and arbitrary name
-# Note: this is to standardize groups between the R and jupyter images
-RUN groupadd -g 1000 jovyan
+# Setup ssh keys
+RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys /opt/ssh/pid && \
+    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key
+
+
+COPY sshd_config /opt/ssh/sshd_config
+
+RUN chown -R 0:100 /opt/ssh/ && \
+    chmod -R u=rwX,g=rX,o= /opt/ssh && \
+    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid
 
 # switch to the notebook user
 USER $NB_USER
@@ -56,6 +67,11 @@ RUN conda install gxx_linux-64 && \
     conda config --system --set channel_priority flexible && \
     conda clean --all -f -y
 
+# setup sshd
+RUN mkdir -p "$HOME/.ssh" && \
+    touch "$HOME/.ssh/authorized_keys" && \
+    chmod u=rw,g=,o= "$HOME/.ssh/authorized_keys"
+
 # install renku-python
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
@@ -68,15 +84,20 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     source "$HOME/.renku/venv/bin/activate" && \
     pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
     deactivate && \
-    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
+    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
+    echo $'if (tty -s); then\n\
+    source ~/.renku/venv/bin/activate\n\
+    export PATH=/opt/conda/bin:$PATH\n\
+fi\n\
+'>> "/home/${NB_USER}/.bashrc"
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
 RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
 
 # configure powerline
-COPY --chown=1000:1000 powerline.bashrc /tmp/powerline.bashrc
-COPY --chown=1000:1000 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
+COPY --chown=1000:100 powerline.bashrc /tmp/powerline.bashrc
+COPY --chown=1000:100 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
 
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 
