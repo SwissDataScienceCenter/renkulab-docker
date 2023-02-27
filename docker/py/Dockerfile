@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.0
+ARG BASE_IMAGE=jupyter/base-notebook:python-3.10.9
 FROM $BASE_IMAGE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"

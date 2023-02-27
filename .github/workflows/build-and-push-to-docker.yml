@@ -59,8 +59,8 @@ jobs:
       fail-fast: true
       matrix:
         BASE_IMAGE_TAG:
-          - lab-3.4.0
-          - python-3.10.6
+          - lab-3.6.1
+          - python-3.10.9
           - python-3.9.12
           - python-3.8.13
 
@@ -85,7 +85,7 @@ jobs:
 
         # This ensures the same image tags as before are built, in addition to new ones
         if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
-          export RENKU_PYTHON_BASE_IMAGE_TAG=3.9
+          export RENKU_PYTHON_BASE_IMAGE_TAG=3.10
         else
           export RENKU_PYTHON_BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         fi
