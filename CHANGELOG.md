@@ -1,3 +1,12 @@
+## [0.14.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.13.1...0.14.0) (2023-02-14)
+
+Features:
+* adds support for SSH into sessions.
+* Add cuda 11.7 builds
+
+Bug Fixes:
+* Install Git LFS from a source tarball.
+
 ## [0.13.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.13.0...0.13.1) (2022-10-25)
 
 This release fixes a problem with the jupyter library nbconvert that is used internally by jupyter

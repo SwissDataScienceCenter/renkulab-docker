@@ -12,7 +12,7 @@ USER root
 
 ENV NB_USER rstudio
 ENV NB_UID 1000
-ENV NB_GID 1000
+ENV NB_GID 100
 ENV VENV_DIR /srv/venv
 ENV HOME /home/${NB_USER}
 ENV SHELL bash
@@ -84,7 +84,7 @@ COPY --from=renku_base /entrypoint.sh /entrypoint.sh
 # set permissions of the R library directory to be editable by NB_USER
 COPY fix-permissions.sh /usr/local/bin
 RUN fix-permissions.sh /usr/local/lib/R && \
-    chown 1000:1000 /opt/conda && \
+    chown 1000:100 /opt/conda && \
     usermod -a -G users rstudio && \
     # this hack lets some of the setup from the base renku image work here
     ln -s /home/${NB_USER} /home/jovyan && \
