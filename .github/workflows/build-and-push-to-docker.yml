@@ -92,6 +92,7 @@ jobs:
 
         # needed by the makefile - these are generated dynamically
         # and hence they are not part of the env setup above
+        export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make py 
