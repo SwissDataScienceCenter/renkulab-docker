@@ -32,8 +32,8 @@ DOCKER_LABEL?=latest
 GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
-BASE_IMAGE_TAG?=lab-3.4.0
-RENKU_PYTHON_BASE_IMAGE_TAG?=3.9
+BASE_IMAGE_TAG?=lab-3.6.1
+RENKU_PYTHON_BASE_IMAGE_TAG?=3.10
 
 # for building the r container
 RVERSION?=4.2.0
