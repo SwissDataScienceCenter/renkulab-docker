@@ -138,13 +138,13 @@ vnc-qgis: vnc
 
 batch: py
 	docker build docker/batch \
-		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
+		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
 		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA)
 
 bioc: py
 	docker build docker/r \
-		--build-arg RENKU_BASE="$(DOCKER_PREFIX)-py:3.9-$(GIT_COMMIT_SHA)" \
+		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=linux/amd64 \
 		-t $(DOCKER_PREFIX)-bioc:$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
