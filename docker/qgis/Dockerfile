@@ -33,4 +33,4 @@ RUN chmod +x /home/jovyan/Desktop/qgis.desktop
 USER ${NB_USER}
 
 # install the python dependencies
-RUN conda install -c conda-forge qgis
+RUN mamba install -y -c conda-forge qgis

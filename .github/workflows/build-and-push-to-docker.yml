@@ -27,6 +27,7 @@ on: [push]
 
 env:
   DOCKER_NAME: "renku/renkulab"
+  DEFAULT_PYTHON_VERSION: "3.10"
 
 jobs:
 
@@ -59,9 +60,9 @@ jobs:
       fail-fast: true
       matrix:
         BASE_IMAGE_TAG:
-          - lab-3.4.0
-          - python-3.10.6
-          - python-3.9.12
+          - lab-3.6.1
+          - python-3.10.9
+          - python-3.9.13
           - python-3.8.13
 
     steps:
@@ -85,13 +86,14 @@ jobs:
 
         # This ensures the same image tags as before are built, in addition to new ones
         if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
-          export RENKU_PYTHON_BASE_IMAGE_TAG=3.9
+          export RENKU_PYTHON_BASE_IMAGE_TAG=$DEFAULT_PYTHON_VERSION
         else
           export RENKU_PYTHON_BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         fi
 
         # needed by the makefile - these are generated dynamically
         # and hence they are not part of the env setup above
+        export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make py 
@@ -127,31 +129,26 @@ jobs:
         include:
           # taken from tensorflow compatibility chart at https://www.tensorflow.org/install/source#gpu
           - CUDA_VERSION: "11.2"
-            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-2=11.2.152-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-2"
             LIBCUDNN_PACKAGE: "libcudnn8=8.1.1.33-1+cuda11.2"
           - CUDA_VERSION: "11.3"
-            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-3=11.3.109-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-3"
             LIBCUDNN_PACKAGE: "libcudnn8=8.2.1.32-1+cuda11.3"
           - CUDA_VERSION: "11.4"
-            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-4=11.4.148-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-4"
             LIBCUDNN_PACKAGE: "libcudnn8=8.2.4.15-1+cuda11.4"
           - CUDA_VERSION: "11.5"
-            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-5=11.5.117-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-5"
             LIBCUDNN_PACKAGE: "libcudnn8=8.3.2.44-1+cuda11.5"
           - CUDA_VERSION: "11.7"
-            PYTHON_VERSION: "3.9.12"
             EXTRA_LIBRARIES: ""
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-7=11.7.60-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-7"
@@ -182,8 +179,7 @@ jobs:
 
         # these are set dynamically so not part of env
         export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
-        export PYTHON_VERSION="${{ matrix.PYTHON_VERSION }}"
-        export CUDA_BASE_IMAGE="renku/renkulab-py:python-${{ matrix.PYTHON_VERSION }}-$LABEL" 
+        export CUDA_BASE_IMAGE="renku/renkulab-py:$DEFAULT_PYTHON_VERSION-$LABEL" 
         export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
@@ -311,8 +307,8 @@ jobs:
         # needed by the makefile
         export DOCKER_LABEL="$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL"
-        export BASE_IMAGE="python:3.9-slim-buster" 
+        export RENKU_BASE="$DOCKER_PREFIX-py:3.10-$LABEL"
+        export BASE_IMAGE="python:3.10-slim-buster" 
         make batch
         echo "IMAGE_NAME=$DOCKER_NAME-batch:$DOCKER_LABEL" >> $GITHUB_OUTPUT
 
@@ -349,7 +345,7 @@ jobs:
         export DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export BASE_IMAGE="$DOCKER_NAME-py:3.9-$LABEL"
+        export BASE_IMAGE="$DOCKER_NAME-py:3.10-$LABEL"
         make julia
         echo "IMAGE_NAME=$DOCKER_NAME-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
         
@@ -406,7 +402,7 @@ jobs:
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
         export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
-        export RENKU_PYTHON_BASE_IMAGE_TAG="3.9"
+        export RENKU_PYTHON_BASE_IMAGE_TAG="3.10"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
@@ -466,9 +462,7 @@ jobs:
 
         # needed by the makefile
         export DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export RENKU_BASE="$DOCKER_PREFIX-py:3.9-$LABEL"
-        export BASE_IMAGE="bioconductor/bioconductor_docker:${{ matrix.RELEASE }}"
+        export RENKU_BASE="$DOCKER_PREFIX-py:3.10-$LABEL"
         export BIOC_VERSION="${{ matrix.RELEASE }}"
         make bioc
         docker push $DOCKER_PREFIX-bioc:$DOCKER_LABEL
