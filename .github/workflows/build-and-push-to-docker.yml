@@ -26,11 +26,10 @@ name: Renku Docker Image CI
 on: [push]
 
 env:
-  DOCKER_NAME: "renku/renkulab"
+  DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
 
 jobs:
-
   lint:
     strategy:
       fail-fast: true
@@ -75,8 +74,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project python-based docker images
       id: build-image
-      env:
-        DOCKER_PREFIX: renku/renkulab    
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -115,8 +112,8 @@ jobs:
 
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-py:latest
-          docker push $DOCKER_NAME-py:latest
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
+          docker push $DOCKER_PREFIX-py:latest
         fi
 
   build-cuda:
@@ -164,29 +161,30 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
-    - name: Build renku project python-based docker image extensions
-      id: build-image
-      env:
-        DOCKER_PREFIX: "renku/renkulab"    
-      run: |
-        # cd docker/cuda
-
+    - name: set label
+      run: | 
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-
+        echo "LABEL=$LABEL" >> $GITHUB_ENV
+    - name: Pull renku base image
+      run: docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${{ env.LABEL }}
+    - name: Build renku project python-based docker image extensions
+      id: build-image
+      run: |
         # these are set dynamically so not part of env
-        export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
+        export LABEL="${{ env.LABEL }}"
         export CUDA_BASE_IMAGE="renku/renkulab-py:$DEFAULT_PYTHON_VERSION-$LABEL" 
-        export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
-        export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
-        export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
         export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
+        export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
+        export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
+        export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
+        export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
         make cuda
-        echo "IMAGE_NAME=$DOCKER_NAME-cuda:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -202,9 +200,9 @@ jobs:
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
 
         # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.CUDA_VERSION }}" == "11.5" ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-cuda:latest
-          docker push $DOCKER_NAME-cuda:latest
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.CUDA_VERSION }}" == "11.7" ]; then
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-cuda:latest
+          docker push $DOCKER_PREFIX-cuda:latest
         fi
 
   build-py-ext:
@@ -227,7 +225,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project python-based docker image extensions
       env:
-        DOCKER_PREFIX: renku/renkulab    
         EXTENSION: ${{ matrix.EXTENSIONS }}
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
@@ -237,10 +234,11 @@ jobs:
         fi
 
         # needed by the makefile - for these images, we only tag with commit sha
+        export BASE_IMAGE=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         export DOCKER_LABEL="${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make vnc 
-        docker push $DOCKER_NAME-$EXTENSION:$LABEL
+        docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
 
   build-vnc-ext:
     needs: build-py-ext
@@ -263,9 +261,7 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project python-based docker image extensions
       env:
-        DOCKER_PREFIX: renku/renkulab    
         EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
-        DOCKER_NAME: "renku/renkulab"
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -280,7 +276,7 @@ jobs:
         # add another type of vnc based images, we need to add a target to
         # the makrfile accordingly
         make vnc-$EXTENSION
-        docker push $DOCKER_NAME-$EXTENSION:$LABEL
+        docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
 
   build-py-batch:
     needs: build-py
@@ -295,8 +291,6 @@ jobs:
 
     - uses: actions/checkout@v3
     - name: Build renku project python-based docker image for batch execution
-      env:
-        DOCKER_PREFIX: renku/renkulab    
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -307,10 +301,10 @@ jobs:
         # needed by the makefile
         export DOCKER_LABEL="$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export RENKU_BASE="$DOCKER_PREFIX-py:3.10-$LABEL"
+        export RENKU_BASE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
         export BASE_IMAGE="python:3.10-slim-buster" 
         make batch
-        echo "IMAGE_NAME=$DOCKER_NAME-batch:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-batch:$DOCKER_LABEL" >> $GITHUB_OUTPUT
 
   build-julia-ext:
     needs: build-py
@@ -332,8 +326,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project julia docker image extensions
       id: build-image
-      env:
-        DOCKER_PREFIX: renku/renkulab    
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -342,12 +334,12 @@ jobs:
         fi
 
         # needed by the makefile
+        export BASE_IMAGE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
         export DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
-        export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export BASE_IMAGE="$DOCKER_NAME-py:3.10-$LABEL"
+        export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
         make julia
-        echo "IMAGE_NAME=$DOCKER_NAME-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -361,7 +353,7 @@ jobs:
     - name: Push to docker
       run: |
         docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
+        
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
@@ -390,8 +382,6 @@ jobs:
     - uses: actions/checkout@v3
     - name: Build renku project rocker docker images
       id: build-image
-      env:
-        DOCKER_PREFIX: renku/renkulab    
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -402,9 +392,8 @@ jobs:
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
         export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
-        export RENKU_PYTHON_BASE_IMAGE_TAG="3.10"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
+        export RENKU_PYTHON_BASE_IMAGE_TAG=${DEFAULT_PYTHON_VERSION}-$LABEL
+        export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
         make r
         echo "IMAGE_NAME=$DOCKER_PREFIX-r:$DOCKER_LABEL" >> $GITHUB_OUTPUT
@@ -427,8 +416,8 @@ jobs:
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
         then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_NAME-r:latest
-          docker push $DOCKER_NAME-r:latest
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-r:latest
+          docker push $DOCKER_PREFIX-r:latest
         fi
 
   build-bioc:
@@ -451,8 +440,6 @@ jobs:
 
     - uses: actions/checkout@v3
     - name: Build renku project bioconductor docker images
-      env:
-        DOCKER_PREFIX: renku/renkulab    
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
@@ -470,7 +457,7 @@ jobs:
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
         then
-          docker tag $DOCKER_NAME-bioc:$DOCKER_TAG $DOCKER_NAME-bioc:latest
-          docker push $DOCKER_NAME-bioc:latest
+          docker tag $DOCKER_PREFIX-bioc:$DOCKER_TAG $DOCKER_PREFIX-bioc:latest
+          docker push $DOCKER_PREFIX-bioc:latest
         fi
 

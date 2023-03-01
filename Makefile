@@ -27,13 +27,20 @@ extensions = \
 	batch \
 	bioc
 
+PLATFORM?=linux/amd64
+
 DOCKER_PREFIX?=renku/renkulab
-DOCKER_LABEL?=latest
 GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
 BASE_IMAGE_TAG?=lab-3.6.1
-RENKU_PYTHON_BASE_IMAGE_TAG?=3.10
+RENKU_PYTHON_BASE_IMAGE_TAG?=3.10-0.15.0
+RENKU_BASE?=$(DOCKER_PREFIX)-py:latest
+DOCKER_LABEL?=latest
+
+# RStudio version
+RSTUDIO_VERSION_OVERRIDE?=2022.02.3-492
+RSTUDIO_BASE_IMAGE?=rocker/verse:devel
 
 # for building the r container
 RVERSION?=4.2.0
@@ -47,7 +54,7 @@ BIOC_VERSION?=devel
 BIOC_TAG=$(BIOC_VERSION)
 
 # cuda defaults - these should be updated from time to time
-CUDA_BASE_IMAGE?=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA)
+CUDA_BASE_IMAGE?=renku/renkulab-py:$(DOCKER_LABEL)
 CUDA_VERSION?=11.7
 EXTRA_LIBRARIES?=
 CUDA_CUDART_PACKAGE?=cuda-cudart-11-7=11.7.60-1
@@ -88,14 +95,17 @@ pull:
 py:
 	docker build docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
-		-t $(DOCKER_PREFIX)-$@:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA)
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)
 
 r: py
 	docker build docker/r \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
+		--build-arg BASE_IMAGE=$(RSTUDIO_BASE_IMAGE) \
+		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG) \
 		--build-arg RVERSION=$(RVERSION) \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-r:$(RVERSION)-$(GIT_COMMIT_SHA)
+		--build-arg RSTUDIO_VERSION_OVERRIDE=$(RSTUDIO_VERSION_OVERRIDE) \
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)
 
 # BASE_IMAGE was used for all the docker files, but if there are dependencies,
 # it can be expected to mean different things in different contexts; hence
@@ -103,26 +113,26 @@ r: py
 cuda: py
 	docker build docker/cuda \
 		--build-arg CUDA_BASE_IMAGE="$(CUDA_BASE_IMAGE)" \
+		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
+		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
 		--build-arg CUDA_VERSION="$(CUDA_VERSION)" \
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
-		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
-		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-cuda:$(CUDA_VERSION)-$(GIT_COMMIT_SHA)
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL)
 
 # this image is just tagged with the commit hash
 vnc: py
 	docker build docker/vnc \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-vnc:$(GIT_COMMIT_SHA)
+		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
+		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)
 
 # this image is tagged with the julia version and the commit hash
 julia: py
 	docker build docker/julia \
-		--build-arg BASE_IMAGE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG)-$(GIT_COMMIT_SHA) \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-julia:$(JULIAVERSION)-$(GIT_COMMIT_SHA)
+		--build-arg BASE_IMAGE=$(RENKU_BASE) \
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)
 
 # this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-matlab: vnc
@@ -133,7 +143,7 @@ vnc-matlab: vnc
 vnc-qgis: vnc
 	docker build docker/qgis \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
-		--platform=linux/amd64 \
+		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA)
 
 batch: py
@@ -146,5 +156,5 @@ bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
-		--platform=linux/amd64 \
-		-t $(DOCKER_PREFIX)-bioc:$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)
