@@ -160,22 +160,18 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3
-    - name: set label
-      run: | 
+    - uses: actions/checkout@v3  
+    - name: Build renku project python-based docker image extensions
+      id: build-image
+      run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
           export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        echo "LABEL=$LABEL" >> $GITHUB_ENV
-    - name: Pull renku base image
-      run: docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${{ env.LABEL }}
-    - name: Build renku project python-based docker image extensions
-      id: build-image
-      run: |
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
+
         # these are set dynamically so not part of env
-        export LABEL="${{ env.LABEL }}"
         export CUDA_BASE_IMAGE="renku/renkulab-py:$DEFAULT_PYTHON_VERSION-$LABEL" 
         export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
         export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
@@ -232,7 +228,8 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
+        
         # needed by the makefile - for these images, we only tag with commit sha
         export BASE_IMAGE=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         export DOCKER_LABEL="${LABEL}"
@@ -268,7 +265,8 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
+        
         # needed by the makefile
         export DOCKER_LABEL="${LABEL}"
         export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
@@ -297,6 +295,7 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export DOCKER_LABEL="$LABEL"
@@ -332,6 +331,7 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export BASE_IMAGE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
@@ -388,6 +388,7 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
@@ -446,6 +447,7 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
