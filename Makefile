@@ -34,7 +34,6 @@ GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
 BASE_IMAGE_TAG?=lab-3.6.1
-RENKU_PYTHON_BASE_IMAGE_TAG?=3.10-0.15.0
 RENKU_BASE?=$(DOCKER_PREFIX)-py:latest
 DOCKER_LABEL?=latest
 
@@ -101,7 +100,7 @@ py:
 r: py
 	docker build docker/r \
 		--build-arg BASE_IMAGE=$(RSTUDIO_BASE_IMAGE) \
-		--build-arg RENKU_BASE=renku/renkulab-py:$(RENKU_PYTHON_BASE_IMAGE_TAG) \
+		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--build-arg RVERSION=$(RVERSION) \
 		--build-arg RSTUDIO_VERSION_OVERRIDE=$(RSTUDIO_VERSION_OVERRIDE) \
 		--platform=$(PLATFORM) \

@@ -393,7 +393,7 @@ jobs:
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
         export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
-        export RENKU_PYTHON_BASE_IMAGE_TAG=${DEFAULT_PYTHON_VERSION}-$LABEL
+        export RENKU_BASE=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-$LABEL
         export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
         make r
