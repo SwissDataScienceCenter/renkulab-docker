@@ -1,5 +1,5 @@
-renku==1.11.2
-sentry-sdk==1.14.0
+renku==2.3.0
+sentry-sdk==1.16.0
 pip==23.0.1
 setuptools>=65.5.1
 wheel==0.38.4
