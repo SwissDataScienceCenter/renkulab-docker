@@ -334,7 +334,7 @@ jobs:
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
-        export BASE_IMAGE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
+        export RENKU_BASE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
         export DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
