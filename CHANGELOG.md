@@ -1,3 +1,11 @@
+## [0.15.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.14.0...0.15.0) (2023-03-01)
+
+Note that the version of JupyterLab has been bumped with this release, which also means we default to Python 3.10 now.
+
+Features:
+
+* use mamba and update to JL 3.6.1 ([f6b7e48](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/f6b7e48))
+
 ## [0.14.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.13.1...0.14.0) (2023-02-14)
 
 Features:
