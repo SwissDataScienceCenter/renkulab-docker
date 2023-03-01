@@ -91,10 +91,10 @@ jobs:
         # needed by the makefile - these are generated dynamically
         # and hence they are not part of the env setup above
         export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
-        export DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
+        export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make py 
-        echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${DOCKER_LABEL}" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
 
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -172,15 +172,14 @@ jobs:
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # these are set dynamically so not part of env
-        export CUDA_BASE_IMAGE="renku/renkulab-py:$DEFAULT_PYTHON_VERSION-$LABEL" 
         export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
         export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
         export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
-        export DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
+        export CUDA_DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
         make cuda
-        echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$CUDA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -210,6 +209,7 @@ jobs:
       matrix:
         EXTENSIONS:
           - vnc
+          - batch
 
     steps:
     - name: Docker Login
@@ -231,10 +231,8 @@ jobs:
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         
         # needed by the makefile - for these images, we only tag with commit sha
-        export BASE_IMAGE=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        export DOCKER_LABEL="${LABEL}"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        make vnc 
+        export EXTRA_DOCKER_LABEL="${LABEL}"
+        make $EXTENSION 
         docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
 
   build-vnc-ext:
@@ -266,44 +264,12 @@ jobs:
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        
-        # needed by the makefile
-        export DOCKER_LABEL="${LABEL}"
-        export GIT_MASTER_HEAD_SHA=$(git rev-parse --short=7 --verify HEAD)
-        # the mainfile contains targets for each of these extensions; if we
-        # add another type of vnc based images, we need to add a target to
-        # the makrfile accordingly
+        docker pull ${DOCKER_PREFIX}-vnc:${LABEL}
+
+        # needed by the Makefile
+        export EXTRA_DOCKER_LABEL="${LABEL}"
         make vnc-$EXTENSION
         docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
-
-  build-py-batch:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v3
-    - name: Build renku project python-based docker image for batch execution
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-
-        # needed by the makefile
-        export DOCKER_LABEL="$LABEL"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export RENKU_BASE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
-        export BASE_IMAGE="python:3.10-slim-buster" 
-        make batch
-        echo "IMAGE_NAME=$DOCKER_PREFIX-batch:$DOCKER_LABEL" >> $GITHUB_OUTPUT
 
   build-julia-ext:
     needs: build-py
@@ -334,12 +300,11 @@ jobs:
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
-        export RENKU_BASE="$DOCKER_PREFIX-py:${DEFAULT_PYTHON_VERSION}-$LABEL"
-        export DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
+        export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
         make julia
-        echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$JULIA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -392,12 +357,11 @@ jobs:
 
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
-        export DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
-        export RENKU_BASE=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-$LABEL
+        export R_DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
         export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
         make r
-        echo "IMAGE_NAME=$DOCKER_PREFIX-r:$DOCKER_LABEL" >> $GITHUB_OUTPUT
+        echo "IMAGE_NAME=$DOCKER_PREFIX-r:$R_DOCKER_LABEL" >> $GITHUB_OUTPUT
 
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -450,16 +414,15 @@ jobs:
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
-        export DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
-        export RENKU_BASE="$DOCKER_PREFIX-py:3.10-$LABEL"
+        export BIOC_DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
         export BIOC_VERSION="${{ matrix.RELEASE }}"
         make bioc
-        docker push $DOCKER_PREFIX-bioc:$DOCKER_LABEL
+        docker push $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL
 
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
         then
-          docker tag $DOCKER_PREFIX-bioc:$DOCKER_TAG $DOCKER_PREFIX-bioc:latest
+          docker tag $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL $DOCKER_PREFIX-bioc:latest
           docker push $DOCKER_PREFIX-bioc:latest
         fi
 

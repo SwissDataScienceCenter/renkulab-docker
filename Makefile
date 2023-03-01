@@ -34,23 +34,23 @@ GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
 BASE_IMAGE_TAG?=lab-3.6.1
-RENKU_BASE?=$(DOCKER_PREFIX)-py:latest
-DOCKER_LABEL?=latest
+DEFAULT_PYTHON_VERSION?=3.10
+PY_DOCKER_LABEL?=$(DEFAULT_PYTHON_VERSION)-$(GIT_COMMIT_SHA)
+RENKU_BASE?=$(DOCKER_PREFIX)-py:$(PY_DOCKER_LABEL)
 
 # RStudio version
 RSTUDIO_VERSION_OVERRIDE?=2022.02.3-492
 RSTUDIO_BASE_IMAGE?=rocker/verse:devel
-
-# for building the r container
 RVERSION?=4.2.0
-TENSORFLOW_VERSION?=2.2.0
+R_DOCKER_LABEL?=$(RVERSION)-$(GIT_COMMIT_SHA)
 
 # for building the julia container
 JULIAVERSION?=1.7.1
+JULIA_DOCKER_LABEL?=$(JULIAVERSION)-$(GIT_COMMIT_SHA)
 
 # for building the bioconductor container
 BIOC_VERSION?=devel
-BIOC_TAG=$(BIOC_VERSION)
+BIOC_DOCKER_LABEL?=$(BIOC_VERSION)-$(GIT_COMMIT_SHA)
 
 # cuda defaults - these should be updated from time to time
 CUDA_BASE_IMAGE?=renku/renkulab-py:$(DOCKER_LABEL)
@@ -59,6 +59,10 @@ EXTRA_LIBRARIES?=
 CUDA_CUDART_PACKAGE?=cuda-cudart-11-7=11.7.60-1
 CUDA_COMPAT_PACKAGE?=cuda-compat-11-7
 LIBCUDNN_PACKAGE?=libcudnn8=8.5.0.96-1+cuda11.7
+CUDA_DOCKER_LABEL?=$(CUDA_VERSION)-$(GIT_COMMIT_SHA)
+
+# setup for the extras
+EXTRA_DOCKER_LABEL?=$(GIT_COMMIT_SHA)
 
 .PHONY: all
 
@@ -95,7 +99,7 @@ py:
 	docker build docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-$@:$(DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-$@:$(PY_DOCKER_LABEL)
 
 r: py
 	docker build docker/r \
@@ -104,56 +108,49 @@ r: py
 		--build-arg RVERSION=$(RVERSION) \
 		--build-arg RSTUDIO_VERSION_OVERRIDE=$(RSTUDIO_VERSION_OVERRIDE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-r:$(DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL)
 
-# BASE_IMAGE was used for all the docker files, but if there are dependencies,
-# it can be expected to mean different things in different contexts; hence
-# CUDA_BASE_IMAGE was introduced here
 cuda: py
 	docker build docker/cuda \
-		--build-arg CUDA_BASE_IMAGE="$(CUDA_BASE_IMAGE)" \
+		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
 		--build-arg CUDA_VERSION="$(CUDA_VERSION)" \
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-cuda:$(DOCKER_LABEL)
-
-# this image is just tagged with the commit hash
-vnc: py
-	docker build docker/vnc \
-		--build-arg BASE_IMAGE=$(BASE_IMAGE) \
-		-t $(DOCKER_PREFIX)-vnc:$(DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-cuda:$(CUDA_DOCKER_LABEL)
 
 # this image is tagged with the julia version and the commit hash
 julia: py
 	docker build docker/julia \
-		--build-arg BASE_IMAGE=$(RENKU_BASE) \
+		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-julia:$(DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-julia:$(JULIA_DOCKER_LABEL)
+
+# this image is just tagged with the commit hash
+vnc: py
+	docker build docker/vnc \
+		--build-arg RENKU_BASE=$(RENKU_BASE) \
+		--platform=$(PLATFORM) \
+		-t $(DOCKER_PREFIX)-vnc:$(EXTRA_DOCKER_LABEL)
 
 # this image is built on the vnc image and tagged as matlab with the commit hash
-vnc-matlab: vnc
-	docker build docker/matlab \
-		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
-		-t $(DOCKER_PREFIX)-matlab:$(GIT_COMMIT_SHA)
-
-vnc-qgis: vnc
-	docker build docker/qgis \
+vnc-%: vnc
+	docker build docker/$* \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-qgis:$(GIT_COMMIT_SHA)
+		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL)
 
 batch: py
 	docker build docker/batch \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
-		--build-arg BASE_IMAGE="python:3.9-slim-buster" \
-		-t $(DOCKER_PREFIX)-batch:$(GIT_COMMIT_SHA)
+		--build-arg BASE_IMAGE="python:3.10-slim-buster" \
+		-t $(DOCKER_PREFIX)-batch:$(EXTRA_DOCKER_LABEL)
 
 bioc: py
 	docker build docker/r \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-bioc:$(DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-bioc:$(BIOC_DOCKER_LABEL)

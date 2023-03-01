@@ -1,5 +1,5 @@
-ARG CUDA_BASE_IMAGE=renku/renkulab-py:latest
-FROM $CUDA_BASE_IMAGE
+ARG RENKU_BASE=renku/renkulab-py:latest
+FROM $RENKU_BASE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
