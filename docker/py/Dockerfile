@@ -24,6 +24,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     musl-dev \
     nano \
     netcat \
+    rclone \
     unzip \
     vim \
     openssh-server && \

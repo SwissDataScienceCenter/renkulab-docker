@@ -64,6 +64,7 @@ RUN apt-get update --fix-missing && \
     libxext6 \
     libxrender1 \
     libzmq3-dev \
+    rclone \
     vim && \
     apt-get purge && \
     apt-get clean && \

@@ -12,7 +12,7 @@ SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
 # install dependencies
 RUN apt-get update -y && \
-    apt-get install --no-install-recommends -y curl wget git && \
+    apt-get install --no-install-recommends -y curl wget git rclone && \
     apt-get purge && \
     apt-get clean && \
     apt-get autoremove --yes && \

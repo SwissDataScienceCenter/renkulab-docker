@@ -33,6 +33,7 @@ RUN apt-get update --fix-missing && \
     libsm6 \
     libxext6 \
     libxrender1 \
+    rclone \
     tini \
     wget \
     vim && \
