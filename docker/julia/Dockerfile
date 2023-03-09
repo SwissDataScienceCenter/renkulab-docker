@@ -1,5 +1,5 @@
-ARG BASE_IMAGE=renku/renkulab-py:latest
-FROM $BASE_IMAGE as base
+ARG RENKU_BASE=renku/renkulab-py:latest
+FROM $RENKU_BASE as base
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 

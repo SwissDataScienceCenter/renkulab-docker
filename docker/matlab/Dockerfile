@@ -74,10 +74,8 @@ RUN export DEBIAN_FRONTEND=noninteractive && apt-get update && apt-get install -
     libpango-1.0-0 \
     libpangocairo-1.0-0 \
     libpangoft2-1.0-0 \
-    libpython3.9 \
     libsm6 \
     libsndfile1 \
-    libssl1.1 \
     libuuid1 \
     libx11-6 \
     libx11-xcb1 \

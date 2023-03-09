@@ -61,10 +61,8 @@ RUN python3 -m pip install --no-cache-dir -U pip && \
     # npm cache clean --force && \
     rm -rf "/home/${NB_USER}/.cache"
 
-# fix https://github.com/SwissDataScienceCenter/renku-jupyter/issues/14
-RUN mamba install -y gxx_linux-64 && \
-    # jupyter sets channel priority to strict which often causes very long error messages
-    mamba config --system --set channel_priority flexible && \
+# jupyter sets channel priority to strict which often causes very long error messages
+RUN mamba config --system --set channel_priority flexible && \
     mamba clean --all -f -y
 
 # setup sshd
