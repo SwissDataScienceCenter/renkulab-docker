@@ -1,5 +1,5 @@
 # define build arguments
-ARG RENKU_BASE=renku/renkulab-py:3.9-d7394dd
+ARG RENKU_BASE=renku/renkulab-py:latest
 ARG BASE_IMAGE=rocker/verse:devel
 
 # define base images

@@ -7,7 +7,7 @@ environments like JupyterLab and RStudio from the Renku platform. They also each
 contain a version of the [renku cli](https://github.com/SwissDataScienceCenter/renku-python).
 
 The images are available on
-[DockerHub](https://hub.docker.com/search?q=renku%2Frenkulab-&type=image)and
+[DockerHub](https://hub.docker.com/search?q=renku%2Frenkulab-&type=image) and
 are automatically built from this repo via github actions (see the `.github`
 folder for more).
 
@@ -18,8 +18,8 @@ updating the `Makefile` to modify what it builds by default.
 
 ## Usage
 
-The basic python (renkulab-py), basic R (renkulab-r), and basic Julia (renkulab-julia)
-images are available via
+The basic python (`renkulab-py`), basic R (`renkulab-r`), and basic Julia (`renkulab-julia`)
+images are used in the 
 [renku project templates](https://github.com/SwissDataScienceCenter/renku-project-template)
 that you select upon renku project creation on the RenkuLab platform, or locally
 via `renku init`.
@@ -64,26 +64,21 @@ the image that's right for you:
 `renku/renkulab-[image flavor]:[image flavor version]-[tag|hash]`
 
 For example:
-`renku/renkulab-py:python-3.8.13-0.11.0`
+`renku/renkulab-py:python-3.10-0.15.0`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on RenkuLab.
 * `-py`: indicates this is a python image flavor; either the programming language
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
-* `python-3.8.13`: indicates the version of python is 3.8.13
-* `0.11.0` (or `d572e9a`): the tag is a value given to a commit of the repository
+* `python-3.10`: indicates the version of python is 3.10
+* `0.15.0` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
   image is built.
 
-Note that the base images include the specified version of the `renku` CLI.
-This can easily be overridden by installing another version with `pipx` in the container
-or any Dockerfile that uses these images, e.g.
-
-```bash
-pipx install --force renku==<version>
-```
+Note that the base images include the latest version of the `renku` CLI.
+This can easily be overridden modifying the renku version in the project's Dockerfile.
 
 ## Current images
 
@@ -125,25 +120,19 @@ dockerhub: https://hub.docker.com/r/renku/renkulab-r/tags
 
 **Available via renku project templates**
 
-Based on the renkulab-py (python 3.9) image with julia installed.
+Based on the renkulab-py image with julia installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-julia/tags
 
 ### cuda
 
-Based on the renkulab-py with different versions of python and CUDA installed.
+Based on the `renkulab-py` with different versions of python and CUDA installed.
 
 dockerhub: https://hub.docker.com/r/renku/renkulab-cuda/tags
 
-### cuda-tf
-
-Based on the the cuda-tf images with different (compatible) versions of Tensorflow installed.
-
-dockerhub: https://hub.docker.com/r/renku/renkulab-cuda-tf/tags
-
 ### vnc
 
-Based on the renkulab-py (python 3.9) with a full virtual desktop installed.
+Based on the `renkulab-py` image with a full virtual desktop installed.
 It uses noVNC 1.1.0 and TigerVNC 1.9.0 with a Renku UI to deliver a Linux desktop.
 
 https://hub.docker.com/r/renku/renkulab-vnc/tags
@@ -156,7 +145,7 @@ https://hub.docker.com/r/renku/renkulab-matlab/tags
 
 ### qgis
 
-A full virtual desktop as above with QGIS  installed.
+A full virtual desktop as above with QGIS installed.
 
 https://hub.docker.com/r/renku/renkulab-qgis/tags
 
@@ -175,7 +164,7 @@ It may be necessary to build individual images directly with `docker`; this
 is done by running `docker build -t <name:tag> .` in the directory of the 
 image you would like to build. Note that on arm-based systems (e.g. Apple 
 M1/M2) you may need to use the flag `--platform=linux/amd64` for the
-build because `git-lfs 3.2.0` is not available for the arm architecture.
+build because not all base images are available for ARM architecture. 
 
 ## Adding renku to your own images
 

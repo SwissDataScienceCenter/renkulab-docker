@@ -1,12 +1,12 @@
-ARG BASE_IMAGE=renku/renkulab-py:latest
-FROM ${BASE_IMAGE}
+ARG RENKU_BASE=renku/renkulab-py:latest
+FROM ${RENKU_BASE}
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
 USER root
 SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 
-RUN apt-get update \
+RUN apt-get update -y \
     && apt-get install -yq --no-install-recommends \
         dbus-x11 \
         firefox \
@@ -19,7 +19,7 @@ RUN apt-get update \
         xorg \
         xubuntu-icon-theme \
         gnome-terminal \
-        ttf-dejavu \
+        fonts-dejavu \
         git-gui \
         gitk \
         emacs \
