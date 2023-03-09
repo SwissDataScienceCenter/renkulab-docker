@@ -85,12 +85,7 @@ RUN mkdir -p "$HOME/.renku/bin" && \
     source "$HOME/.renku/venv/bin/activate" && \
     pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
     deactivate && \
-    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
-    echo $'if (tty -s); then\n\
-    source ~/.renku/venv/bin/activate\n\
-    export PATH=/opt/conda/bin:$PATH\n\
-fi\n\
-'>> "/home/${NB_USER}/.bashrc"
+    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" 
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
