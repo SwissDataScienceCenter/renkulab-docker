@@ -1,10 +1,18 @@
-## [0.15.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.14.0...0.15.0) (2023-03-01)
+## [0.15.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.14.0...0.15.0) (2023-03-10)
 
 Note that the version of JupyterLab has been bumped with this release, which also means we default to Python 3.10 now.
 
-Features:
+### Bug Fixes
+
+* docker/py/requirements.txt to reduce vulnerabilities ([#304](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/304)) ([4dd042f](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/4dd042f))
+* image tagging consistency ([#313](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/313)) ([e6c1294](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/e6c1294))
+
+
+### Features
 
 * use mamba and update to JL 3.6.1 ([f6b7e48](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/f6b7e48))
+* add rclone and modify shell prompt ([#314](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/314)) ([60c642a](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/60c642a))
+
 
 ## [0.14.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.13.1...0.14.0) (2023-02-14)
 
