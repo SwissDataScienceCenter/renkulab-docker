@@ -45,5 +45,16 @@ fi
 # Start the SHH daemon in the background
 /usr/sbin/sshd -f /opt/ssh/sshd_config -E /tmp/sshd.log
 
+# Override the jupyter command to be forward compatible with newer
+# images that no longer launch the whole server with `jupyter notebook`.
+jupyter() { 
+    if [ "$1" = "notebook" ]; 
+    then 
+        shift  
+        $(which jupyter) server $@; 
+    else $(which jupyter) $@; 
+    fi; 
+}
+
 # run the command
 $@
