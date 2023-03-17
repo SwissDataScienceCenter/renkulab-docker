@@ -395,6 +395,7 @@ jobs:
         RELEASE:
           - RELEASE_3_14
           - RELEASE_3_15
+          - RELEASE_3_16
           - devel
     steps:
     - name: Docker Login
