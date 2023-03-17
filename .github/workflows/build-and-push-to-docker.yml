@@ -77,6 +77,9 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2.0.0
     - name: Build renku project python-based docker images
+      env:
+        # build multi-platform
+        MULTIARCH: true
       id: build-image
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
@@ -99,6 +102,8 @@ jobs:
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         make py 
         echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
+        # load the linux image
+        BUILDX_EXTRA_FLAGS=--load PLATFORM=linux/amd64 make py
 
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -112,13 +117,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        docker buildx build \
-          --platform ${{env.DOCKER_PLATFORMS}} \
-          --tag ${{ steps.build-image.outputs.IMAGE_NAME }} \
-          --build-arg BASE_IMAGE="jupyter/base-notebook:${{ matrix.BASE_IMAGE_TAG }}" \
-          --push \
-          docker/py
-
+        BUILDX_EXTRA_FLAGS=--push make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
