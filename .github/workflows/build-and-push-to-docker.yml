@@ -117,7 +117,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS=--push make py
+        BUILDX_EXTRA_FLAGS=--push MULTIARCH=true make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
