@@ -327,7 +327,12 @@ jobs:
         command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS=--push MULTIARCH=true make julia
+        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+        # on master push latest image
+        if [ "$REF" == "refs/heads/master" ]; then
+          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-julia:latest
+          docker push $DOCKER_PREFIX-julia:latest
+        fi
         
   build-r-ubuntu:
     needs: build-py
