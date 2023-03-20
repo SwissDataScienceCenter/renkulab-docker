@@ -111,7 +111,7 @@ py:
 		$(BUILDX_EXTRA_FLAGS)
 
 r: py
-	docker build docker/r \
+	docker $(BUILD_CMD) docker/r \
 		--build-arg BASE_IMAGE=$(RSTUDIO_BASE_IMAGE) \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--build-arg RVERSION=$(RVERSION) \
@@ -120,7 +120,7 @@ r: py
 		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL)
 
 cuda: py
-	docker build docker/cuda \
+	docker $(BUILD_CMD) docker/cuda \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
@@ -148,7 +148,7 @@ vnc: py
 
 # this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-%: vnc
-	docker build docker/$* \
+	docker $(BUILD_CMD) docker/$* \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL)
@@ -161,7 +161,7 @@ batch: py
 		$(BUILDX_EXTRA_FLAGS)
 
 bioc: py
-	docker build docker/r \
+	docker $(BUILD_CMD) docker/r \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=$(PLATFORM) \

@@ -116,7 +116,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make py
+        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
@@ -180,7 +180,6 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # these are set dynamically so not part of env
         export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
@@ -189,7 +188,7 @@ jobs:
         export CUDA_DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
-        make cuda
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make cuda
         echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$CUDA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
@@ -245,11 +244,10 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         
         # needed by the makefile - for these images, we only tag with commit sha
         export EXTRA_DOCKER_LABEL="${LABEL}"
-        BUILDX_EXTRA_FLAGS="--push --cache-to type=gha --cache-from type=gha" make $EXTENSION 
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make $EXTENSION 
         
   build-vnc-ext:
     needs: build-py-ext
@@ -282,13 +280,10 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        docker pull ${DOCKER_PREFIX}-vnc:${LABEL}
 
         # needed by the Makefile
         export EXTRA_DOCKER_LABEL="${LABEL}"
-        make vnc-$EXTENSION
-        docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make vnc-$EXTENSION
 
   build-julia-ext:
     needs: build-py
@@ -322,13 +317,12 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
-        make julia
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make julia
         echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$JULIA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
     - name: Image Acceptance Tests
@@ -342,7 +336,7 @@ jobs:
         command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make julia
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-julia:latest
@@ -387,14 +381,13 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export RVERSION="${{ matrix.RVERSION }}"
         export R_DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
         export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
-        make r
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make r
         echo "IMAGE_NAME=$DOCKER_PREFIX-r:$R_DOCKER_LABEL" >> $GITHUB_OUTPUT
 
     - name: Image Acceptance Tests
@@ -449,13 +442,11 @@ jobs:
         else
           export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
         fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
 
         # needed by the makefile
         export BIOC_DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
         export BIOC_VERSION="${{ matrix.RELEASE }}"
-        make bioc
-        docker push $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make bioc
 
         # on master push latest image
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
