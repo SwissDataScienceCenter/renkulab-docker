@@ -30,7 +30,7 @@ env:
   DEFAULT_PYTHON_VERSION: "3.10"
   USE_BUILDX: true
   BUILDX_EXTRA_FLAGS: "--cache-from type=gha"
-
+  BUILDKIT_INLINE_CACHE: 1
 jobs:
   lint:
     strategy:
@@ -188,6 +188,8 @@ jobs:
         export CUDA_DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
         export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
+
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make cuda
         echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$CUDA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
@@ -247,6 +249,7 @@ jobs:
         
         # needed by the makefile - for these images, we only tag with commit sha
         export EXTRA_DOCKER_LABEL="${LABEL}"
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make $EXTENSION 
         
   build-vnc-ext:
@@ -283,6 +286,7 @@ jobs:
 
         # needed by the Makefile
         export EXTRA_DOCKER_LABEL="${LABEL}"
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make vnc-$EXTENSION
 
   build-julia-ext:
@@ -322,6 +326,7 @@ jobs:
         export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make julia
         echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$JULIA_DOCKER_LABEL" >> $GITHUB_OUTPUT
         
@@ -387,6 +392,7 @@ jobs:
         export R_DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
         export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make r
         echo "IMAGE_NAME=$DOCKER_PREFIX-r:$R_DOCKER_LABEL" >> $GITHUB_OUTPUT
 
@@ -446,6 +452,7 @@ jobs:
         # needed by the makefile
         export BIOC_DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
         export BIOC_VERSION="${{ matrix.RELEASE }}"
+        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
         BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make bioc
 
         # on master push latest image
