@@ -27,12 +27,11 @@ extensions = \
 	batch \
 	bioc
 
-# set the build command to buildx if multi-arch
-ifdef MULTIARCH
-    BUILDX=buildx
-	PLATFORM?=linux/amd64,linux/arm64
-else
-	PLATFORM?=linux/amd64
+PLATFORM?=linux/amd64
+BUILD_CMD=build
+# set the build command
+ifdef USE_BUILDX
+    BUILD_CMD=buildx build
 endif
 
 # use BUILDX_EXTRA_FLAGS to set either --push or --load
@@ -105,7 +104,7 @@ pull:
 # BASE_IMAGE_TAG: used to identify the jupyter base notebook to build from
 # RENKU_PYTHON_BASE_TAG: used to tag the resulting image
 py:
-	docker $(BUILDX) build docker/py \
+	docker $(BUILD_CMD) docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
 		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-$@:$(PY_DOCKER_LABEL) \
@@ -133,7 +132,7 @@ cuda: py
 
 # this image is tagged with the julia version and the commit hash
 julia: py
-	docker $(BUILDX) build docker/julia \
+	docker $(BUILD_CMD) docker/julia \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-julia:$(JULIA_DOCKER_LABEL) \
@@ -141,7 +140,7 @@ julia: py
 
 # this image is just tagged with the commit hash
 vnc: py
-	docker $(BUILDX) build docker/vnc \
+	docker $(BUILD_CMD) docker/vnc \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-vnc:$(EXTRA_DOCKER_LABEL) \
@@ -155,7 +154,7 @@ vnc-%: vnc
 		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL)
 
 batch: py
-	docker $(BUILDX) build docker/batch \
+	docker $(BUILD_CMD) docker/batch \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="python:3.10-slim-buster" \
 		-t $(DOCKER_PREFIX)-batch:$(EXTRA_DOCKER_LABEL) \

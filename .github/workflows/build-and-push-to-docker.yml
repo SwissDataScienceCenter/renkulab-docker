@@ -28,6 +28,8 @@ on: [push]
 env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
+  USE_BUILDX: true
+  BUILDX_EXTRA_FLAGS: "--cache-to type=gha,mode=max --cache-from type=gha"
 
 jobs:
   lint:
@@ -76,6 +78,8 @@ jobs:
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project python-based docker images
       id: build-image
       run: |
@@ -97,7 +101,7 @@ jobs:
         export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        make py 
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make py 
         echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
      
     - name: Image Acceptance Tests
@@ -112,7 +116,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS=--push MULTIARCH=true make py
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
@@ -163,7 +167,11 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3  
+    - uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project python-based docker image extensions
       id: build-image
       run: |
@@ -226,6 +234,8 @@ jobs:
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project python-based docker image extensions
       env:
         EXTENSION: ${{ matrix.EXTENSIONS }}
@@ -239,7 +249,7 @@ jobs:
         
         # needed by the makefile - for these images, we only tag with commit sha
         export EXTRA_DOCKER_LABEL="${LABEL}"
-        BUILDX_EXTRA_FLAGS=--push MULTIARCH=true make $EXTENSION 
+        BUILDX_EXTRA_FLAGS="--push --cache-to type=gha --cache-from type=gha" make $EXTENSION 
         
   build-vnc-ext:
     needs: build-py-ext
@@ -258,8 +268,11 @@ jobs:
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
     - uses: actions/checkout@v3
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project python-based docker image extensions
       env:
         EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
@@ -299,6 +312,8 @@ jobs:
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project julia docker image extensions
       id: build-image
       run: |
@@ -333,7 +348,7 @@ jobs:
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-julia:latest
           docker push $DOCKER_PREFIX-julia:latest
         fi
-        
+
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
@@ -360,6 +375,10 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project rocker docker images
       id: build-image
       run: |
@@ -419,6 +438,10 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
     - name: Build renku project bioconductor docker images
       run: |
         if [[ ${{ github.ref }} == refs/tags* ]]; then
