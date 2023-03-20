@@ -117,7 +117,8 @@ r: py
 		--build-arg RVERSION=$(RVERSION) \
 		--build-arg RSTUDIO_VERSION_OVERRIDE=$(RSTUDIO_VERSION_OVERRIDE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 cuda: py
 	docker $(BUILD_CMD) docker/cuda \
@@ -128,7 +129,8 @@ cuda: py
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-cuda:$(CUDA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-cuda:$(CUDA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 # this image is tagged with the julia version and the commit hash
 julia: py
@@ -151,7 +153,8 @@ vnc-%: vnc
 	docker $(BUILD_CMD) docker/$* \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 batch: py
 	docker $(BUILD_CMD) docker/batch \
@@ -165,4 +168,5 @@ bioc: py
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-bioc:$(BIOC_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-bioc:$(BIOC_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)

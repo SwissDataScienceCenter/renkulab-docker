@@ -29,7 +29,7 @@ env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
   USE_BUILDX: true
-  BUILDX_EXTRA_FLAGS: "--cache-to type=gha,mode=max --cache-from type=gha"
+  BUILDX_EXTRA_FLAGS: "--cache-from type=gha"
 
 jobs:
   lint:
@@ -101,7 +101,7 @@ jobs:
         export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make py 
+        BUILDX_EXTRA_FLAGS="--cache-to type=gha,mode=max --load $BUILDX_EXTRA_FLAGS" make py 
         echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
      
     - name: Image Acceptance Tests
@@ -116,7 +116,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make py
+        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--cache-to type=gha,mode=max --push $BUILDX_EXTRA_FLAGS" make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
