@@ -27,6 +27,7 @@ extensions = \
 	batch \
 	bioc
 
+BUILDKIT_INLINE_CACHE?=1
 PLATFORM?=linux/amd64
 BUILD_CMD=build
 # set the build command
