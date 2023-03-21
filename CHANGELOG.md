@@ -1,3 +1,14 @@
+## [0.15.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.15.0...0.15.1) (2023-03-21)
+
+### Features
+
+* add bioc 3.16 and 3.17 to matrix ([#321](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/321)) ([abcc3a3](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/abcc3a32d9059aa28e15b89532c9d46589ebfa2a))
+
+### Bug Fixes
+
+* use jupyter server to launch notebooks if possible ([#320](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/320)) ([0361fdc](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/0361fdcb19fa86cb640fb716e4b893560f460358))
+
+
 ## [0.15.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.14.0...0.15.0) (2023-03-10)
 
 Note that the version of JupyterLab has been bumped with this release, which also means we default to Python 3.10 now.
