@@ -62,7 +62,6 @@ jobs:
       matrix:
         BASE_IMAGE_TAG:
           - lab-3.6.1
-          - python-3.10.9
           - python-3.9.13
           - python-3.8.13
 
@@ -116,12 +115,63 @@ jobs:
 
     - name: Push to docker
       run: |
-        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make py
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make py
+        
+  build-py-multiarch:
+    needs: build-py
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        BASE_IMAGE_TAG:
+          - lab-3.6.1
+          - python-3.9.13
+          - python-3.8.13
+
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+
+    - uses: actions/checkout@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Expose GitHub Runtime
+      uses: crazy-max/ghaction-github-runtime@v2
+    - name: Build renku project python-based docker images
+      id: build-image
+      run: |
+        if [[ ${{ github.ref }} == refs/tags* ]]; then
+          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
+        else
+          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
+        fi
+
+        # This ensures the same image tags as before are built, in addition to new ones
+        if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
+          export RENKU_PYTHON_BASE_IMAGE_TAG=$DEFAULT_PYTHON_VERSION
+        else
+          export RENKU_PYTHON_BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
+        fi
+
+        # needed by the makefile - these are generated dynamically
+        # and hence they are not part of the env setup above
+        export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
+        export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
+        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
+        export PLATFORM=linux/amd64,linux/arm64 
+        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" 
+
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
-          docker push $DOCKER_PREFIX-py:latest
+          export BUILDX_EXTRA_FLAGS="$BUILDX_EXTRA_FLAGS --tag $DOCKER_PREFIX-py:latest"
         fi
+        make py
 
   build-cuda:
     needs: build-py
@@ -190,9 +240,9 @@ jobs:
         export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
 
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM $BUILDX_CACHE_TO" make cuda
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM" make cuda
         echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$CUDA_DOCKER_LABEL" >> $GITHUB_OUTPUT
-        
+
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
