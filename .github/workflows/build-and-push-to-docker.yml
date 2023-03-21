@@ -29,8 +29,8 @@ env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
   USE_BUILDX: true
-  BUILDX_CACHE_TO: --cache-to type=s3,mode=max,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }} 
-  BUILDX_CACHE_FROM: --cache-from type=s3,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }}
+  BUILDX_CACHE_TO: --cache-to type=gha
+  BUILDX_CACHE_FROM: --cache-from type=gha
 jobs:
   lint:
     strategy:
