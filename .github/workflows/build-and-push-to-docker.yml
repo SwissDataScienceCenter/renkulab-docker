@@ -29,10 +29,8 @@ env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
   USE_BUILDX: true
-  # BUILDKIT_INLINE_CACHE: 1
-  BUILDX_EXTRA_FLAGS: --cache-to type=s3,mode=max,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }} 
-                      --cache-from type=s3,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }}
-     
+  BUILDX_CACHE_TO: --cache-to type=s3,mode=max,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }} 
+  BUILDX_CACHE_FROM: --cache-from type=s3,bucket=gha-cache,region=zh,endpoint_url=https://s3-zh.os.switch.ch,access_key_id=${{ secrets.GHA_S3_CACHE_ACCESS_KEY }},secret_access_key=${{ secrets.GHA_S3_CACHE_SECRET_ACCESS_KEY }}
 jobs:
   lint:
     strategy:
@@ -103,7 +101,7 @@ jobs:
         export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
         export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_EXTRA_FLAGS" make py 
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM --cache-to type=inline" make py 
         echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
      
     - name: Image Acceptance Tests
@@ -118,7 +116,7 @@ jobs:
 
     - name: Push to docker
       run: |
-        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--push $BUILDX_EXTRA_FLAGS" make py
+        PLATFORM=linux/arm64,linux/amd64 BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make py
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
           docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest

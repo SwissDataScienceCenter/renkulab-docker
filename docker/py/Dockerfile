@@ -1,5 +1,37 @@
 ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.0
-FROM $BASE_IMAGE as base
+
+FROM ${BASE_IMAGE} as builder
+
+USER root
+RUN apt-get update && apt-get install -yq --no-install-recommends \
+    build-essential && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# switch to the notebook user
+USER $NB_USER
+# install jupyterlab, papermill, git extension and renku-jupyterlab-ts
+COPY requirements.txt /tmp/requirements.txt
+RUN python3 -m pip install --no-cache-dir -U pip && \
+    python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
+    # jupyter lab build && \
+    # jupyter labextension list && \
+    # npm cache clean --force && \
+    rm -rf "/home/${NB_USER}/.cache"
+
+# jupyter sets channel priority to strict which often causes very long error messages
+RUN mamba config --system --set channel_priority flexible && \
+    mamba clean --all -f -y
+
+COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
+
+RUN mkdir -p "$HOME/.renku/bin" && \
+    virtualenv --no-periodic-update "$HOME/.renku/venv" && \
+    source "$HOME/.renku/venv/bin/activate" && \
+    pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
+    deactivate
+
+FROM $BASE_IMAGE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
 
@@ -36,21 +68,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     /tmp/git-lfs-3.3.0/install.sh && \
     rm -rf /tmp/git-lfs*
 
-# switch to the notebook user
 USER $NB_USER
-
-# install jupyterlab, papermill, git extension and renku-jupyterlab-ts
-COPY requirements.txt /tmp/requirements.txt
-RUN python3 -m pip install --no-cache-dir -U pip && \
-    python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
-    # jupyter lab build && \
-    # jupyter labextension list && \
-    # npm cache clean --force && \
-    rm -rf "/home/${NB_USER}/.cache"
-
-# jupyter sets channel priority to strict which often causes very long error messages
-RUN mamba config --system --set channel_priority flexible && \
-    mamba clean --all -f -y
 
 # setup sshd
 RUN mkdir -p "$HOME/.ssh" && \
@@ -61,15 +79,6 @@ RUN mkdir -p "$HOME/.ssh" && \
 ENV RENKU_DISABLE_VERSION_CHECK 1
 
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
-
-COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
-
-RUN mkdir -p "$HOME/.renku/bin" && \
-    virtualenv --no-periodic-update "$HOME/.renku/venv" && \
-    source "$HOME/.renku/venv/bin/activate" && \
-    pip install --no-cache-dir -r /tmp/renku-requirements.txt && \
-    deactivate && \
-    ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" 
 
 # configure git
 COPY git-config.bashrc /home/$NB_USER/
@@ -102,3 +111,6 @@ ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 CMD [ "/usr/local/bin/start-singleuser.sh" ]
 
 USER $NB_USER
+COPY --from=builder /opt/conda /opt/conda
+COPY --from=builder "$HOME/.renku" "$HOME/.renku"
+RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
