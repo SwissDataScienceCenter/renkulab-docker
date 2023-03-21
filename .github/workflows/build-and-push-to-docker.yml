@@ -30,7 +30,7 @@ env:
   DEFAULT_PYTHON_VERSION: "3.10"
   USE_BUILDX: true
   BUILDX_CACHE_TO: --cache-to type=gha
-  BUILDX_CACHE_FROM: --cache-from type=gha
+  BUILDX_CACHE_FROM: --cache-from type=gha --cache-from type=inline
 jobs:
   lint:
     strategy:
@@ -64,7 +64,8 @@ jobs:
           - lab-3.6.1
           - python-3.9.13
           - python-3.8.13
-
+    env:
+      BASE_IMAGE_TAG: ${{ matrix.BASE_IMAGE_TAG }}
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -97,16 +98,14 @@ jobs:
 
         # needed by the makefile - these are generated dynamically
         # and hence they are not part of the env setup above
-        export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM --cache-to type=inline" make py 
-        echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM" make py 
+        echo "PY_DOCKER_LABEL=${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
      
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_IMAGE_NAME: ${DOCKER_PREFIX}-py:${{ steps.build-image.outputs.PY_DOCKER_LABEL }}
         TEST_USER_NAME: jovyan
         TEST_SPEC: jupyterlab.cy.ts
       with:
@@ -115,7 +114,8 @@ jobs:
 
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make py
+        export PY_DOCKER_LABEL=${{ steps.build-image.outputs.PY_DOCKER_LABEL }}
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM" make py
         
   build-py-multiarch:
     needs: build-py
@@ -163,9 +163,8 @@ jobs:
         # and hence they are not part of the env setup above
         export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
         export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export PLATFORM=linux/amd64,linux/arm64 
-        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" 
+        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM" 
 
         # on master push latest image - the lab-* image is tagged latest
         if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
@@ -300,7 +299,7 @@ jobs:
         # needed by the makefile - for these images, we only tag with commit sha
         export EXTRA_DOCKER_LABEL="${LABEL}"
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make $EXTENSION 
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM" make $EXTENSION 
         
   build-vnc-ext:
     needs: build-py-ext
@@ -337,7 +336,7 @@ jobs:
         # needed by the Makefile
         export EXTRA_DOCKER_LABEL="${LABEL}"
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make vnc-$EXTENSION
+        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM" make vnc-$EXTENSION
 
   build-julia-ext:
     needs: build-py
@@ -374,11 +373,10 @@ jobs:
 
         # needed by the makefile
         export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
         export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
+        export BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM"
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM --cache-to type=inline --cache-from type=inline" make julia
-        echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$JULIA_DOCKER_LABEL" >> $GITHUB_OUTPUT
+        make julia
         
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
@@ -391,13 +389,14 @@ jobs:
         command: npx mocha -r ts-node/register index.ts
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_TO $BUILDX_CACHE_FROM --cache-from type=inline" make julia
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-julia:latest
-          docker push $DOCKER_PREFIX-julia:latest
+        export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
+        export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
+        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM"
+        # on master push latest image - the lab-* image is tagged latest 
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
+          export BUILDX_EXTRA_FLAGS="$BUILDX_EXTRA_FLAGS --tag $DOCKER_PREFIX-julia:latest"
         fi
-
+        make julia
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
@@ -443,7 +442,7 @@ jobs:
         export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
         export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM --cache-from type=inline --cache-to type=inline" make r
+        BUILDX_EXTRA_FLAGS="--load $BUILDX_CACHE_FROM" make r
         echo "IMAGE_NAME=$DOCKER_PREFIX-r:$R_DOCKER_LABEL" >> $GITHUB_OUTPUT
 
     - name: Image Acceptance Tests
@@ -459,14 +458,12 @@ jobs:
 
     - name: Push to docker
       run: |
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM --cache-from type=inline $BUILDX_CACHE_TO" make r
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
-        then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-r:latest
-          docker push $DOCKER_PREFIX-r:latest
+        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM" 
+        # on master push latest image - the 4.2.0 image is tagged latest
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]; then
+          export BUILDX_EXTRA_FLAGS="$BUILDX_EXTRA_FLAGS --tag $DOCKER_PREFIX-r:latest"
         fi
+        make r
 
   build-bioc:
     needs: build-py
@@ -503,12 +500,10 @@ jobs:
         export BIOC_DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
         export BIOC_VERSION="${{ matrix.RELEASE }}"
         docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM --cache-from type=inline $BUILDX_CACHE_TO" make bioc
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
-        then
-          docker tag $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL $DOCKER_PREFIX-bioc:latest
-          docker push $DOCKER_PREFIX-bioc:latest
+        export BUILDX_EXTRA_FLAGS="--push $BUILDX_CACHE_FROM" 
+        # on master push latest image - the devel image is tagged latest
+        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]; then
+          export BUILDX_EXTRA_FLAGS="$BUILDX_EXTRA_FLAGS --tag $DOCKER_PREFIX-bioc:latest"
         fi
+        make bioc
 
