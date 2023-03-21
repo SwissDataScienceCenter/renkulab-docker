@@ -36,20 +36,6 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     /tmp/git-lfs-3.3.0/install.sh && \
     rm -rf /tmp/git-lfs*
 
-# Setup ssh keys
-RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys /opt/ssh/pid && \
-    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
-    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
-    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
-    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key
-
-
-COPY sshd_config /opt/ssh/sshd_config
-
-RUN chown -R 0:100 /opt/ssh/ && \
-    chmod -R u=rwX,g=rX,o= /opt/ssh && \
-    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid
-
 # switch to the notebook user
 USER $NB_USER
 
@@ -96,6 +82,23 @@ COPY --chown=1000:100 powerline.config /home/${NB_USER}/.config/powerline-shell/
 RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
 
 COPY entrypoint.sh /entrypoint.sh
+
+# Setup ssh keys
+USER root
+RUN mkdir -p /opt/ssh/sshd_config.d /opt/ssh/ssh_host_keys /opt/ssh/pid && \
+    ssh-keygen -q -N "" -t dsa -f /opt/ssh/ssh_host_keys/ssh_host_dsa_key && \
+    ssh-keygen -q -N "" -t rsa -b 4096 -f /opt/ssh/ssh_host_keys/ssh_host_rsa_key && \
+    ssh-keygen -q -N "" -t ecdsa -f /opt/ssh/ssh_host_keys/ssh_host_ecdsa_key && \
+    ssh-keygen -q -N "" -t ed25519 -f /opt/ssh/ssh_host_keys/ssh_host_ed25519_key
+
+COPY sshd_config /opt/ssh/sshd_config
+
+RUN chown -R 0:100 /opt/ssh/ && \
+    chmod -R u=rwX,g=rX,o= /opt/ssh && \
+    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid
+
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
 CMD [ "/usr/local/bin/start-singleuser.sh" ]
+
+USER $NB_USER
