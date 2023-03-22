@@ -28,11 +28,6 @@ on: [push]
 env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
-  USE_BUILDX: true
-  BUILDX_CACHE_TO: --cache-to type=gha
-  BUILDX_CACHE_FROM: --cache-from type=gha --cache-from type=inline
-  BASE_IMAGE_FILENAME: renkulab-py.tar
-  BUILDKIT_INLINE_CACHE: 1
 jobs:
   lint:
     strategy:
@@ -66,8 +61,6 @@ jobs:
           - "3.10"
           - "3.9"
           - "3.8"
-    env:
-      BASE_IMAGE_TAG: python-${{ matrix.BASE_PYTHON_VERSION }}
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -131,8 +124,6 @@ jobs:
           - "3.10"
           - "3.9"
           - "3.8"
-    env:
-      BASE_IMAGE_TAG: python-${{ matrix.BASE_IMAGE_TAG }}
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -433,7 +424,7 @@ jobs:
     env: 
       RSTUDIO_VERSION: 2022.02.3-492
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
         include:
           - RVERSION: 4.1.0
@@ -518,8 +509,8 @@ jobs:
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          RSTUDIO_BASE_IMAGE=rocker/verse:${{ matrix.RVERSION }}
-          RSTUDIO_VERSION_OVERRIDE=${{ matrix.RSTUDIO_VERSION }}
+          BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+          RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
         context: docker/r
         labels: ${{ steps.meta.outputs.labels }}
         push: true
