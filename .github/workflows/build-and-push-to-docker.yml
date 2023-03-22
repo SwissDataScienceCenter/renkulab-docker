@@ -18,8 +18,7 @@
 #
 # It's probbaly worth noting here that the same action is used multiple
 # times with multiple input parameters in the `matrix` variable to
-# build different versions of the container; these parameters are then
-# passed on to the makefile.
+# build different versions of the image.
 
 name: Renku Docker Image CI
 

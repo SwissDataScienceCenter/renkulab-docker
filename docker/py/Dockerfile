@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=jupyter/base-notebook:lab-3.4.0
+ARG BASE_IMAGE=jupyter/base-notebook:python-3.10
 
 FROM ${BASE_IMAGE} as builder
 
