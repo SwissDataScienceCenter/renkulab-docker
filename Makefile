@@ -42,8 +42,8 @@ DOCKER_PREFIX?=renku/renkulab
 GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
-BASE_IMAGE_TAG?=lab-3.6.1
 DEFAULT_PYTHON_VERSION?=3.10
+BASE_IMAGE_TAG?=python-$(DEFAULT_PYTHON_VERSION)
 PY_DOCKER_LABEL?=$(DEFAULT_PYTHON_VERSION)-$(GIT_COMMIT_SHA)
 RENKU_BASE?=$(DOCKER_PREFIX)-py:$(PY_DOCKER_LABEL)
 

@@ -111,6 +111,6 @@ ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 CMD [ "/usr/local/bin/start-singleuser.sh" ]
 
 USER $NB_USER
-COPY --from=builder /opt/conda /opt/conda
-COPY --from=builder "$HOME/.renku" "$HOME/.renku"
+COPY --chown=1000:100 --from=builder /opt/conda /opt/conda
+COPY --chown=1000:100 --from=builder "$HOME/.renku" "$HOME/.renku"
 RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
