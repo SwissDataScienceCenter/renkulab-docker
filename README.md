@@ -13,7 +13,7 @@ folder for more).
 
 Images are updated from time to time; we try to keep them reasonably current
 with modern python versions, cuda/torch versions and R versions. Typically, this
-involves updating our github actions to include new versions and occasionally
+involves updating our github actions to include new versions and 
 updating the `Makefile` to modify what it builds by default.
 
 ## Usage
@@ -64,14 +64,14 @@ the image that's right for you:
 `renku/renkulab-[image flavor]:[image flavor version]-[tag|hash]`
 
 For example:
-`renku/renkulab-py:python-3.10-0.15.0`
+`renku/renkulab-py:3.10-0.15.0`
 
 * `renku/renkulab`: indicates this is an image you can use to spawn an environment
   from your project on RenkuLab.
 * `-py`: indicates this is a python image flavor; either the programming language
   installed in the environment, or the base image that extra dependencies are added to.
   See below for details about the available flavors.
-* `python-3.10`: indicates the version of python is 3.10
+* `3.10`: indicates the version of python is 3.10
 * `0.15.0` (or `d572e9a`): the tag is a value given to a commit of the repository
   and indicates that the version is part of a release. If the version is not part of
   a release, this value is the first few chars of the git commit SHA from which the
@@ -84,9 +84,9 @@ This can easily be overridden modifying the renku version in the project's Docke
 
 | Image                                                                          | Description                                     | Base image                                                                                         |
 |--------------------------------------------------------------------------------|-------------------------------------------------|----------------------------------------------------------------------------------------------------|
-| [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)           | Basic Jupyter image with minimal dependencies   | [jupyter/base-notebook](https://hub.docker.com/r/jupyter/base-notebook/tags)                       |
-| [renku/renkulab-r](https://hub.docker.com/r/renku/renkulab-r/tags)             | Basic Rstudio image                             | [rocker/verse](https://hub.docker.com/r/rocker/verse/tags)                                         |
-| [renku/renkulab-julia](https://hub.docker.com/r/renku/renkulab-julia/tags)     | Basic Julia image                               | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
+| [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)           | Jupyter image with minimal dependencies   | [jupyter/base-notebook](https://hub.docker.com/r/jupyter/base-notebook/tags)                       |
+| [renku/renkulab-r](https://hub.docker.com/r/renku/renkulab-r/tags)             | Rstudio image                             | [rocker/verse](https://hub.docker.com/r/rocker/verse/tags)                                         |
+| [renku/renkulab-julia](https://hub.docker.com/r/renku/renkulab-julia/tags)     | Julia image                               | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
 | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)       | Cuda image with Python and minimal dependencies | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
 | [renku/renkulab-cuda-tf](https://hub.docker.com/r/renku/renkulab-cuda-tf/tags) | Cuda image with Python and Tensorflow           | [renku/renkulab-cuda](https://hub.docker.com/r/renku/renkulab-cuda/tags)                           |
 | [renku/renkulab-vnc](https://hub.docker.com/r/renku/renkulab-vnc/tags)         | VNC Image with Python                           | [renku/renkulab-py](https://hub.docker.com/r/renku/renkulab-py/tags)                               |
@@ -165,6 +165,26 @@ is done by running `docker build -t <name:tag> .` in the directory of the
 image you would like to build. Note that on arm-based systems (e.g. Apple 
 M1/M2) you may need to use the flag `--platform=linux/amd64` for the
 build because not all base images are available for ARM architecture. 
+
+### M1/M2 (arm64) support
+Starting with 0.16.0, the python base images are built to support both `X86_64`
+and `arm64` architectures. If you need to build a multi-arch image locally, you can
+do it with `make`:
+
+```
+$ PLATFORM=linux/amd64,linux/arm64 USE_BUILDX=1 make py
+```
+
+Alternatively you can use the `buildx` command directly:
+
+```
+$ docker buildx build \
+  --platform linux/amd64,linux/arm64 \
+  --tag myimage:tag \
+  --push \
+  docker/py
+
+Note that for the time being we can only provide the python images with `arm64` support. 
 
 ## Adding renku to your own images
 

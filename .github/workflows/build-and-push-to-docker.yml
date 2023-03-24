@@ -18,8 +18,7 @@
 #
 # It's probbaly worth noting here that the same action is used multiple
 # times with multiple input parameters in the `matrix` variable to
-# build different versions of the container; these parameters are then
-# passed on to the makefile.
+# build different versions of the image.
 
 name: Renku Docker Image CI
 
@@ -28,7 +27,6 @@ on: [push]
 env:
   DOCKER_PREFIX: renku/renkulab
   DEFAULT_PYTHON_VERSION: "3.10"
-
 jobs:
   lint:
     strategy:
@@ -58,12 +56,10 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        BASE_IMAGE_TAG:
-          - lab-3.6.1
-          - python-3.10.9
-          - python-3.9.13
-          - python-3.8.13
-
+        BASE_PYTHON_VERSION:
+          - "3.10"
+          - "3.9"
+          - "3.8"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -72,49 +68,93 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
-    - name: Build renku project python-based docker images
-      id: build-image
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-
-        # This ensures the same image tags as before are built, in addition to new ones
-        if [[ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]]; then
-          export RENKU_PYTHON_BASE_IMAGE_TAG=$DEFAULT_PYTHON_VERSION
-        else
-          export RENKU_PYTHON_BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
-        fi
-
-        # needed by the makefile - these are generated dynamically
-        # and hence they are not part of the env setup above
-        export BASE_IMAGE_TAG=${{ matrix.BASE_IMAGE_TAG }}
-        export PY_DOCKER_LABEL="${RENKU_PYTHON_BASE_IMAGE_TAG}-${LABEL}"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        make py 
-        echo "IMAGE_NAME=${DOCKER_PREFIX}-py:${PY_DOCKER_LABEL}" >> $GITHUB_OUTPUT
-
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-py
+        tags: |
+          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+    - name: Build and load
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        context: docker/py
+        labels: ${{ steps.meta.outputs.labels }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
         TEST_USER_NAME: jovyan
         TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
+    # export the default base image for other jobs to use
+    - name: Build and export
+      if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+            BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+        cache-from: type=gha
+        context: docker/py
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+  
+  build-py-multiarch:
+    needs: build-py
+    runs-on: ubuntu-latest
 
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
-        # on master push latest image - the lab-* image is tagged latest
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.BASE_IMAGE_TAG }}" == lab-* ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-py:latest
-          docker push $DOCKER_PREFIX-py:latest
-        fi
+    strategy:
+      fail-fast: true
+      matrix:
+        BASE_PYTHON_VERSION:
+          - "3.10"
+          - "3.9"
+          - "3.8"
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+    - uses: actions/checkout@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-py
+        tags: |
+          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        context: docker/py
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+        cache-to: type=gha,mode=max
+        cache-from: type=gha
+        build-args: |
+          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}   
+        platforms: linux/amd64,linux/arm64
 
   build-cuda:
     needs: build-py
@@ -152,54 +192,71 @@ jobs:
             LIBCUDNN_PACKAGE: "libcudnn8=8.5.0.96-1+cuda11.7"
           # note cuda 11.8 is available now, but there I could not
           # find a cuda-compat package in the ubuntu repos at this time
-
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v3  
-    - name: Build renku project python-based docker image extensions
-      id: build-image
+    - uses: actions/checkout@v3
+    - name: Set outputs
+      id: vars
       run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-
-        # these are set dynamically so not part of env
-        export CUDA_COMPAT_PACKAGE="${{ matrix.CUDA_COMPAT_PACKAGE }}" 
-        export CUDA_CUDART_PACKAGE="${{ matrix.CUDA_CUDART_PACKAGE }}" 
-        export CUDA_VERSION="${{ matrix.CUDA_VERSION }}" 
-        export CUDA_DOCKER_LABEL="${{ matrix.CUDA_VERSION }}-${LABEL}"
-        export EXTRA_LIBRARIES="${{ matrix.EXTRA_LIBRARIES }}" 
-        export LIBCUDNN_PACKAGE="${{ matrix.LIBCUDNN_PACKAGE }}" 
-        make cuda
-        echo "IMAGE_NAME=$DOCKER_PREFIX-cuda:$CUDA_DOCKER_LABEL" >> $GITHUB_OUTPUT
-        
+        sha_short=$(git rev-parse --short HEAD)
+        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-cuda
+        tags: |
+          type=sha,prefix=${{ matrix.CUDA_VERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.CUDA_VERSION == '11.7' }}
+    - name: Build and load
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
+          CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }} 
+          CUDA_VERSION=${{ matrix.CUDA_VERSION }}
+          EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
+          LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
+        context: docker/cuda
+        labels: ${{ steps.meta.outputs.labels }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: |
+          type=inline
+          type=registry,ref=${{ steps.vars.outputs.renku_base }}
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-cuda:${{ steps.meta.outputs.version }}
         TEST_USER_NAME: jovyan
         TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.CUDA_VERSION }}" == "11.7" ]; then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-cuda:latest
-          docker push $DOCKER_PREFIX-cuda:latest
-        fi
-
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
+          CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }} 
+          CUDA_VERSION=${{ matrix.CUDA_VERSION }}
+          EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }} 
+          LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }} 
+        context: docker/cuda
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        
   build-py-ext:
     needs: build-py
     runs-on: ubuntu-latest
@@ -207,7 +264,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        EXTENSIONS:
+        EXTENSION:
           - vnc
           - batch
 
@@ -219,58 +276,80 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
-    - name: Build renku project python-based docker image extensions
-      env:
-        EXTENSION: ${{ matrix.EXTENSIONS }}
+    - name: Set outputs
+      id: vars
       run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
+        sha_short=$(git rev-parse --short HEAD)
+        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
+        tags: |
+          type=sha,prefix=
+          type=semver,pattern={{version}},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+        context: docker/${{ matrix.EXTENSION }}
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
         
-        # needed by the makefile - for these images, we only tag with commit sha
-        export EXTRA_DOCKER_LABEL="${LABEL}"
-        make $EXTENSION 
-        docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
-
   build-vnc-ext:
     needs: build-py-ext
     runs-on: ubuntu-latest
-
     strategy:
       fail-fast: true
       matrix:
-        VNC-EXTENSIONS:
+        VNC-EXTENSION:
           - matlab
           - qgis
-
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
     - uses: actions/checkout@v3
-    - name: Build renku project python-based docker image extensions
-      env:
-        EXTENSION: ${{ matrix.VNC-EXTENSIONS }}
+    - name: Set outputs
+      id: vars
       run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-        docker pull ${DOCKER_PREFIX}-vnc:${LABEL}
-
-        # needed by the Makefile
-        export EXTRA_DOCKER_LABEL="${LABEL}"
-        make vnc-$EXTENSION
-        docker push $DOCKER_PREFIX-$EXTENSION:$LABEL
-
+        sha_short=$(git rev-parse --short HEAD)
+        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
+        tags: |
+          type=sha,prefix=
+          type=semver,pattern={{version}},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ steps.vars.outputs.sha_short }}
+        context: docker/${{ matrix.VNC-EXTENSION }}
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
+    
   build-julia-ext:
     needs: build-py
     runs-on: ubuntu-latest
@@ -278,9 +357,8 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        JULIAVERSIONS:
-          - 1.7.1
-
+        JULIAVERSION:
+          - "1.7.1"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -289,54 +367,95 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
-    - name: Build renku project julia docker image extensions
-      id: build-image
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Set outputs
+      id: vars
       run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-
-        # needed by the makefile
-        export JULIA_DOCKER_LABEL="${{ matrix.JULIAVERSIONS }}-$LABEL"
-        export GIT_COMMIT_SHA=$(git rev-parse --short=7 --verify HEAD)
-        export JULIAVERSION="${{ matrix.JULIAVERSIONS }}"
-        make julia
-        echo "IMAGE_NAME=$DOCKER_PREFIX-julia:$JULIA_DOCKER_LABEL" >> $GITHUB_OUTPUT
-        
+        sha_short=$(git rev-parse --short HEAD)
+        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-julia
+        tags: |
+          type=sha,prefix=${{ matrix.JULIAVERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.JULIAVERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIAVERSION == '1.7.1' }}
+    - name: Build and load
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+        context: docker/julia
+        labels: ${{ steps.meta.outputs.labels }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
+        cache-to: type=gha
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIAVERSION }}-${{ steps.vars.outputs.sha_short }}
         TEST_USER_NAME: jovyan
         TEST_SPEC: jupyterlab.cy.ts
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
+    - name: Build and push
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+        context: docker/julia
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
         
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
-
+    env: 
+      RSTUDIO_VERSION: 2022.02.3-492
     strategy:
       fail-fast: true
       matrix:
         include:
           - RVERSION: 4.1.0
-            RSTUDIO_VERSION: 2022.02.3-492
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
           - RVERSION: 4.1.1
-            RSTUDIO_VERSION: 2022.02.3-492
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
           - RVERSION: 4.1.2
-            RSTUDIO_VERSION: 2022.02.3-492
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
           - RVERSION: 4.2.0
-            RSTUDIO_VERSION: 2022.02.3-492
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
           - RVERSION: devel
-            RSTUDIO_VERSION: 2022.02.3-492
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
+          - RVERSION: RELEASE_3_14
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
+          - RVERSION: RELEASE_3_15
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
+          - RVERSION: RELEASE_3_16
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
+          - RVERSION: RELEASE_3_17
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
+          - RVERSION: devel
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -345,86 +464,55 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
     - uses: actions/checkout@v3
-    - name: Build renku project rocker docker images
-      id: build-image
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Set outputs
+      id: vars
       run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-
-        # needed by the makefile
-        export RVERSION="${{ matrix.RVERSION }}"
-        export R_DOCKER_LABEL="${{ matrix.RVERSION }}-$LABEL"
-        export RSTUDIO_BASE_IMAGE="rocker/verse:${{ matrix.RVERSION }}" 
-        export RSTUDIO_VERSION_OVERRIDE="${{ matrix.RSTUDIO_VERSION }}"
-        make r
-        echo "IMAGE_NAME=$DOCKER_PREFIX-r:$R_DOCKER_LABEL" >> $GITHUB_OUTPUT
-
+        sha_short=$(git rev-parse --short HEAD)
+        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
+        tags: |
+          type=sha,prefix=${{ matrix.RVERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.RVERSION == 'devel' }}
+    - name: Build and load
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+          RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
+        context: docker/r
+        labels: ${{ steps.meta.outputs.labels }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${{ steps.build-image.outputs.IMAGE_NAME }}
+        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}:${{ matrix.RVERSION }}-${{ steps.vars.outputs.sha_short }}
         TEST_ENV: rstudio
         TEST_USER_NAME: rstudio
         TEST_SPEC: rstudio.cy.ts
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
-
-    - name: Push to docker
-      run: |
-        docker push ${{ steps.build-image.outputs.IMAGE_NAME }}
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RVERSION }}" == "4.2.0" ]
-        then
-          docker tag ${{ steps.build-image.outputs.IMAGE_NAME }} $DOCKER_PREFIX-r:latest
-          docker push $DOCKER_PREFIX-r:latest
-        fi
-
-  build-bioc:
-    needs: build-py
-    runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        RELEASE:
-          - RELEASE_3_14
-          - RELEASE_3_15
-          - RELEASE_3_16
-          - RELEASE_3_17
-          - devel
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
+    - name: Build and push
+      uses: docker/build-push-action@v4
       with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v3
-    - name: Build renku project bioconductor docker images
-      run: |
-        if [[ ${{ github.ref }} == refs/tags* ]]; then
-          export LABEL=$(echo ${{ github.ref }} | cut -d / -f 3)
-        else
-          export LABEL=$(echo ${{ github.sha }} | cut -c 1-7)
-        fi
-        docker pull ${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${LABEL}
-
-        # needed by the makefile
-        export BIOC_DOCKER_LABEL="${{ matrix.RELEASE }}-$LABEL"
-        export BIOC_VERSION="${{ matrix.RELEASE }}"
-        make bioc
-        docker push $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL
-
-        # on master push latest image
-        if [ "$REF" == "refs/heads/master" ] && [ "${{ matrix.RELEASE }}" == "devel" ]
-        then
-          docker tag $DOCKER_PREFIX-bioc:$BIOC_DOCKER_LABEL $DOCKER_PREFIX-bioc:latest
-          docker push $DOCKER_PREFIX-bioc:latest
-        fi
-
+        build-args: |
+          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+          RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
+        context: docker/r
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=gha
+    

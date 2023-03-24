@@ -27,14 +27,23 @@ extensions = \
 	batch \
 	bioc
 
+BUILDKIT_INLINE_CACHE?=1
 PLATFORM?=linux/amd64
+BUILD_CMD=build
+# set the build command
+ifdef USE_BUILDX
+    BUILD_CMD=buildx build
+endif
+
+# use BUILDX_EXTRA_FLAGS to set either --push or --load
+BUILDX_EXTRA_FLAGS?=
 
 DOCKER_PREFIX?=renku/renkulab
 GIT_COMMIT_SHA?=$(shell git rev-parse --short=7 --verify HEAD)
 
 # for building the base image
-BASE_IMAGE_TAG?=lab-3.6.1
 DEFAULT_PYTHON_VERSION?=3.10
+BASE_IMAGE_TAG?=python-$(DEFAULT_PYTHON_VERSION)
 PY_DOCKER_LABEL?=$(DEFAULT_PYTHON_VERSION)-$(GIT_COMMIT_SHA)
 RENKU_BASE?=$(DOCKER_PREFIX)-py:$(PY_DOCKER_LABEL)
 
@@ -96,22 +105,24 @@ pull:
 # BASE_IMAGE_TAG: used to identify the jupyter base notebook to build from
 # RENKU_PYTHON_BASE_TAG: used to tag the resulting image
 py:
-	docker build docker/py \
+	docker $(BUILD_CMD) docker/py \
 		--build-arg BASE_IMAGE=jupyter/base-notebook:$(BASE_IMAGE_TAG) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-$@:$(PY_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-$@:$(PY_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 r: py
-	docker build docker/r \
+	docker $(BUILD_CMD) docker/r \
 		--build-arg BASE_IMAGE=$(RSTUDIO_BASE_IMAGE) \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--build-arg RVERSION=$(RVERSION) \
 		--build-arg RSTUDIO_VERSION_OVERRIDE=$(RSTUDIO_VERSION_OVERRIDE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-r:$(R_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 cuda: py
-	docker build docker/cuda \
+	docker $(BUILD_CMD) docker/cuda \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg CUDA_COMPAT_PACKAGE="$(CUDA_COMPAT_PACKAGE)" \
 		--build-arg CUDA_CUDART_PACKAGE="$(CUDA_CUDART_PACKAGE)" \
@@ -119,38 +130,44 @@ cuda: py
 		--build-arg EXTRA_LIBRARIES="$(EXTRA_LIBRARIES)" \
 		--build-arg LIBCUDNN_PACKAGE="$(LIBCUDNN_PACKAGE)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-cuda:$(CUDA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-cuda:$(CUDA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 # this image is tagged with the julia version and the commit hash
 julia: py
-	docker build docker/julia \
+	docker $(BUILD_CMD) docker/julia \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-julia:$(JULIA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-julia:$(JULIA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 # this image is just tagged with the commit hash
 vnc: py
-	docker build docker/vnc \
+	docker $(BUILD_CMD) docker/vnc \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-vnc:$(EXTRA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-vnc:$(EXTRA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 # this image is built on the vnc image and tagged as matlab with the commit hash
 vnc-%: vnc
-	docker build docker/$* \
+	docker $(BUILD_CMD) docker/$* \
 		--build-arg BASE_IMAGE=renku/renkulab-vnc:$(GIT_COMMIT_SHA) \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-$*:$(EXTRA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 batch: py
-	docker build docker/batch \
+	docker $(BUILD_CMD) docker/batch \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="python:3.10-slim-buster" \
-		-t $(DOCKER_PREFIX)-batch:$(EXTRA_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-batch:$(EXTRA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
 
 bioc: py
-	docker build docker/r \
+	docker $(BUILD_CMD) docker/r \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
 		--build-arg BASE_IMAGE="bioconductor/bioconductor_docker:$(BIOC_VERSION)" \
 		--platform=$(PLATFORM) \
-		-t $(DOCKER_PREFIX)-bioc:$(BIOC_DOCKER_LABEL)
+		-t $(DOCKER_PREFIX)-bioc:$(BIOC_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
