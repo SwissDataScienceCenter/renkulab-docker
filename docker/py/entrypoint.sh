@@ -22,7 +22,7 @@ then
 fi
 
 # install git hooks
-renku githooks install || true
+renku githooks install > /dev/null 2>&1 || true 
 
 # run the post-init script in the root directory (i.e. coming from the image)
 if [ -f "/post-init.sh" ]; then
