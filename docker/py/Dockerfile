@@ -14,9 +14,6 @@ USER $NB_USER
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache-dir -U pip && \
     python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
-    # jupyter lab build && \
-    # jupyter labextension list && \
-    # npm cache clean --force && \
     rm -rf "/home/${NB_USER}/.cache"
 
 # jupyter sets channel priority to strict which often causes very long error messages
@@ -75,20 +72,11 @@ RUN mkdir -p "$HOME/.ssh" && \
     touch "$HOME/.ssh/authorized_keys" && \
     chmod u=rw,g=,o= "$HOME/.ssh/authorized_keys"
 
-# install renku-python
-ENV RENKU_DISABLE_VERSION_CHECK 1
-
+# configure bash and shell prompt
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
-
-# configure git
-COPY git-config.bashrc /home/$NB_USER/
-RUN cat "/home/$NB_USER/git-config.bashrc" >> "/home/$NB_USER/.bashrc" && rm "/home/$NB_USER/git-config.bashrc"
-
-# configure powerline
-COPY --chown=1000:100 powerline.bashrc /tmp/powerline.bashrc
+COPY --chown=1000:100 bashrc /renku/
 COPY --chown=1000:100 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
-
-RUN cat /tmp/powerline.bashrc >> ~/.bashrc && rm /tmp/powerline.bashrc
+RUN cat "/renku/bashrc" >> "${HOME}/.bashrc" 
 
 COPY entrypoint.sh /entrypoint.sh
 
@@ -108,7 +96,7 @@ RUN chown -R 0:100 /opt/ssh/ && \
 
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
-CMD [ "/usr/local/bin/start-singleuser.sh" ]
+CMD [ "jupyter", "server", "--ip", "0.0.0.0" ]
 
 USER $NB_USER
 COPY --chown=1000:100 --from=builder /opt/conda /opt/conda

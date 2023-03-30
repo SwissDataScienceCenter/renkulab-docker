@@ -1,0 +1,23 @@
+# if this is an ssh shell, set PATH
+if [ -n "$SSH_TTY" ]; then
+    export PATH=/opt/conda/bin:/opt/conda/condabin:$HOME/.local/bin:$PATH:$HOME/.renku/bin
+    eval "$(command conda shell.bash hook 2> /dev/null)"
+fi
+
+# Setup git user
+if [[ -z "$(git config --global --get user.name)" && -v GIT_AUTHOR_NAME ]]; then
+    git config --global user.name "$GIT_AUTHOR_NAME"
+fi
+if [[ -z "$(git config --global --get user.email)" && -v EMAIL ]]; then
+    git config --global user.email "$EMAIL"
+fi
+
+function _update_ps1() {
+    PS1=$(powerline-shell $?)
+}
+
+if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+    PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+fi
+
+export RENKU_DISABLE_VERSION_CHECK=1

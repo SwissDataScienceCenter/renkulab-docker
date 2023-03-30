@@ -77,10 +77,10 @@ RUN apt-get update --fix-missing && \
 
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
-COPY --from=renku_base --chown=rstudio:rstudio  /usr/local/bin/ /usr/local/bin/
-COPY --from=renku_base --chown=rstudio:rstudio \
-    /home/jovyan/ /home/rstudio/
+COPY --from=renku_base --chown=rstudio:rstudio /usr/local/bin/ /usr/local/bin/
+COPY --from=renku_base --chown=rstudio:rstudio /home/jovyan/ /home/rstudio/
 COPY --from=renku_base /entrypoint.sh /entrypoint.sh
+COPY --from=renku_base /renku/bashrc /renku/bashrc
 
 # set permissions of the R library directory to be editable by NB_USER
 COPY fix-permissions.sh /usr/local/bin
@@ -98,7 +98,9 @@ USER ${NB_USER}
 
 # set up conda in the NB_USER environment
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
-    echo "conda activate base" >> ~/.bashrc
+    echo "conda activate base" >> ~/.bashrc && \
+    cat /renku/bashrc >> $HOME/.bashrc && \
+    echo "source ~/.bashrc" >> ~/.bash_profile
 
 RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.0.1"
 
@@ -106,10 +108,8 @@ RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.0.1"
 RUN R --quiet -e "install.packages('IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${CONDA_PATH}')"
 
-RUN  echo "source ~/.bashrc" >> ~/.bash_profile
-
 COPY post-init.sh /post-init.sh
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
-CMD [ "jupyterhub-singleuser" ]
+CMD [ "jupyter", "server", "--ip", "0.0.0.0" ]
 
 WORKDIR ${HOME}
