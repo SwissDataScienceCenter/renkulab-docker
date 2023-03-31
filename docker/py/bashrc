@@ -1,5 +1,5 @@
 # if this is an ssh shell, set PATH
-if [ -n "$SSH_CLIENT" ] || [ -n "$VSCODE_IPC_HOOK_CLI" ]; then
+if [ -n "$SSH_CLIENT" ]; then
     export PATH=/opt/conda/bin:/opt/conda/condabin:$HOME/.local/bin:$PATH:$HOME/.renku/bin
     eval "$(command conda shell.bash hook 2> /dev/null)"
 fi
