@@ -1,3 +1,13 @@
+## [0.16.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.15.1...0.16.0) (2023-03-31)
+
+### Features
+
+* support multi-platform build using buildx ([#212](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/212)) ([d15203a](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/d15203a))
+
+### Bug Fixes
+
+* ensure that the PATH is set correctly in VSCode ([#326](https://github.com/SwissDataScienceCenter/renkulab-docker/pull/326))
+
 ## [0.15.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.15.0...0.15.1) (2023-03-21)
 
 ### Features
