@@ -155,6 +155,7 @@ jobs:
         build-args: |
           BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}   
         platforms: linux/amd64,linux/arm64
+        provenance: false
 
   build-cuda:
     needs: build-py
