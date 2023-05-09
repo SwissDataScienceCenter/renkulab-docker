@@ -183,6 +183,7 @@ $ docker buildx build \
   --tag myimage:tag \
   --push \
   docker/py
+```
 
 Note that for the time being we can only provide the python images with `arm64` support. 
 
