@@ -361,6 +361,8 @@ jobs:
         include: 
           - JULIA_VERSION: "1.7.1"
             JULIA_CHECKSUM: "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11"
+          - JULIA_VERSION: "1.8.5"
+            JULIA_CHECKSUM: "e71a24816e8fe9d5f4807664cbbb42738f5aa9fe05397d35c81d4c5d649b9d05"
           - JULIA_VERSION: "1.9.0"
             JULIA_CHECKSUM: "00c614466ef9809c2eb23480e38d196a2c577fff2730c4f83d135b913d473359"
         
@@ -390,7 +392,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.JULIA_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIA_VERSION == '1.7.1' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIA_VERSION == '1.9.0' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
