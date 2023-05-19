@@ -1,6 +1,6 @@
 # define build arguments
 ARG RENKU_BASE=renku/renkulab-py:latest
-ARG BASE_IMAGE=python:3-slim-bullseye
+ARG BASE_IMAGE=python:3.10-slim-bullseye
 ARG NB_USER=jovyan
 
 # define base images
