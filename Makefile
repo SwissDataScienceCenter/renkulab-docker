@@ -54,8 +54,9 @@ RVERSION?=4.2.0
 R_DOCKER_LABEL?=$(RVERSION)-$(GIT_COMMIT_SHA)
 
 # for building the julia container
-JULIAVERSION?=1.7.1
-JULIA_DOCKER_LABEL?=$(JULIAVERSION)-$(GIT_COMMIT_SHA)
+JULIA_VERSION?=1.9.0
+JULIA_CHECKSUM?=00c614466ef9809c2eb23480e38d196a2c577fff2730c4f83d135b913d473359
+JULIA_DOCKER_LABEL?=$(JULIA_VERSION)-$(GIT_COMMIT_SHA)
 
 # for building the bioconductor container
 BIOC_VERSION?=devel
@@ -137,6 +138,8 @@ cuda: py
 julia: py
 	docker $(BUILD_CMD) docker/julia \
 		--build-arg RENKU_BASE=$(RENKU_BASE) \
+		--build-arg JULIA_CHECKSUM=$(JULIA_CHECKSUM) \
+		--build-arg JULIA_VERSION_ARG=$(JULIA_VERSION) \
 		--platform=$(PLATFORM) \
 		-t $(DOCKER_PREFIX)-julia:$(JULIA_DOCKER_LABEL) \
 		$(BUILDX_EXTRA_FLAGS)

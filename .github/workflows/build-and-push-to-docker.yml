@@ -358,8 +358,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        JULIAVERSION:
-          - "1.7.1"
+        include: 
+          - JULIA_VERSION: "1.7.1"
+            JULIA_CHECKSUM: "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11"
+          - JULIA_VERSION: "1.9.0"
+            JULIA_CHECKSUM: "00c614466ef9809c2eb23480e38d196a2c577fff2730c4f83d135b913d473359"
+        
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -384,14 +388,16 @@ jobs:
       with:
         images: ${{ env.DOCKER_PREFIX }}-julia
         tags: |
-          type=sha,prefix=${{ matrix.JULIAVERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.JULIAVERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIAVERSION == '1.7.1' }}
+          type=sha,prefix=${{ matrix.JULIA_VERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIA_VERSION == '1.7.1' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          JULIA_VERSION_ARG=${{ matrix.JULIA_VERSION }}
+          JULIA_CHECKSUM=${{ matrix.JULIA_CHECKSUM }}
         context: docker/julia
         labels: ${{ steps.meta.outputs.labels }}
         load: true
@@ -401,7 +407,7 @@ jobs:
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
-        TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIAVERSION }}-${{ steps.vars.outputs.sha_short }}
+        TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIA_VERSION }}-${{ steps.vars.outputs.sha_short }}
         TEST_USER_NAME: jovyan
         TEST_SPEC: jupyterlab.cy.ts
       with:

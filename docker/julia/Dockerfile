@@ -11,7 +11,8 @@ SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 ENV JULIA_DEPOT_PATH=/opt/julia
 ENV JULIA_PKGDIR=/opt/julia
 # If this changes, you also need to change the checksum below
-ENV JULIA_VERSION=1.9.0
+ARG JULIA_VERSION_ARG=1.9.0
+ENV JULIA_VERSION=${JULIA_VERSION_ARG}
 ARG JULIA_CHECKSUM="00c614466ef9809c2eb23480e38d196a2c577fff2730c4f83d135b913d473359"
 
 RUN mkdir /opt/julia-${JULIA_VERSION} && \
