@@ -1,3 +1,13 @@
+## [0.17.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.16.0...0.17.0) (2023-05-26)
+
+### Features
+
+* support different Julia versions. Users can configure their image to use either `1.7.1`, `1.8.5` or `1.9.0`. See the [docker hub](https://hub.docker.com/r/renku/renkulab-julia/tags) listing for valid tags.
+
+### Bug fixes
+
+* Add the `_toil_worker` executable needed for `renku workflow` functionality to the `PATH` in the container 
+
 ## [0.16.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.15.1...0.16.0) (2023-03-31)
 
 ### Features
