@@ -101,4 +101,5 @@ CMD [ "jupyter", "server", "--ip", "0.0.0.0" ]
 USER $NB_USER
 COPY --chown=1000:100 --from=builder /opt/conda /opt/conda
 COPY --chown=1000:100 --from=builder "$HOME/.renku" "$HOME/.renku"
-RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku"
+RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
+    ln -s "$HOME/.renku/venv/bin/_toil_worker" "$HOME/.renku/bin/"
