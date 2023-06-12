@@ -1,3 +1,7 @@
+## [0.18.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.17.0...0.18.0) (2023-06-12)
+
+Bump version of the renku CLI. 
+
 ## [0.17.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.16.0...0.17.0) (2023-05-26)
 
 ### Features
