@@ -13,10 +13,10 @@ if [[ -z "$(git config --global --get user.email)" && -v EMAIL ]]; then
 fi
 
 function _update_ps1() {
-    PS1=$(powerline-shell $?)
+    PS1="$(/usr/local/bin/powerline-shell -error $? -jobs $(jobs -p | wc -l) -mode compatible -modules ssh,venv,cwd,git,root)"
 }
 
-if [[ $TERM != linux && ! $PROMPT_COMMAND =~ _update_ps1 ]]; then
+if [ "$TERM" != "linux" ] && [ -f "/usr/local/bin/powerline-shell" ]; then
     PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 fi
 

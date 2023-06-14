@@ -61,6 +61,8 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     rm -rf /var/lib/apt/lists/* && \
     ln -s /usr/lib/x86_64-linux-musl/libc.so /lib/libc.musl-x86_64.so.1 && \
     wget -q https://github.com/git-lfs/git-lfs/releases/download/v3.3.0/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -P /tmp && \
+    wget -q  https://github.com/justjanne/powerline-go/releases/download/v1.24/powerline-go-linux-"$(dpkg --print-architecture)" -O /usr/local/bin/powerline-shell && \
+    chmod a+x /usr/local/bin/powerline-shell && \
     tar -zxvf /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -C /tmp && \
     /tmp/git-lfs-3.3.0/install.sh && \
     rm -rf /tmp/git-lfs*
@@ -75,7 +77,6 @@ RUN mkdir -p "$HOME/.ssh" && \
 # configure bash and shell prompt
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
 COPY --chown=1000:100 bashrc /renku/
-COPY --chown=1000:100 powerline.config /home/${NB_USER}/.config/powerline-shell/config.json
 RUN cat "/renku/bashrc" >> "${HOME}/.bashrc" 
 
 COPY entrypoint.sh /entrypoint.sh
