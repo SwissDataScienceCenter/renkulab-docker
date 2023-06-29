@@ -142,7 +142,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -216,7 +216,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.CUDA_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.CUDA_VERSION == '11.7' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CUDA_VERSION == '11.7' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
@@ -295,7 +295,7 @@ jobs:
         tags: |
           type=sha,prefix=
           type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -339,7 +339,7 @@ jobs:
         tags: |
           type=sha,prefix=
           type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -392,7 +392,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.JULIA_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIA_VERSION == '1.9.0' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.JULIA_VERSION == '1.9.0' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
@@ -489,7 +489,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.RVERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.RVERSION == 'devel' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
