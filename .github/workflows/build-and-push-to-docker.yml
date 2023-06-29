@@ -90,6 +90,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         load: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -111,6 +112,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
   
   build-py-multiarch:
     needs: build-py
@@ -234,6 +236,7 @@ jobs:
         cache-from: |
           type=inline
           type=registry,ref=${{ steps.vars.outputs.renku_base }}
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -257,6 +260,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
         
   build-py-ext:
     needs: build-py
@@ -306,6 +310,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
         
   build-vnc-ext:
     needs: build-py-ext
@@ -350,6 +355,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
     
   build-julia-ext:
     needs: build-py
@@ -406,6 +412,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
         cache-to: type=gha
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -425,6 +432,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
         
   build-r-ubuntu:
     needs: build-py
@@ -502,6 +510,7 @@ jobs:
         load: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -524,4 +533,4 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
-    
+        provenance: false
