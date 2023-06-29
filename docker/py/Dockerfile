@@ -14,6 +14,7 @@ USER $NB_USER
 COPY requirements.txt /tmp/requirements.txt
 RUN python3 -m pip install --no-cache-dir -U pip && \
     python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
+    jupyter labextension disable "@jupyterlab/apputils-extension:announcements" && \
     rm -rf "/home/${NB_USER}/.cache"
 
 # jupyter sets channel priority to strict which often causes very long error messages
