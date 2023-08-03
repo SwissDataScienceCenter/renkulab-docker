@@ -1,4 +1,4 @@
-ARG RENKU_BASE=renku/renkulab-py:3.10-0.18.1
+ARG RENKU_BASE=renku/renkulab-py:latest
 FROM $RENKU_BASE
 
 LABEL maintainer="Swiss Data Science Center <info@datascience.ch>"
@@ -14,9 +14,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo "deb https://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu2004/x86_64 /" > /etc/apt/sources.list.d/nvidia-ml.list && \
     apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/7fa2af80.pub && \
     apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub && \
+    if [[ -z "${ADD_2204_APT_REPOS}" ]] ; \
+    then echo "Not adding 22.04 CUDA repos." ; \ 
+    else \
     curl -fsSL https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub | apt-key add - && \
     echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64 /" > /etc/apt/sources.list.d/cuda.list && \
-    apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub && \
+    apt-key adv --fetch-keys http://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub ; \
+    fi && \
     apt-get purge --autoremove -y curl \
     && rm -rf /var/lib/apt/lists/*
 

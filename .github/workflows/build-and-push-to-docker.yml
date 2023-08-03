@@ -198,6 +198,7 @@ jobs:
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-8=11.8.89-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-8"
             LIBCUDNN_PACKAGE: "libcudnn8=8.6.0.163-1+cuda11.8"
+            ADD_2204_APT_REPOS: "true"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -232,6 +233,7 @@ jobs:
           CUDA_VERSION=${{ matrix.CUDA_VERSION }}
           EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
           LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
+          ADD_2204_APT_REPOS=${{ matrix.ADD_2204_APT_REPOS }}
         context: docker/cuda
         labels: ${{ steps.meta.outputs.labels }}
         load: true
