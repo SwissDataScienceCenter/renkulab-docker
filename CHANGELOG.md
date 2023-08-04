@@ -1,3 +1,13 @@
+## [0.19.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.18.1...0.19.0) (2023-08-04)
+
+Includes package upgrades and a CUDA image with CUDA 11.8.
+
+### Features
+
+* add CUDA 11.8 images ([#368](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/368)) ([00f8986](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/00f8986568b7677a53a2726e0875c717285cacda))
+
+
+
 ## [0.18.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.18.0...0.18.1) (2023-06-29)
 
 Includes package upagrades and a switch to a new shell prompt.
