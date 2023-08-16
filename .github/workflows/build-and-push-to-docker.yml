@@ -90,6 +90,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         load: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -111,6 +112,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
   
   build-py-multiarch:
     needs: build-py
@@ -142,7 +144,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -191,8 +193,12 @@ jobs:
             CUDA_CUDART_PACKAGE: "cuda-cudart-11-7=11.7.60-1"
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-7"
             LIBCUDNN_PACKAGE: "libcudnn8=8.5.0.96-1+cuda11.7"
-          # note cuda 11.8 is available now, but there I could not
-          # find a cuda-compat package in the ubuntu repos at this time
+          - CUDA_VERSION: "11.8"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-11-8=11.8.89-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-11-8"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.6.0.163-1+cuda11.8"
+            ADD_2204_APT_REPOS: "true"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -216,7 +222,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.CUDA_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.CUDA_VERSION == '11.7' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CUDA_VERSION == '11.7' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
@@ -227,6 +233,7 @@ jobs:
           CUDA_VERSION=${{ matrix.CUDA_VERSION }}
           EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
           LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
+          ADD_2204_APT_REPOS=${{ matrix.ADD_2204_APT_REPOS }}
         context: docker/cuda
         labels: ${{ steps.meta.outputs.labels }}
         load: true
@@ -234,6 +241,7 @@ jobs:
         cache-from: |
           type=inline
           type=registry,ref=${{ steps.vars.outputs.renku_base }}
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -257,6 +265,7 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
         push: true
         tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
         
   build-py-ext:
     needs: build-py
@@ -295,7 +304,7 @@ jobs:
         tags: |
           type=sha,prefix=
           type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -306,6 +315,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
         
   build-vnc-ext:
     needs: build-py-ext
@@ -339,7 +349,7 @@ jobs:
         tags: |
           type=sha,prefix=
           type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }},prefix=
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -350,6 +360,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
     
   build-julia-ext:
     needs: build-py
@@ -392,7 +403,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.JULIA_VERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.JULIA_VERSION == '1.9.0' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.JULIA_VERSION == '1.9.0' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
@@ -406,6 +417,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
         cache-to: type=gha
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -425,6 +437,7 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
         
   build-r-ubuntu:
     needs: build-py
@@ -489,7 +502,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.RVERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' && matrix.RVERSION == 'devel' }}
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
     - name: Build and load
       uses: docker/build-push-action@v4
       with:
@@ -502,6 +515,7 @@ jobs:
         load: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
+        provenance: false
     - name: Image Acceptance Tests
       uses: cypress-io/github-action@v4
       env:
@@ -524,4 +538,4 @@ jobs:
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
-    
+        provenance: false
