@@ -1,6 +1,6 @@
 # define build arguments
 ARG RENKU_BASE=renku/renkulab-py:latest
-ARG BASE_IMAGE=rocker/verse:devel
+ARG BASE_IMAGE=rocker/verse:4.3.0
 
 # define base images
 FROM $RENKU_BASE as renku_base
@@ -32,7 +32,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ARG RSTUDIO_VERSION_OVERRIDE="2022.02.3-492"
+ARG RSTUDIO_VERSION_OVERRIDE="2023.06.0-421"
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
 # if rstudio and rstudio-server users are not deleted below, the installation
 # script fails when it installs rstudio and tries to add them back in
