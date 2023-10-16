@@ -114,6 +114,72 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         provenance: false
   
+  build-py-homedir-env:
+    needs: lint
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        BASE_PYTHON_VERSION:
+          - "3.10"
+          - "3.9"
+          - "3.8"
+    steps:
+    - name: Docker Login
+      uses: Azure/docker-login@v1
+      with:
+        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+    - uses: actions/checkout@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v2.0.0
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2.0.0
+    - name: Docker meta
+      id: meta
+      uses: docker/metadata-action@v4
+      with:
+        images: ${{ env.DOCKER_PREFIX }}-py-homedir-envs
+        tags: |
+          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+    - name: Build and load
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
+          CONDA_ENVS_DIRS=/home/jovyan/work/envs
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+        context: docker/py
+        labels: ${{ steps.meta.outputs.labels }}
+        load: true
+        tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
+    - name: Image Acceptance Tests
+      uses: cypress-io/github-action@v4
+      env:
+        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py-homedir-envs:${{ steps.meta.outputs.version }}
+        TEST_USER_NAME: jovyan
+        TEST_SPEC: jupyterlab.cy.ts
+      with:
+        working-directory: tests
+        command: npx mocha -r ts-node/register index.ts
+    # export the default base image for other jobs to use
+    - name: Build and export
+      if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
+      uses: docker/build-push-action@v4
+      with:
+        build-args: |
+            BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+            CONDA_ENVS_DIRS=/home/jovyan/work/envs
+        cache-from: type=gha
+        context: docker/py
+        labels: ${{ steps.meta.outputs.labels }}
+        push: true
+        tags: ${{ steps.meta.outputs.tags }}
+        provenance: false
+
   build-py-multiarch:
     needs: build-py
     runs-on: ubuntu-latest
