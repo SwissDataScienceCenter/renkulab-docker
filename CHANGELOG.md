@@ -1,3 +1,11 @@
+## [0.20.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.19.0...0.20.0) (2023-08-04)
+
+### Features
+
+* image with conda packages in home directory ([#391](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/391)) ([02d46d5](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/02d46d52e69d51bb10f8b84310d8bf7a51fb4fb9))
+
+
+
 ## [0.19.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.18.1...0.19.0) (2023-08-04)
 
 Includes package upgrades and a CUDA image with CUDA 11.8.
