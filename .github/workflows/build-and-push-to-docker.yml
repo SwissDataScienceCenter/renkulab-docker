@@ -591,6 +591,7 @@ jobs:
         TEST_SPEC: rstudio.cy.ts
       with:
         working-directory: tests
+        start: docker images
         command: npx mocha -r ts-node/register index.ts
     - name: Build and push
       uses: docker/build-push-action@v4
