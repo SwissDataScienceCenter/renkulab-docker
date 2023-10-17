@@ -569,6 +569,11 @@ jobs:
           type=sha,prefix=${{ matrix.RVERSION }}-
           type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
+    - name: Clean cache
+      run: |
+        df -h
+        rm -rf /opt/hostedtoolcache/*
+        df -h
     - name: Build and load
       uses: docker/build-push-action@v5
       with:
