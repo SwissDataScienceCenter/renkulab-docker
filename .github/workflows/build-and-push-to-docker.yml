@@ -71,7 +71,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -80,7 +80,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
     - name: Build and load
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
@@ -103,7 +103,7 @@ jobs:
     # export the default base image for other jobs to use
     - name: Build and export
       if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
             BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
@@ -135,7 +135,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -144,7 +144,7 @@ jobs:
         tags: |
           type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
     - name: Build and load
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
@@ -168,7 +168,7 @@ jobs:
     # export the default base image for other jobs to use
     - name: Build and export
       if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
             BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
@@ -201,7 +201,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -212,7 +212,7 @@ jobs:
           type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         context: docker/py
         push: true
@@ -279,7 +279,7 @@ jobs:
         echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
         echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -290,7 +290,7 @@ jobs:
           type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CUDA_VERSION == '11.7' }}
     - name: Build and load
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -318,7 +318,7 @@ jobs:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -361,7 +361,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
       uses: docker/metadata-action@v4
@@ -372,7 +372,7 @@ jobs:
           type=semver,pattern={{version}},prefix=
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -399,7 +399,7 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - uses: actions/checkout@v3
     - name: Set outputs
       id: vars
@@ -417,7 +417,7 @@ jobs:
           type=semver,pattern={{version}},prefix=
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ steps.vars.outputs.sha_short }}
@@ -454,7 +454,7 @@ jobs:
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v2.0.0
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Set outputs
       id: vars
       run: |
@@ -471,7 +471,7 @@ jobs:
           type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.JULIA_VERSION == '1.9.0' }}
     - name: Build and load
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -494,7 +494,7 @@ jobs:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -553,7 +553,7 @@ jobs:
 
     - uses: actions/checkout@v3
     - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2.0.0
+      uses: docker/setup-buildx-action@v3
     - name: Set outputs
       id: vars
       run: |
@@ -570,7 +570,7 @@ jobs:
           type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
           type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
     - name: Build and load
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
@@ -594,7 +594,7 @@ jobs:
         start: docker images
         command: npx mocha -r ts-node/register index.ts
     - name: Build and push
-      uses: docker/build-push-action@v4
+      uses: docker/build-push-action@v5
       with:
         build-args: |
           RENKU_BASE=${{ steps.vars.outputs.renku_base }}
