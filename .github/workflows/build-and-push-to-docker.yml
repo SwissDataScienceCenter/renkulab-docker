@@ -526,6 +526,12 @@ jobs:
           - RVERSION: 4.2.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+          - RVERSION: 4.2.3
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
+          - RVERSION: 4.3.1
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
           - RVERSION: devel
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
