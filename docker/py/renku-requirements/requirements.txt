@@ -1,4 +1,4 @@
-renku==2.6.2
+renku==2.7.0
 pip==23.2.1
 sentry-sdk==1.31.0
 setuptools>=65.5.1
