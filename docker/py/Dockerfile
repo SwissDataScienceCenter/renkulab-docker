@@ -8,6 +8,9 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+# remove the nodejs pin if needed - see https://github.com/jupyter/docker-stacks/issues/1990
+RUN sed -i '/nodejs/d' /opt/conda/conda-meta/pinned
+
 # switch to the notebook user
 USER $NB_USER
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
