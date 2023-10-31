@@ -15,7 +15,7 @@ jobs:
       run: |
         echo "NEW_IMAGE=renku/renkulab-py:3.9-${{ env.NEW_VERSION }}" >> $GITHUB_ENV
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         repository: SwissDataScienceCenter/renku-notebooks
         ref: main

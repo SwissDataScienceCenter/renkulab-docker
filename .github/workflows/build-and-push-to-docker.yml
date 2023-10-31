@@ -43,7 +43,7 @@ jobs:
         - docker/qgis/Dockerfile
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: hadolint/hadolint-action@v2.0.0
       with:
         dockerfile: ${{ matrix.DOCKERFILE_PATH }}
@@ -67,7 +67,7 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -131,7 +131,7 @@ jobs:
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -199,7 +199,7 @@ jobs:
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -273,7 +273,7 @@ jobs:
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set outputs
       id: vars
       run: |
@@ -353,7 +353,7 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set outputs
       id: vars
       run: |
@@ -402,7 +402,7 @@ jobs:
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set outputs
       id: vars
       run: |
@@ -452,7 +452,7 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -559,7 +559,7 @@ jobs:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     - name: Set outputs
