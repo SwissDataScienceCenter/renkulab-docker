@@ -74,7 +74,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-py
         tags: |
@@ -138,7 +138,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-py-homedir-envs
         tags: |
@@ -206,7 +206,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-py
         tags: |
@@ -284,7 +284,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-cuda
         tags: |
@@ -366,7 +366,7 @@ jobs:
       uses: docker/setup-buildx-action@v3
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
         tags: |
@@ -411,7 +411,7 @@ jobs:
         echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
         tags: |
@@ -465,7 +465,7 @@ jobs:
         echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-julia
         tags: |
@@ -570,7 +570,7 @@ jobs:
         echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Docker meta
       id: meta
-      uses: docker/metadata-action@v4
+      uses: docker/metadata-action@v5
       with:
         images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
         tags: |
