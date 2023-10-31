@@ -1,4 +1,12 @@
-## [0.20.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.19.0...0.20.0) (2023-08-04)
+## [0.21.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.20.0...0.21.0) (2023-10-31)
+
+### Fixes and updates
+
+* chore: add new R version (#396) ([7941b9c](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/7941b9c)), closes [#396](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/396)
+* chore: remove unneded nodejs pin (#386) ([e5f63f2](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/e5f63f2)), closes [#386](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/386)
+* chore(ci): publish tagged homedir env images (#395) ([aaf36ad](https://github.com/SwissDataScienceCenter/renkulab-docker/commit/aaf36ad)), closes [#395](https://github.com/SwissDataScienceCenter/renkulab-docker/issues/395)
+
+## [0.20.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.19.0...0.20.0) (2023-10-17)
 
 ### Features
 
