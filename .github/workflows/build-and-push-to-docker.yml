@@ -92,7 +92,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         provenance: false
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
+      uses: cypress-io/github-action@v6
       env:
         TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
         TEST_USER_NAME: jovyan
@@ -159,7 +159,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         provenance: false
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
+      uses: cypress-io/github-action@v6
       env:
         TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py-homedir-envs:${{ steps.meta.outputs.version }}
         TEST_USER_NAME: jovyan
@@ -311,7 +311,7 @@ jobs:
           type=registry,ref=${{ steps.vars.outputs.renku_base }}
         provenance: false
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
+      uses: cypress-io/github-action@v6
       env:
         TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-cuda:${{ steps.meta.outputs.version }}
         TEST_USER_NAME: jovyan
@@ -487,7 +487,7 @@ jobs:
         cache-to: type=gha
         provenance: false
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
+      uses: cypress-io/github-action@v6
       env:
         TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIA_VERSION }}-${{ steps.vars.outputs.sha_short }}
         TEST_USER_NAME: jovyan
@@ -596,7 +596,7 @@ jobs:
         cache-from: type=gha
         provenance: false
     - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v4
+      uses: cypress-io/github-action@v6
       env:
         TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}:${{ matrix.RVERSION }}-${{ steps.vars.outputs.sha_short }}
         TEST_ENV: rstudio
