@@ -549,6 +549,9 @@ jobs:
           - RVERSION: RELEASE_3_17
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+          - RVERSION: RELEASE_3_18
+            BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+            EXTENSION: bioc
           - RVERSION: devel
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
