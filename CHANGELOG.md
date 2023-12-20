@@ -1,5 +1,5 @@
 
-## [0.21.1](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.21.0...0.21.1) (2023-12-20)
+## [0.22.0](https://github.com/SwissDataScienceCenter/renkulab-docker/compare/0.21.0...0.22.0) (2023-12-20)
 
 This release adds a new Bioconductor version (3.18) and various package updates. It also provides
 images that have patches for the SSH Terrapin vulnerability in the SSH servers.
