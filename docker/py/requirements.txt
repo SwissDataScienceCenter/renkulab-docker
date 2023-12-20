@@ -2,7 +2,7 @@ bleach>5.0.0 # closes #300
 certifi>=2022.12.7 # not directly required, pinned by Snyk to avoid a vulnerability
 Jinja2<3.1 # because of https://github.com/jupyter/nbconvert/issues/1742
 jupyter-server-proxy==4.1.0
-jupyterlab-git==0.44.0
+jupyterlab-git==0.50.0
 jupyterlab-system-monitor~=0.8.0
 mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
 papermill~=2.5.0
