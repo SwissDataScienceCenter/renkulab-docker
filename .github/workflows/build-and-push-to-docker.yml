@@ -549,9 +549,13 @@ jobs:
           - RVERSION: RELEASE_3_17
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
-          - RVERSION: devel
+          - RVERSION: RELEASE_3_18
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+          # NOTE: The devel version of bioconductor uses unstable R so it often breaks or fails to build
+          # - RVERSION: devel
+          #    BASE_IMAGE_NAME: bioconductor/bioconductor_docker
+          #    EXTENSION: bioc
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
