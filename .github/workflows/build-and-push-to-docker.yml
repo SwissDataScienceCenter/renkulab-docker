@@ -105,9 +105,8 @@ jobs:
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
-    # export the default base image for other jobs to use
+    # export the base images for other jobs to use
     - name: Build and export
-      if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
       uses: docker/build-push-action@v5
       with:
         build-args: |
@@ -347,10 +346,12 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        EXTENSION:
-          - vnc
-          - batch
-
+        - EXTENSION: vnc
+          PYTHON_VERSION: "3.10"
+        - EXTENSION: vnc
+          PYTHON_VERSION: "3.11"
+        - EXTENSION: batch
+          PYTHON_VERSION: "3.10"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -364,7 +365,7 @@ jobs:
       run: |
         sha_short=$(git rev-parse --short HEAD)
         echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -375,9 +376,9 @@ jobs:
       with:
         images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
         tags: |
-          type=sha,prefix=
-          type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
+          type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
