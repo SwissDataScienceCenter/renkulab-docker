@@ -346,12 +346,13 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        - EXTENSION: vnc
-          PYTHON_VERSION: "3.10"
-        - EXTENSION: vnc
-          PYTHON_VERSION: "3.11"
-        - EXTENSION: batch
-          PYTHON_VERSION: "3.10"
+        include:
+          - EXTENSION: vnc
+            PYTHON_VERSION: "3.10"
+          - EXTENSION: vnc
+            PYTHON_VERSION: "3.11"
+          - EXTENSION: batch
+            PYTHON_VERSION: "3.10"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
