@@ -366,7 +366,7 @@ jobs:
       run: |
         sha_short=$(git rev-parse --short HEAD)
         echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+        echo "renku_base=${DOCKER_PREFIX}-py:${matrix.PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
