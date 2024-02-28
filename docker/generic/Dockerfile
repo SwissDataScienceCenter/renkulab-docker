@@ -27,6 +27,7 @@ RUN apt-get update --fix-missing && \
     bzip2 \
     ca-certificates \
     curl \
+    git \
     gpg-agent \
     gnupg \
     libglib2.0-0 \
