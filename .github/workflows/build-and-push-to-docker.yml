@@ -267,6 +267,12 @@ jobs:
             CUDA_COMPAT_PACKAGE: "cuda-compat-11-8"
             LIBCUDNN_PACKAGE: "libcudnn8=8.6.0.163-1+cuda11.8"
             ADD_2204_APT_REPOS: "true"
+          - CUDA_VERSION: "12.2"
+            EXTRA_LIBRARIES: ""
+            CUDA_CUDART_PACKAGE: "cuda-cudart-12-2=12.2.140-1"
+            CUDA_COMPAT_PACKAGE: "cuda-compat-12-2"
+            LIBCUDNN_PACKAGE: "libcudnn8=8.9.5.29-1+cuda12.2"
+            ADD_2204_APT_REPOS: "true"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
