@@ -516,8 +516,6 @@ jobs:
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
-    env: 
-      RSTUDIO_VERSION: 2022.02.3-492
     strategy:
       fail-fast: true
       matrix:
