@@ -517,7 +517,7 @@ jobs:
     needs: build-py
     runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - RVERSION: 4.1.0
