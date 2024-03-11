@@ -608,6 +608,7 @@ jobs:
           build-args: |
             RENKU_BASE=${{ steps.vars.outputs.renku_base }}
             BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+            RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
           context: docker/r
           labels: ${{ steps.meta.outputs.labels }}
           load: true
