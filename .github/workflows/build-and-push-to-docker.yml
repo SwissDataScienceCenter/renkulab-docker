@@ -523,39 +523,51 @@ jobs:
           - RVERSION: 4.1.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.1.1
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.1.2
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.2.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.2.3
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.3.1
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: devel
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_14
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: RELEASE_3_15
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: RELEASE_3_16
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_17
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_18
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           # NOTE: The devel version of bioconductor uses unstable R so it often breaks or fails to build
           # - RVERSION: devel
           #    BASE_IMAGE_NAME: bioconductor/bioconductor_docker
