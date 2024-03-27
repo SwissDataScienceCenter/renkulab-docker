@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@renku/notebooks-cypress-tests": "^0.0.7",
+    "@renku/notebooks-cypress-tests": "^0.0.10",
     "@types/node": "^18.7.18",
     "axios": "^1.6.0",
     "axios-cookiejar-support": "^4.0.3",
