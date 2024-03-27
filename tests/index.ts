@@ -63,7 +63,7 @@ describe(`Starting container with image ${imageName} and name ${containerName}`,
       configFile: "cypress.config.ts",
       browser: "chrome"
     })
-    assert_(!results.totalFailed, `Tests failed with errors on chrome.`)
+    assert_(results.status !== 'failed' && !results.totalFailed, `Tests failed with errors on chrome.`)
   });
   after(async function () {
     console.log(`Stopping container with image ${imageName} and name ${containerName}`)
