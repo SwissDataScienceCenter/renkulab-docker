@@ -1,6 +1,6 @@
 import {
   rstudioTestFuncs,
-  registerCustomCommands,
+  registerCustomCommands,validateLogin
 } from "@renku/notebooks-cypress-tests";
 
 const username = Cypress.env("USERNAME");
@@ -8,8 +8,6 @@ const password = Cypress.env("PASSWORD");
 const url_or_path = Cypress.env("URL");
 const url =
   url_or_path.slice(-1) === "/" ? url_or_path.slice(0, -1) : url_or_path;
-
-console.log({ url });
 
 describe("Basic Rstudio functionality", () => {
   before(() => {
@@ -23,20 +21,10 @@ describe("Basic Rstudio functionality", () => {
         cy.renkuLoginIfRequired(username, password);
       },
       {
-        validate() {
-          cy.url().then((url) => {
-            if (
-              url.includes("realms/Renku/protocol/openid-connect") &&
-              username.length > 0 &&
-              password.length > 0
-            ) {
-              return false;
-            }
-          });
-        },
+        validate: () => validateLogin(username, password),
       }
     );
-    cy.visit(url);
+    cy.visit(url);cy.wait(100)
   });
   it("Successfully loads", rstudioTestFuncs.findExpectedElements);
   it("Can launch a terminal", rstudioTestFuncs.launchTerminal);
