@@ -102,7 +102,7 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     cat /renku/bashrc >> $HOME/.bashrc && \
     echo "source ~/.bashrc" >> ~/.bash_profile
 
-RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.0.1"
+RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.2.0"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
