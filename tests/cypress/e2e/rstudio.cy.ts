@@ -1,6 +1,7 @@
 import {
   rstudioTestFuncs,
-  registerCustomCommands,validateLogin
+  registerCustomCommands,
+  validateLogin,
 } from "@renku/notebooks-cypress-tests";
 
 const username = Cypress.env("USERNAME");
@@ -24,7 +25,8 @@ describe("Basic Rstudio functionality", () => {
         validate: () => validateLogin(username, password),
       }
     );
-    cy.visit(url);cy.wait(100)
+    cy.visit(url);
+    cy.wait(100);
   });
   it("Successfully loads", rstudioTestFuncs.findExpectedElements);
   it("Can launch a terminal", rstudioTestFuncs.launchTerminal);
