@@ -21,8 +21,8 @@ RUN python3 -m pip install --no-cache-dir -U pip && \
     rm -rf "/home/${NB_USER}/.cache"
 
 # jupyter sets channel priority to strict which often causes very long error messages
-RUN mamba config --system --set channel_priority flexible && \
-    mamba clean --all -f -y
+RUN conda config --system --set channel_priority flexible && \
+    conda clean --all -f -y
 
 COPY renku-requirements/requirements.txt /tmp/renku-requirements.txt
 
