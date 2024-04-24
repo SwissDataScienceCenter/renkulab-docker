@@ -56,10 +56,15 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        BASE_PYTHON_VERSION:
-          - "3.10"
-          - "3.9"
-          - "3.8"
+        include:
+        - BASE_PYTHON_VERSION: "3.11"
+          REGISTRY: quay.io
+        - BASE_PYTHON_VERSION: "3.10"
+          REGISTRY: docker.io
+        - BASE_PYTHON_VERSION: "3.9"
+          REGISTRY: docker.io
+        - BASE_PYTHON_VERSION: "3.8"
+          REGISTRY: docker.io
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
@@ -83,7 +88,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         build-args: |
-          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
+          BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
         cache-from: type=gha
         cache-to: type=gha,mode=max
         context: docker/py
@@ -100,13 +105,12 @@ jobs:
       with:
         working-directory: tests
         command: npx mocha -r ts-node/register index.ts
-    # export the default base image for other jobs to use
+    # export the base images for other jobs to use
     - name: Build and export
-      if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
       uses: docker/build-push-action@v5
       with:
         build-args: |
-            BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+            BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
         cache-from: type=gha
         context: docker/py
         labels: ${{ steps.meta.outputs.labels }}
@@ -348,24 +352,25 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        EXTENSION:
-          - vnc
-          - batch
-
+        include:
+          - EXTENSION: vnc
+            PYTHON_VERSION: "3.10"
+          - EXTENSION: vnc
+            PYTHON_VERSION: "3.11"
+          - EXTENSION: batch
+            PYTHON_VERSION: "3.10"
     steps:
     - name: Docker Login
       uses: Azure/docker-login@v1
       with:
         username: ${{ secrets.RENKU_DOCKER_USERNAME }}
         password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
     - uses: actions/checkout@v4
     - name: Set outputs
       id: vars
       run: |
         sha_short=$(git rev-parse --short HEAD)
         echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
     - name: Set up QEMU
       uses: docker/setup-qemu-action@v3.0.0
     - name: Set up Docker Buildx
@@ -376,14 +381,14 @@ jobs:
       with:
         images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
         tags: |
-          type=sha,prefix=
-          type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
+          type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
+          type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
+          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
     - name: Build and push
       uses: docker/build-push-action@v5
       with:
         build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          RENKU_BASE=${{ env.DOCKER_PREFIX }}-py:${{ matrix.PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
         context: docker/${{ matrix.EXTENSION }}
         labels: ${{ steps.meta.outputs.labels }}
         push: true
@@ -428,7 +433,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         build-args: |
-          BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ steps.vars.outputs.sha_short }}
+          BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ env.DEFAULT_PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
         context: docker/${{ matrix.VNC-EXTENSION }}
         labels: ${{ steps.meta.outputs.labels }}
         push: true
