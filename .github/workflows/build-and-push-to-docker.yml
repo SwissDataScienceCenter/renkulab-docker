@@ -395,6 +395,7 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         cache-from: type=gha
         provenance: false
+        platforms: linux/amd64,linux/arm64
         
   build-vnc-ext:
     needs: build-py-ext
