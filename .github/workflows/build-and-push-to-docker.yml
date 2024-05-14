@@ -71,52 +71,51 @@ jobs:
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-py
-        tags: |
-          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    # export the base images for other jobs to use
-    - name: Build and export
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-py
+          tags: |
+            type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
             BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
-        cache-from: type=gha
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
+          TEST_USER_NAME: jovyan
+          TEST_SPEC: jupyterlab.cy.ts
+        with:
+          working-directory: tests
+          command: npx mocha -r ts-node/register index.ts
+      # export the base images for other jobs to use
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+              BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+          cache-from: type=gha
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
 
   build-py-homedir-env:
     needs: lint
@@ -360,41 +359,41 @@ jobs:
           - EXTENSION: batch
             PYTHON_VERSION: "3.10"
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v4
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
-        tags: |
-          type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ env.DOCKER_PREFIX }}-py:${{ matrix.PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
-        context: docker/${{ matrix.EXTENSION }}
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
+          tags: |
+            type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ env.DOCKER_PREFIX }}-py:${{ matrix.PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
+          context: docker/${{ matrix.EXTENSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
 
   build-vnc-ext:
     needs: build-py-ext
@@ -406,40 +405,40 @@ jobs:
           - matlab
           - qgis
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - uses: actions/checkout@v4
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
-        tags: |
-          type=sha,prefix=
-          type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ env.DEFAULT_PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
-        context: docker/${{ matrix.VNC-EXTENSION }}
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
+          tags: |
+            type=sha,prefix=
+            type=semver,pattern={{version}},prefix=
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ env.DEFAULT_PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
+          context: docker/${{ matrix.VNC-EXTENSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
 
   build-julia-ext:
     needs: build-py
