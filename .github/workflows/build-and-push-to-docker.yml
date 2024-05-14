@@ -33,21 +33,21 @@ jobs:
       fail-fast: true
       matrix:
         DOCKERFILE_PATH:
-        - docker/py/Dockerfile
-        - docker/r/Dockerfile
-        - docker/cuda/Dockerfile
-        - docker/vnc/Dockerfile
-        - docker/matlab/Dockerfile
-        - docker/julia/Dockerfile
-        - docker/batch/Dockerfile
-        - docker/qgis/Dockerfile
+          - docker/py/Dockerfile
+          - docker/r/Dockerfile
+          - docker/cuda/Dockerfile
+          - docker/vnc/Dockerfile
+          - docker/matlab/Dockerfile
+          - docker/julia/Dockerfile
+          - docker/batch/Dockerfile
+          - docker/qgis/Dockerfile
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - uses: hadolint/hadolint-action@v3.1.0
-      with:
-        dockerfile: ${{ matrix.DOCKERFILE_PATH }}
-        config: .hadolint.yaml
+      - uses: actions/checkout@v4
+      - uses: hadolint/hadolint-action@v3.1.0
+        with:
+          dockerfile: ${{ matrix.DOCKERFILE_PATH }}
+          config: .hadolint.yaml
 
   build-py:
     needs: lint
@@ -66,58 +66,57 @@ jobs:
         - BASE_PYTHON_VERSION: "3.8"
           REGISTRY: docker.io
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-py
-        tags: |
-          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    # export the base images for other jobs to use
-    - name: Build and export
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-py
+          tags: |
+            type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
             BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
-        cache-from: type=gha
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
-  
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py:${{ steps.meta.outputs.version }}
+          TEST_USER_NAME: jovyan
+          TEST_SPEC: jupyterlab.cy.ts
+        with:
+          working-directory: tests
+          command: npx mocha -r ts-node/register index.ts
+      # export the base images for other jobs to use
+      - name: Build and export
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+              BASE_IMAGE=${{ matrix.REGISTRY }}/jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+          cache-from: type=gha
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
+
   build-py-homedir-env:
     needs: lint
     runs-on: ubuntu-latest
@@ -130,61 +129,61 @@ jobs:
           - "3.9"
           - "3.8"
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-py-homedir-envs
-        tags: |
-          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}      
-          CONDA_ENVS_DIRS=/home/jovyan/work/envs
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py-homedir-envs:${{ steps.meta.outputs.version }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    # export the default base image for other jobs to use
-    - name: Build and export
-      if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-py-homedir-envs
+          tags: |
+            type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }}
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
             BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
             CONDA_ENVS_DIRS=/home/jovyan/work/envs
-        cache-from: type=gha
-        context: docker/py
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-py-homedir-envs:${{ steps.meta.outputs.version }}
+          TEST_USER_NAME: jovyan
+          TEST_SPEC: jupyterlab.cy.ts
+        with:
+          working-directory: tests
+          command: npx mocha -r ts-node/register index.ts
+      # export the default base image for other jobs to use
+      - name: Build and export
+        if: matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+            CONDA_ENVS_DIRS=/home/jovyan/work/envs
+          cache-from: type=gha
+          context: docker/py
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
 
   build-py-multiarch:
     needs: build-py
@@ -198,38 +197,38 @@ jobs:
           - "3.9"
           - "3.8"
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-py
-        tags: |
-          type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }} 
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        context: docker/py
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-to: type=gha,mode=max
-        cache-from: type=gha
-        build-args: |
-          BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}   
-        platforms: linux/amd64,linux/arm64
-        provenance: false
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-py
+          tags: |
+            type=sha,prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.BASE_PYTHON_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.BASE_PYTHON_VERSION == env.DEFAULT_PYTHON_VERSION }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: docker/py
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-to: type=gha,mode=max
+          cache-from: type=gha
+          build-args: |
+            BASE_IMAGE=jupyter/base-notebook:python-${{ matrix.BASE_PYTHON_VERSION }}
+          platforms: linux/amd64,linux/arm64
+          provenance: false
 
   build-cuda:
     needs: build-py
@@ -278,73 +277,73 @@ jobs:
             LIBCUDNN_PACKAGE: "libcudnn8=8.9.5.29-1+cuda12.2"
             ADD_2204_APT_REPOS: "true"
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v4
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-cuda
-        tags: |
-          type=sha,prefix=${{ matrix.CUDA_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CUDA_VERSION == '11.7' }}
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
-          CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }} 
-          CUDA_VERSION=${{ matrix.CUDA_VERSION }}
-          EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
-          LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
-          ADD_2204_APT_REPOS=${{ matrix.ADD_2204_APT_REPOS }}
-        context: docker/cuda
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: |
-          type=inline
-          type=registry,ref=${{ steps.vars.outputs.renku_base }}
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-cuda:${{ steps.meta.outputs.version }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
-          CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }} 
-          CUDA_VERSION=${{ matrix.CUDA_VERSION }}
-          EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }} 
-          LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }} 
-        context: docker/cuda
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        provenance: false
-        
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-cuda
+          tags: |
+            type=sha,prefix=${{ matrix.CUDA_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.CUDA_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CUDA_VERSION == '11.7' }}
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+            CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
+            CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }}
+            CUDA_VERSION=${{ matrix.CUDA_VERSION }}
+            EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
+            LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
+            ADD_2204_APT_REPOS=${{ matrix.ADD_2204_APT_REPOS }}
+          context: docker/cuda
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: |
+            type=inline
+            type=registry,ref=${{ steps.vars.outputs.renku_base }}
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-cuda:${{ steps.meta.outputs.version }}
+          TEST_USER_NAME: jovyan
+          TEST_SPEC: jupyterlab.cy.ts
+        with:
+          working-directory: tests
+          command: npx mocha -r ts-node/register index.ts
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+            CUDA_COMPAT_PACKAGE=${{ matrix.CUDA_COMPAT_PACKAGE }}
+            CUDA_CUDART_PACKAGE=${{ matrix.CUDA_CUDART_PACKAGE }}
+            CUDA_VERSION=${{ matrix.CUDA_VERSION }}
+            EXTRA_LIBRARIES=${{ matrix.EXTRA_LIBRARIES }}
+            LIBCUDNN_PACKAGE=${{ matrix.LIBCUDNN_PACKAGE }}
+          context: docker/cuda
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          provenance: false
+
   build-py-ext:
     needs: build-py
     runs-on: ubuntu-latest
@@ -360,43 +359,43 @@ jobs:
           - EXTENSION: batch
             PYTHON_VERSION: "3.10"
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - uses: actions/checkout@v4
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
-        tags: |
-          type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ env.DOCKER_PREFIX }}-py:${{ matrix.PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
-        context: docker/${{ matrix.EXTENSION }}
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
-        platforms: linux/amd64,linux/arm64
-        
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
+          tags: |
+            type=sha,prefix=${{ matrix.PYTHON_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.PYTHON_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=${{ matrix.PYTHON_VERSION }}-
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ env.DOCKER_PREFIX }}-py:${{ matrix.PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
+          context: docker/${{ matrix.EXTENSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
+          platforms: linux/amd64,linux/arm64
+
   build-vnc-ext:
     needs: build-py-ext
     runs-on: ubuntu-latest
@@ -407,41 +406,41 @@ jobs:
           - matlab
           - qgis
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - uses: actions/checkout@v4
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
-        tags: |
-          type=sha,prefix=
-          type=semver,pattern={{version}},prefix=
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ env.DEFAULT_PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
-        context: docker/${{ matrix.VNC-EXTENSION }}
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
-    
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-${{ matrix.VNC-EXTENSION }}
+          tags: |
+            type=sha,prefix=
+            type=semver,pattern={{version}},prefix=
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }},prefix=
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            BASE_IMAGE=${{ env.DOCKER_PREFIX }}-vnc:${{ env.DEFAULT_PYTHON_VERSION }}-${{ steps.vars.outputs.sha_short }}
+          context: docker/${{ matrix.VNC-EXTENSION }}
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
+
   build-julia-ext:
     needs: build-py
     runs-on: ubuntu-latest
@@ -449,189 +448,199 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
-        include: 
+        include:
           - JULIA_VERSION: "1.7.1"
             JULIA_CHECKSUM: "44658e9c7b45e2b9b5b59239d190cca42de05c175ea86bc346c294a8fe8d9f11"
           - JULIA_VERSION: "1.8.5"
             JULIA_CHECKSUM: "e71a24816e8fe9d5f4807664cbbb42738f5aa9fe05397d35c81d4c5d649b9d05"
           - JULIA_VERSION: "1.9.0"
             JULIA_CHECKSUM: "00c614466ef9809c2eb23480e38d196a2c577fff2730c4f83d135b913d473359"
-        
-    steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v4
-    - name: Set up QEMU
-      uses: docker/setup-qemu-action@v3.0.0
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-julia
-        tags: |
-          type=sha,prefix=${{ matrix.JULIA_VERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.JULIA_VERSION == '1.9.0' }}
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          JULIA_VERSION_ARG=${{ matrix.JULIA_VERSION }}
-          JULIA_CHECKSUM=${{ matrix.JULIA_CHECKSUM }}
-        context: docker/julia
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        cache-to: type=gha
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIA_VERSION }}-${{ steps.vars.outputs.sha_short }}
-        TEST_USER_NAME: jovyan
-        TEST_SPEC: jupyterlab.cy.ts
-      with:
-        working-directory: tests
-        command: npx mocha -r ts-node/register index.ts
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-        context: docker/julia
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
-        
+    steps:
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+
+      - uses: actions/checkout@v4
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.0.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-julia
+          tags: |
+            type=sha,prefix=${{ matrix.JULIA_VERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.JULIA_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.JULIA_VERSION == '1.9.0' }}
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+            JULIA_VERSION_ARG=${{ matrix.JULIA_VERSION }}
+            JULIA_CHECKSUM=${{ matrix.JULIA_CHECKSUM }}
+          context: docker/julia
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          cache-to: type=gha
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${DOCKER_PREFIX}-julia:${{ matrix.JULIA_VERSION }}-${{ steps.vars.outputs.sha_short }}
+          TEST_USER_NAME: jovyan
+          TEST_SPEC: jupyterlab.cy.ts
+        with:
+          working-directory: tests
+          command: npx mocha -r ts-node/register index.ts
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+          context: docker/julia
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
+
   build-r-ubuntu:
     needs: build-py
     runs-on: ubuntu-latest
-    env: 
-      RSTUDIO_VERSION: 2022.02.3-492
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         include:
           - RVERSION: 4.1.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.1.1
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.1.2
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.2.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.2.3
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.3.1
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: devel
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_14
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: RELEASE_3_15
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: RELEASE_3_16
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_17
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           - RVERSION: RELEASE_3_18
             BASE_IMAGE_NAME: bioconductor/bioconductor_docker
             EXTENSION: bioc
+            RSTUDIO_VERSION: 2023.12.1+402
           # NOTE: The devel version of bioconductor uses unstable R so it often breaks or fails to build
           # - RVERSION: devel
           #    BASE_IMAGE_NAME: bioconductor/bioconductor_docker
           #    EXTENSION: bioc
     steps:
-    - name: Docker Login
-      uses: Azure/docker-login@v1
-      with:
-        username: ${{ secrets.RENKU_DOCKER_USERNAME }}
-        password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
+      - name: Docker Login
+        uses: Azure/docker-login@v1
+        with:
+          username: ${{ secrets.RENKU_DOCKER_USERNAME }}
+          password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
 
-    - uses: actions/checkout@v4
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    - name: Set outputs
-      id: vars
-      run: |
-        sha_short=$(git rev-parse --short HEAD)
-        echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-        echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
-    - name: Docker meta
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
-        tags: |
-          type=sha,prefix=${{ matrix.RVERSION }}-
-          type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
-          type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
-    - name: Clean cache
-      run: |
-        df -h
-        rm -rf /opt/hostedtoolcache/*
-        df -h
-    - name: Build and load
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
-          RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
-        context: docker/r
-        labels: ${{ steps.meta.outputs.labels }}
-        load: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
-    - name: Image Acceptance Tests
-      uses: cypress-io/github-action@v6
-      env:
-        TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}:${{ matrix.RVERSION }}-${{ steps.vars.outputs.sha_short }}
-        TEST_ENV: rstudio
-        TEST_USER_NAME: rstudio
-        TEST_SPEC: rstudio.cy.ts
-      with:
-        working-directory: tests
-        start: docker images
-        command: npx mocha -r ts-node/register index.ts
-    - name: Build and push
-      uses: docker/build-push-action@v5
-      with:
-        build-args: |
-          RENKU_BASE=${{ steps.vars.outputs.renku_base }}
-          BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
-          RSTUDIO_VERSION_OVERRIDE=${{ env.RSTUDIO_VERSION }}
-        context: docker/r
-        labels: ${{ steps.meta.outputs.labels }}
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        cache-from: type=gha
-        provenance: false
+      - uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-py:${DEFAULT_PYTHON_VERSION}-${sha_short}" >> $GITHUB_OUTPUT
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}
+          tags: |
+            type=sha,prefix=${{ matrix.RVERSION }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.RVERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.RVERSION == 'devel' }}
+      - name: Clean cache
+        run: |
+          df -h
+          rm -rf /opt/hostedtoolcache/*
+          df -h
+      - name: Build and load
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+            BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+            RSTUDIO_VERSION_OVERRIDE=${{ matrix.RSTUDIO_VERSION }}
+          context: docker/r
+          labels: ${{ steps.meta.outputs.labels }}
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
+      - name: Image Acceptance Tests
+        uses: cypress-io/github-action@v6
+        env:
+          TEST_IMAGE_NAME: ${{ env.DOCKER_PREFIX }}-${{ matrix.EXTENSION }}:${{ matrix.RVERSION }}-${{ steps.vars.outputs.sha_short }}
+          TEST_ENV: rstudio
+          TEST_USER_NAME: rstudio
+          TEST_SPEC: rstudio.cy.ts
+        with:
+          working-directory: tests
+          start: docker images
+          command: npx mocha -r ts-node/register index.ts
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          build-args: |
+            RENKU_BASE=${{ steps.vars.outputs.renku_base }}
+            BASE_IMAGE=${{ matrix.BASE_IMAGE_NAME }}:${{ matrix.RVERSION }}
+            RSTUDIO_VERSION_OVERRIDE=${{ matrix.RSTUDIO_VERSION }}
+          context: docker/r
+          labels: ${{ steps.meta.outputs.labels }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          cache-from: type=gha
+          provenance: false
