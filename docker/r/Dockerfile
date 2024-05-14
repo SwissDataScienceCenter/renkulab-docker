@@ -32,7 +32,7 @@ RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron.site && \
 ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
 
 # pin the version of RStudio
-ARG RSTUDIO_VERSION_OVERRIDE="2023.06.0-421"
+ARG RSTUDIO_VERSION_OVERRIDE="2023.12.1-402"
 ENV RSTUDIO_VERSION=${RSTUDIO_VERSION_OVERRIDE}
 # if rstudio and rstudio-server users are not deleted below, the installation
 # script fails when it installs rstudio and tries to add them back in
@@ -102,7 +102,7 @@ RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     cat /renku/bashrc >> $HOME/.bashrc && \
     echo "source ~/.bashrc" >> ~/.bash_profile
 
-RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.0.1"
+RUN pip install --no-cache-dir "jupyter-rsession-proxy==2.2.0"
 
 # install IRKernel
 RUN R --quiet -e "install.packages('IRkernel')" && \
