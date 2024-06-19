@@ -38,6 +38,7 @@ jobs:
           - docker/cuda/Dockerfile
           - docker/vnc/Dockerfile
           - docker/matlab/Dockerfile
+          - docker/matlab-jupyter/Dockerfile
           - docker/julia/Dockerfile
           - docker/batch/Dockerfile
           - docker/qgis/Dockerfile
@@ -357,6 +358,8 @@ jobs:
           - EXTENSION: vnc
             PYTHON_VERSION: "3.11"
           - EXTENSION: batch
+            PYTHON_VERSION: "3.10"
+          - EXTENSION: matlab-jupyter
             PYTHON_VERSION: "3.10"
     steps:
       - name: Docker Login
