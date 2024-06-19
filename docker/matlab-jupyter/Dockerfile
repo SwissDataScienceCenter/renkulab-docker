@@ -44,7 +44,9 @@ RUN apt-get update --fix-missing && \
     curl -L -s https://github.com/git-lfs/git-lfs/releases/download/v3.3.0/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -o /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz && \
     tar -zxvf /tmp/git-lfs-linux-"$(dpkg --print-architecture)"-v3.3.0.tar.gz -C /tmp && \
     /tmp/git-lfs-3.3.0/install.sh && \
-    rm -rf /tmp/git-lfs*
+    rm -rf /tmp/git-lfs* && \
+    curl -L -o /usr/bin/mpm -s https://www.mathworks.com/mpm/glnxa64/mpm && \
+    chmod a+x /usr/bin/mpm
 
 # inject the renku-jupyter stack
 COPY --from=renku_base /opt/conda /opt/conda
@@ -55,6 +57,8 @@ COPY --from=renku_base /renku/bashrc /renku/bashrc
 
 # set permissions of the R library directory to be editable by NB_USER
 RUN chown 1000:100 /opt/conda && \
+    mkdir /usr/share/matlab && \
+    chown 1000:1000 /usr/share/matlab && \
     # this hack lets some of the setup from the base renku image work here
     ln -s /home/${NB_USER} /home/jovyan
 
