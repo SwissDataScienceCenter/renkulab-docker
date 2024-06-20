@@ -57,8 +57,7 @@ COPY --from=renku_base /renku/bashrc /renku/bashrc
 
 # set permissions of the R library directory to be editable by NB_USER
 RUN chown 1000:100 /opt/conda && \
-    mkdir /usr/share/matlab && \
-    chown 1000:1000 /usr/share/matlab && \
+    chown -R 1000:1000 /opt/matlab/R2024a && \
     # this hack lets some of the setup from the base renku image work here
     ln -s /home/${NB_USER} /home/jovyan
 
@@ -68,9 +67,8 @@ USER ${NB_USER}
 RUN echo ". ${CONDA_PATH}/etc/profile.d/conda.sh" >> ~/.bashrc && \
     echo "conda activate base" >> ~/.bashrc && \
     cat /renku/bashrc >> $HOME/.bashrc && \
-    echo "source ~/.bashrc" >> ~/.bash_profile
-
-RUN pip install --no-cache-dir "jupyter-matlab-proxy"
+    echo "source ~/.bashrc" >> ~/.bash_profile && \
+    pip install --no-cache-dir "jupyter-matlab-proxy"
 
 ENTRYPOINT [ "/tini", "--", "/entrypoint.sh" ]
 CMD [ "jupyter", "server", "--ip", "0.0.0.0" ]
