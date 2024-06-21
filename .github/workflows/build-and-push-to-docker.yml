@@ -68,7 +68,7 @@ jobs:
           REGISTRY: docker.io
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -131,7 +131,7 @@ jobs:
           - "3.8"
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -199,7 +199,7 @@ jobs:
           - "3.8"
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -279,7 +279,7 @@ jobs:
             ADD_2204_APT_REPOS: "true"
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -360,7 +360,7 @@ jobs:
             PYTHON_VERSION: "3.10"
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -409,7 +409,7 @@ jobs:
             PYTHON_VERSION: "3.11"
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -456,7 +456,7 @@ jobs:
           - qgis
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -507,7 +507,7 @@ jobs:
 
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
@@ -628,7 +628,7 @@ jobs:
           #    EXTENSION: bioc
     steps:
       - name: Docker Login
-        uses: Azure/docker-login@v1
+        uses: Azure/docker-login@v2
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
