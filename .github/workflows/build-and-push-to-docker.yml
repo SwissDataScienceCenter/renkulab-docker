@@ -574,6 +574,10 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - RVERSION: 4.0.2
+            BASE_IMAGE_NAME: rocker/verse
+            EXTENSION: r
+            RSTUDIO_VERSION: 2023.03.2+454
           - RVERSION: 4.1.0
             BASE_IMAGE_NAME: rocker/verse
             EXTENSION: r
