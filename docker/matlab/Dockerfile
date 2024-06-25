@@ -10,7 +10,7 @@ ARG BASE_IMAGE=renku/renkulab-vnc:latest
 
 # Replace "mathworks/matlab" with any Docker image that contains MATLAB
 # MATLAB should be available on the path in the Docker image
-FROM mathworks/matlab:r2021b AS matlab-install-stage
+FROM mathworks/matlab:r2023b AS matlab-install-stage
 ARG BASE_ML_INSTALL_LOC
 
 # Run code to locate a MATLAB install in the base image and softlink
