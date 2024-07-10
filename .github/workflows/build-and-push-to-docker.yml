@@ -74,7 +74,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -137,7 +137,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -205,7 +205,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -371,7 +371,7 @@ jobs:
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -420,7 +420,7 @@ jobs:
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -514,7 +514,7 @@ jobs:
 
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.0.0
+        uses: docker/setup-qemu-action@v3.1.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Set outputs
