@@ -3,7 +3,6 @@ certifi>=2022.12.7 # not directly required, pinned by Snyk to avoid a vulnerabil
 Jinja2<3.1 # because of https://github.com/jupyter/nbconvert/issues/1742
 jupyter-server-proxy==4.2.0
 jupyterlab-git==0.50.1
-jupyterlab-system-monitor~=0.8.0
 mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
 papermill~=2.6.0
 requests>=2.20.0
