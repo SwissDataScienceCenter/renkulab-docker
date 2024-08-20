@@ -68,8 +68,7 @@ RUN chmod +x /home/jovyan/Desktop/gitk.desktop && \
 # Install the jupyter extensions
 USER ${NB_USER}
 
-RUN mamba install -y jupyter-server-proxy numpy websockify -c conda-forge \
-    && jupyter labextension install @jupyterlab/server-proxy \
+RUN mamba install -y numpy websockify -c conda-forge \
     && mamba clean -y --all
 
 COPY jupyter_notebook_config.py /home/jovyan/.jupyter/jupyter_notebook_config.py
