@@ -167,6 +167,13 @@ batch: py
 		-t $(DOCKER_PREFIX)-batch:$(EXTRA_DOCKER_LABEL) \
 		$(BUILDX_EXTRA_FLAGS)
 
+matlab-jupyter: py
+	docker $(BUILD_CMD) docker/matlab-jupyter \
+		--build-arg RENKU_BASE="$(RENKU_BASE)" \
+		--build-arg BASE_IMAGE=mathworks/matlab:r2024a \
+		-t $(DOCKER_PREFIX)-matlab-jupyter:$(EXTRA_DOCKER_LABEL) \
+		$(BUILDX_EXTRA_FLAGS)
+
 bioc: py
 	docker $(BUILD_CMD) docker/r \
 		--build-arg RENKU_BASE="$(RENKU_BASE)" \
