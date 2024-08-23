@@ -10,6 +10,26 @@ const url_or_path = Cypress.env("URL");
 const url =
   url_or_path.slice(-1) === "/" ? url_or_path.slice(0, -1) : url_or_path;
 
+const makeFileWithTerminal_ = (fname: string) => () => {
+  cy.get(".xterm-helper-textarea").click().type(`touch ${fname}{enter}`);
+  cy.get("#filebrowser > .jp-Toolbar")
+    .find('[title="Refresh the file browser."]')
+    .click();
+  cy.get("#filebrowser .jp-DirListing-content")
+    .should("be.visible")
+    .should("contain.text", "new-file.txt");
+};
+
+const removeFileWithTerminal_ = (fname: string) => () => {
+  cy.get(".xterm-helper-textarea").click().type(`rm ${fname}{enter}`);
+  cy.get("#filebrowser > .jp-Toolbar")
+    .find('[title="Refresh the file browser."]')
+    .click();
+  cy.get("#filebrowser .jp-DirListing-content")
+    .should("be.visible")
+    .should("not.contain.text", "new-file.txt");
+};
+
 describe("Test jupyter notebook", () => {
   before(() => {
     registerCustomCommands();
@@ -32,11 +52,11 @@ describe("Test jupyter notebook", () => {
   it("Can launch a terminal", jupyterlabTestFuncs.launchTerminal);
   it(
     "Can run terminal command to create a file",
-    jupyterlabTestFuncs.makeFileWithTerminal("new-file.txt")
+    makeFileWithTerminal_("new-file.txt")
   );
   it(
     "Can remove the file",
-    jupyterlabTestFuncs.removeFileWithTerminal("new-file.txt")
+    removeFileWithTerminal_("new-file.txt")
   );
   it("Can close the terminal", jupyterlabTestFuncs.closeTerminal);
   it(
