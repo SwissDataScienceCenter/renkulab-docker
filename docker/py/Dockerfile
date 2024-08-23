@@ -14,9 +14,8 @@ RUN sed -i '/nodejs/d' /opt/conda/conda-meta/pinned
 # switch to the notebook user
 USER $NB_USER
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
-COPY requirements.txt /tmp/requirements.txt
-RUN python3 -m pip install --no-cache-dir -U pip && \
-    python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
+COPY environment.yml /tmp/environment.yml
+RUN mamba env update -q -f /tmp/environment.yml && \
     jupyter labextension disable "@jupyterlab/apputils-extension:announcements" && \
     rm -rf "/home/${NB_USER}/.cache"
 
