@@ -2,12 +2,11 @@ name: base
 channels:
   - conda-forge
 dependencies:
-  - jupyterlab~=4.0
   - bleach>5.0.0 # closes #300
   - certifi>=2022.12.7 # not directly required, pinned by Snyk to avoid a vulnerability
   - Jinja2<3.1 # because of https://github.com/jupyter/nbconvert/issues/1742
   - jupyter-server-proxy==4.3.0
-  - jupyterlab~=4.0
+  - jupyterlab>4.0,<5.0
   - jupyterlab-git==0.50.1
   - mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
   - papermill~=2.6.0
