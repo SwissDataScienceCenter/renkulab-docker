@@ -14,9 +14,8 @@ RUN sed -i '/nodejs/d' /opt/conda/conda-meta/pinned
 # switch to the notebook user
 USER $NB_USER
 # install jupyterlab, papermill, git extension and renku-jupyterlab-ts
-COPY requirements.txt /tmp/requirements.txt
-RUN python3 -m pip install --no-cache-dir -U pip && \
-    python3 -m pip install --no-cache-dir -r /tmp/requirements.txt && \
+COPY environment.yml /tmp/environment.yml
+RUN mamba env update -f /tmp/environment.yml && \
     jupyter labextension disable "@jupyterlab/apputils-extension:announcements" && \
     rm -rf "/home/${NB_USER}/.cache"
 
@@ -81,7 +80,7 @@ RUN mkdir -p "$HOME/.ssh" && \
 # configure bash and shell prompt
 ENV PATH=$HOME/.local/bin:$PATH:$HOME/.renku/bin
 COPY --chown=1000:100 bashrc /renku/
-RUN cat "/renku/bashrc" >> "${HOME}/.bashrc" 
+RUN cat "/renku/bashrc" >> "${HOME}/.bashrc"
 
 COPY entrypoint.sh /entrypoint.sh
 
@@ -97,7 +96,8 @@ COPY sshd_config /opt/ssh/sshd_config
 
 RUN chown -R 0:100 /opt/ssh/ && \
     chmod -R u=rwX,g=rX,o= /opt/ssh && \
-    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid
+    chmod -R u=rwX,g=rwX,o= /opt/ssh/pid && \
+    rm -rf /opt/conda
 
 ENTRYPOINT [ "tini", "--", "/entrypoint.sh" ]
 
