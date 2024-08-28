@@ -40,7 +40,7 @@ updates:
 # python dependencies
 #
 
-- package-ecosystem: "conda"
+- package-ecosystem: "pip"
   directory: "/docker/py"
   schedule:
     interval: daily
