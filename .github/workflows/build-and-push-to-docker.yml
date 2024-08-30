@@ -193,6 +193,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        include:
         - BASE_PYTHON_VERSION: "3.11"
           REGISTRY: quay.io
         - BASE_PYTHON_VERSION: "3.10"
