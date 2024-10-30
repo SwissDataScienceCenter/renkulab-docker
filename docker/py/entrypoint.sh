@@ -58,7 +58,7 @@ jupyter() {
 
 if [[ -v RENKU_BASE_URL_PATH ]];
 then
-    set -- "$@" "--ServerApp.ip=0.0.0.0" "--ServerApp.port=8888" "--ServerApp.base_url=$RENKU_BASE_URL_PATH"\
+    set -- "$@" "--ServerApp.port=8888" "--ServerApp.base_url=$RENKU_BASE_URL_PATH"\
         "--ServerApp.token=\"\"" "--ServerApp.password=\"\"" "--ServerApp.allow_remote_access=true"\
         " --ContentsManager.allow_hidden=true" "--ServerApp.allow_origin=*"
 fi
