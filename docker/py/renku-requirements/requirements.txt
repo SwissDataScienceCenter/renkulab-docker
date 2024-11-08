@@ -1,4 +1,4 @@
 renku==2.8.0
 pip==24.2
 setuptools>=65.5.1
-wheel==0.44.0
+wheel==0.45.0
