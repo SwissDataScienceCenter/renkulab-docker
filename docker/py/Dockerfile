@@ -55,7 +55,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     lmodern \
     musl-dev \
     nano \
-    netcat \
+    netcat-traditional \
     rclone \
     unzip \
     vim \
