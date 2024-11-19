@@ -1,7 +1,6 @@
 #!/bin/bash
 
-if [[ -v GIT_AUTHOR_NAME && -v EMAIL && -v CI_PROJECT ]];
-then
+if [[ -v GIT_AUTHOR_NAME && -v EMAIL && -v CI_PROJECT ]]; then
     # Setup git user
     if [ -z "$(git config --global --get user.name)" ]; then
         git config --global user.name "$GIT_AUTHOR_NAME"
@@ -11,8 +10,7 @@ then
     fi
 
     # configure global git credentials
-    if [[ -v CI_PROJECT ]];
-    then
+    if [[ -v CI_PROJECT ]]; then
         # set the global git credentials
         git config --global credential.helper "store --file=/work/${CI_PROJECT}/.git/credentials"
 
@@ -22,7 +20,7 @@ then
 fi
 
 # install git hooks
-renku githooks install > /dev/null 2>&1 || true 
+renku githooks install >/dev/null 2>&1 || true
 
 # run the post-init script in the root directory (i.e. coming from the image)
 if [ -f "/post-init.sh" ]; then
@@ -36,9 +34,9 @@ fi
 
 # inject ssh public keys if any exist
 if [ -f "./.ssh/authorized_keys" ]; then
-    echo >> ~/.ssh/authorized_keys
-    cat ./.ssh/authorized_keys >> ~/.ssh/authorized_keys
-    echo >> ~/.ssh/authorized_keys
+    echo >>~/.ssh/authorized_keys
+    cat ./.ssh/authorized_keys >>~/.ssh/authorized_keys
+    echo >>~/.ssh/authorized_keys
     chmod 600 ~/.ssh/authorized_keys
 fi
 
@@ -47,14 +45,20 @@ fi
 
 # Override the jupyter command to be forward compatible with newer
 # images that no longer launch the whole server with `jupyter notebook`.
-jupyter() { 
-    if [ "$1" = "notebook" ]; 
-    then 
-        shift  
-        $(which jupyter) server $@; 
-    else $(which jupyter) $@; 
-    fi; 
+jupyter() {
+    if [ "$1" = "notebook" ]; then
+        shift
+        $(which jupyter) server "$@"
+    else
+        $(which jupyter) "$@"
+    fi
 }
 
+if [[ -v RENKU_BASE_URL_PATH ]]; then
+    "$@" --ServerApp.port=8888 --ServerApp.base_url="$RENKU_BASE_URL_PATH" \
+        --ServerApp.token="" --ServerApp.password="" --ServerApp.allow_remote_access=true \
+        --ContentsManager.allow_hidden=true --ServerApp.allow_origin=*
+fi
+
 # run the command
-$@
+"$@"
