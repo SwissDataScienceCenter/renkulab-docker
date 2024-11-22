@@ -917,7 +917,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: docker/vscode
-          file: docker/vscode/poetry.Dockerfile
+          file: docker/vscode/R.Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
