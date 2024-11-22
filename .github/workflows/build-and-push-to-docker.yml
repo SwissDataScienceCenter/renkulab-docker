@@ -42,10 +42,10 @@ jobs:
           - docker/julia/Dockerfile
           - docker/batch/Dockerfile
           - docker/qgis/Dockerfile
-          - docker/vscodium/base.Dockerfile
-          - docker/vscodium/conda.Dockerfile
-          - docker/vscodium/poetry.Dockerfile
-          - docker/vscodium/R.Dockerfile
+          - docker/vscode/base.Dockerfile
+          - docker/vscode/conda.Dockerfile
+          - docker/vscode/poetry.Dockerfile
+          - docker/vscode/R.Dockerfile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
