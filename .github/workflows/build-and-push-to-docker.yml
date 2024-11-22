@@ -760,18 +760,18 @@ jobs:
           - CONDA_VERSION: latest
             BASE_DEBIAN_VERSION: bookworm
     steps:
-      - name: Set outputs
-        id: vars
-        run: |
-          sha_short=$(git rev-parse --short HEAD)
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
@@ -823,18 +823,18 @@ jobs:
             POETRY_VERSION: 1.8.4
             LATEST: false
     steps:
-      - name: Set outputs
-        id: vars
-        run: |
-          sha_short=$(git rev-parse --short HEAD)
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
@@ -880,18 +880,18 @@ jobs:
           - R_VERSION: 4.2.3
             LATEST: false
     steps:
-      - name: Set outputs
-        id: vars
-        run: |
-          sha_short=$(git rev-parse --short HEAD)
-          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.RENKU_DOCKER_USERNAME }}
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
+      - name: Set outputs
+        id: vars
+        run: |
+          sha_short=$(git rev-parse --short HEAD)
+          echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
