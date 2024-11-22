@@ -7,9 +7,10 @@ ARG POETRY_VERSION=""
 ARG SESSION_USER=vscode
 ARG WORKDIR=/home/${SESSION_USER}/work
 ARG VENVS_PATH=${WORKDIR}/.venvs
+SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 USER root
 RUN apt-get update && \
-	apt-get install -y curl libz-dev libreadline-dev libncurses-dev libsqlite3-dev libssl-dev liblzma-dev libgdbm-dev libbz2-dev libffi-dev && \
+	apt-get install -y --no-install-recommends curl libz-dev libreadline-dev libncurses-dev libsqlite3-dev libssl-dev liblzma-dev libgdbm-dev libbz2-dev libffi-dev && \
 	mkdir -p /python-build && \
 	curl -L https://github.com/pyenv/pyenv/archive/refs/tags/${PYENV_VERSION}.tar.gz | tar -xz -C /python-build && \
 	/bin/sh /python-build/*/plugins/python-build/install.sh && \
