@@ -11,6 +11,8 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/*
 
 USER ${SESSION_USER}
+COPY entrypoint.sh /entrypoint.sh
 WORKDIR ${WORKDIR}
-ENTRYPOINT ["tini", "--", "sh", "-c"]
-CMD ["/codium-server/bin/codium-server --server-base-path $RENKU_BASE_URL_PATH/ --without-connection-token --host 0.0.0.0 --port 8888"]
+# We are setting this to a weird double underscore name to avoid collisions with user-set vars
+ENV __WORKDIR__=${WORKDIR}
+ENTRYPOINT ["tini", "--", "/bin/bash", "/entrypoint.sh"]
