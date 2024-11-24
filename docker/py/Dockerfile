@@ -111,3 +111,4 @@ RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
 
 ARG CONDA_ENVS_DIRS
 ENV CONDA_ENVS_DIRS=${CONDA_ENVS_DIRS:-/opt/conda/envs}
+WORKDIR $HOME
