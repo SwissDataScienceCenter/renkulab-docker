@@ -711,7 +711,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - DEBIAN_VERSION: bookworm
+          - BASE_IMAGE: debian:bookworm
+            BASE_IMAGE_TAG: debian
             LATEST: true
     steps:
       - name: Docker Login
@@ -730,14 +731,14 @@ jobs:
         with:
           images: ${{ env.DOCKER_PREFIX }}-vscode
           tags: |
-            type=sha,prefix=${{ matrix.DEBIAN_VERSION }}-
-            type=semver,pattern={{version}},prefix=${{ matrix.DEBIAN_VERSION }}-
+            type=sha,prefix=${{ matrix.BASE_IMAGE_TAG }}-
+            type=semver,pattern={{version}},prefix=${{ matrix.BASE_IMAGE_TAG }}-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.LATEST }}
       - name: Build and export
         uses: docker/build-push-action@v6
         with:
           build-args: |
-            BASE_IMAGE=debian:${{ matrix.DEBIAN_VERSION }}
+            BASE_IMAGE=${{ matrix.BASE_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: docker/vscode
@@ -756,9 +757,9 @@ jobs:
       matrix:
         include:
           - CONDA_VERSION: 24.9.2-0
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
           - CONDA_VERSION: latest
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
     steps:
       - name: Docker Login
         uses: docker/login-action@v3
@@ -771,7 +772,7 @@ jobs:
         run: |
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
@@ -808,17 +809,17 @@ jobs:
       matrix:
         include:
           - PYTHON_VERSION: 3.12.7
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: true
           - PYTHON_VERSION: 3.11.10
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: false
           - PYTHON_VERSION: 3.10.15
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: false
@@ -834,7 +835,7 @@ jobs:
         run: |
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
@@ -874,13 +875,13 @@ jobs:
       matrix:
         include:
           - R_VERSION: 4.4.2
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             LATEST: true
           - R_VERSION: 4.3.3
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             LATEST: false
           - R_VERSION: 4.2.3
-            BASE_DEBIAN_VERSION: bookworm
+            BASE_IMAGE_TAG: debian
             LATEST: false
     steps:
       - name: Docker Login
@@ -894,7 +895,7 @@ jobs:
         run: |
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
-          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_DEBIAN_VERSION }}-${sha_short}" >> $GITHUB_OUTPUT
+          echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3.2.0
       - name: Set up Docker Buildx
