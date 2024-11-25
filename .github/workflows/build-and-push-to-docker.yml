@@ -711,8 +711,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - DEBIAN_VERSION: debian
           - DEBIAN_VERSION: bookworm
+            LATEST: true
     steps:
       - name: Docker Login
         uses: docker/login-action@v3
@@ -732,12 +732,12 @@ jobs:
           tags: |
             type=sha,prefix=${{ matrix.DEBIAN_VERSION }}-
             type=semver,pattern={{version}},prefix=${{ matrix.DEBIAN_VERSION }}-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.DEBIAN_VERSION == 'debian' }}
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.LATEST }}
       - name: Build and export
         uses: docker/build-push-action@v6
         with:
           build-args: |
-            BASE_IMAGE=mcr.microsoft.com/devcontainers/base:${{ matrix.DEBIAN_VERSION }}
+            BASE_IMAGE=debian:${{ matrix.DEBIAN_VERSION }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           context: docker/vscode
