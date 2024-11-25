@@ -756,10 +756,15 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - CONDA_VERSION: 24.9.2-0
+          - PYTHON_VERSION: 3.12.7
             BASE_IMAGE_TAG: debian
-          - CONDA_VERSION: latest
+            LATEST: true
+          - PYTHON_VERSION: 3.11.10
             BASE_IMAGE_TAG: debian
+            LATEST: true
+          - PYTHON_VERSION: 3.10.15
+            BASE_IMAGE_TAG: debian
+            LATEST: true
     steps:
       - name: Docker Login
         uses: docker/login-action@v3
@@ -781,11 +786,11 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_PREFIX }}-vscode-conda
+          images: ${{ env.DOCKER_PREFIX }}-vscode-python
           tags: |
-            type=sha,prefix=${{ matrix.CONDA_VERSION }}-
-            type=semver,pattern={{version}},prefix=${{ matrix.CONDA_VERSION }}-
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.CONDA_VERSION == 'latest' }}
+            type=sha,prefix=py-${{ matrix.PYTHON_VERSION }}-
+            type=semver,pattern={{version}},prefix=py-${{ matrix.PYTHON_VERSION }}-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.LATEST }}
       - name: Build and export
         uses: docker/build-push-action@v6
         with:
@@ -906,8 +911,8 @@ jobs:
         with:
           images: ${{ env.DOCKER_PREFIX }}-vscode-r
           tags: |
-            type=sha,prefix=${{ matrix.R_VERSION }}-
-            type=semver,pattern={{version}},prefix=${{ matrix.R_VERSION }}-
+            type=sha,prefix=r-${{ matrix.R_VERSION }}-
+            type=semver,pattern={{version}},prefix=r-${{ matrix.R_VERSION }}-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' && matrix.LATEST }}
       - name: Build and export
         uses: docker/build-push-action@v6
