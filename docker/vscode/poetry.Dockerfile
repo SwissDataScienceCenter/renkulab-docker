@@ -5,8 +5,9 @@ ARG PYTHON_VERSION=3.12.7
 # Empty string for poetry version means the latest version
 ARG POETRY_VERSION=""
 ARG SESSION_USER=vscode
-ARG WORKDIR=/home/${SESSION_USER}/work
-ARG VENVS_PATH=${WORKDIR}/.venvs
+ARG WORKDIR=/home/${SESSION_USER}
+ARG MOUNTDIR=${WORKDIR}/work
+ARG VENVS_PATH=${MOUNTDIR}/.venvs
 SHELL [ "/bin/bash", "-c", "-o", "pipefail" ]
 USER root
 RUN apt-get update && \
@@ -19,6 +20,7 @@ RUN apt-get update && \
 	rm -rf /var/lib/apt/lists/*
 
 USER ${SESSION_USER}
+ENV __MOUNTDIR__=${MOUNTDIR}
 RUN curl -sSL https://install.python-poetry.org | python3 - --version=${POETRY_VERSION} && \
 	/home/${SESSION_USER}/.local/bin/poetry config virtualenvs.path ${VENVS_PATH}
 WORKDIR ${WORKDIR}

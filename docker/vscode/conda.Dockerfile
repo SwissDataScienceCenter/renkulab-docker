@@ -7,8 +7,9 @@ ARG PYTHON_VERSION=3.12.7
 ARG OS=linux
 ARG ARCH=64
 ARG SESSION_USER=vscode
-ARG WORKDIR=/home/${SESSION_USER}/work
-ARG VENVS_PATH=${WORKDIR}/.venvs
+ARG WORKDIR=/home/${SESSION_USER}
+ARG MOUNTDIR=${WORKDIR}/work
+ARG VENVS_PATH=${MOUNTDIR}/.venvs
 ENV __VENVS_PATH__=${VENVS_PATH}
 ENV __PYTHON_VERSION__=${PYTHON_VERSION}
 ENV __MAMBA_VERSION__=${MAMBA_VERSION}
@@ -23,5 +24,6 @@ RUN apt-get update && \
 
 USER ${SESSION_USER}
 WORKDIR ${WORKDIR}
+ENV __MOUNTDIR__=${MOUNTDIR}
 ENTRYPOINT ["tini", "--", "sh", "-c"]
 CMD ["set -ex && micromamba install --yes --root-prefix=${__VENVS_PATH__} --prefix=${__VENVS_PATH__} python=${__PYTHON_VERSION__} mamba=${__MAMBA_VERSION__} conda=${__CONDA_VERSION__} && ${__VENVS_PATH__}/bin/mamba init && ${__VENVS_PATH__}/bin/conda config --add channels conda-forge && ${__VENVS_PATH__}/bin/conda config --set channel_priority strict && bash /entrypoint.sh"]
