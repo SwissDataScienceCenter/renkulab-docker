@@ -26,4 +26,4 @@ USER ${SESSION_USER}
 WORKDIR ${WORKDIR}
 ENV __MOUNTDIR__=${MOUNTDIR}
 ENTRYPOINT ["tini", "--", "sh", "-c"]
-CMD ["set -ex && micromamba install --yes --root-prefix=${__VENVS_PATH__} --prefix=${__VENVS_PATH__} python=${__PYTHON_VERSION__} mamba=${__MAMBA_VERSION__} conda=${__CONDA_VERSION__} && ${__VENVS_PATH__}/bin/mamba init && ${__VENVS_PATH__}/bin/conda config --add channels conda-forge && ${__VENVS_PATH__}/bin/conda config --set channel_priority strict && bash /entrypoint.sh"]
+CMD ["set -ex && micromamba install --yes --root-prefix=${__VENVS_PATH__} --prefix=${__VENVS_PATH__} python=${__PYTHON_VERSION__} mamba=${__MAMBA_VERSION__} conda=${__CONDA_VERSION__} && ${__VENVS_PATH__}/bin/mamba init && ${__VENVS_PATH__}/bin/conda config --add channels conda-forge && ${__VENVS_PATH__}/bin/conda config --set channel_priority strict && ${__VENVS_PATH__}/bin/conda config --remove channels defaults && bash /entrypoint.sh"]
