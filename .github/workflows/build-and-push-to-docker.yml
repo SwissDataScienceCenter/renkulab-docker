@@ -711,8 +711,8 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - BASE_IMAGE: debian:bookworm
-            BASE_IMAGE_TAG: debian
+          - BASE_IMAGE: ubuntu:24.04
+            BASE_IMAGE_TAG: ubuntu
             LATEST: true
     steps:
       - name: Docker Login
@@ -757,14 +757,14 @@ jobs:
       matrix:
         include:
           - PYTHON_VERSION: 3.12.7
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             LATEST: true
           - PYTHON_VERSION: 3.11.10
-            BASE_IMAGE_TAG: debian
-            LATEST: true
+            BASE_IMAGE_TAG: ubuntu
+            LATEST: false
           - PYTHON_VERSION: 3.10.15
-            BASE_IMAGE_TAG: debian
-            LATEST: true
+            BASE_IMAGE_TAG: ubuntu
+            LATEST: false
     steps:
       - name: Docker Login
         uses: docker/login-action@v3
@@ -814,17 +814,17 @@ jobs:
       matrix:
         include:
           - PYTHON_VERSION: 3.12.7
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: true
           - PYTHON_VERSION: 3.11.10
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: false
           - PYTHON_VERSION: 3.10.15
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             PYENV_VERSION: v2.4.17
             POETRY_VERSION: 1.8.4
             LATEST: false
@@ -880,13 +880,13 @@ jobs:
       matrix:
         include:
           - R_VERSION: 4.4.2
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             LATEST: true
           - R_VERSION: 4.3.3
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             LATEST: false
           - R_VERSION: 4.2.3
-            BASE_IMAGE_TAG: debian
+            BASE_IMAGE_TAG: ubuntu
             LATEST: false
     steps:
       - name: Docker Login
