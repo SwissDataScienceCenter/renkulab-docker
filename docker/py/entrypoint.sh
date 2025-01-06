@@ -54,12 +54,19 @@ jupyter() {
     fi
 }
 
+# run the command
 if [[ -v RENKU_BASE_URL_PATH ]]; then
-    "$@" --ServerApp.port=8888 --ServerApp.base_url="$RENKU_BASE_URL_PATH" \
+    mkdir -p ~/.jupyter/lab/user-settings/\@jupyterlab/docmanager-extension
+    echo "{\"lastModifiedCheckMargin\": 5000}" > ~/.jupyter/lab/user-settings/\@jupyterlab/docmanager-extension/plugin.jupyterlab-settings
+
+    RENKU_SESSION_PORT="${RENKU_SESSION_PORT:-8888}"
+    RENKU_WORKING_DIR="${RENKU_WORKING_DIR:-${HOME}}"
+    RENKU_MOUNT_DIR="${RENKU_MOUNT_DIR:-${RENKU_WORKING_DIR}/work}"
+
+    "$@" --ServerApp.port="$RENKU_SESSION_PORT" --ServerApp.base_url="$RENKU_BASE_URL_PATH" \
         --ServerApp.token="" --ServerApp.password="" --ServerApp.allow_remote_access=true \
         --ContentsManager.allow_hidden=true --ServerApp.allow_origin=* \
-        --ServerApp.root_dir="${HOME}/work"
+        --ServerApp.root_dir="$RENKU_MOUNT_DIR"
+else
+    "$@"
 fi
-
-# run the command
-"$@"
