@@ -8,6 +8,7 @@ dependencies:
   - jupyter-server-proxy==4.3.0
   - jupyterlab>4.0,<5.0
   - jupyterlab-git==0.50.1
+  - jupyter_server==2.6.0
   - mistune>=2.0.1 # not directly required, pinned by Snyk to avoid a vulnerability
   - papermill~=2.6.0
   - requests>=2.20.0
@@ -15,3 +16,6 @@ dependencies:
   - virtualenv>=20.7.2
   - ipython>=8.10.0 # not directly required, pinned by Snyk to avoid a vulnerability
   - tornado>=6.3.3 # not directly required, pinned by Snyk to avoid a vulnerability
+  - packaging>=22.0 # beacuse of https://github.com/pypa/setuptools/issues/4483
+  - pip: 
+    - backports.tarfile # beacuse of https://github.com/SwissDataScienceCenter/renkulab-docker/issues/471
