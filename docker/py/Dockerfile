@@ -55,7 +55,7 @@ RUN apt-get update && apt-get install -yq --no-install-recommends \
     lmodern \
     musl-dev \
     nano \
-    netcat \
+    netcat-traditional \
     rclone \
     unzip \
     vim \
@@ -111,3 +111,4 @@ RUN ln -s "$HOME/.renku/venv/bin/renku" "$HOME/.renku/bin/renku" && \
 
 ARG CONDA_ENVS_DIRS
 ENV CONDA_ENVS_DIRS=${CONDA_ENVS_DIRS:-/opt/conda/envs}
+WORKDIR $HOME
