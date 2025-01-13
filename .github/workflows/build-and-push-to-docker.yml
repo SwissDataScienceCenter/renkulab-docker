@@ -78,7 +78,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -141,7 +141,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -214,7 +214,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -380,7 +380,7 @@ jobs:
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -429,7 +429,7 @@ jobs:
           sha_short=$(git rev-parse --short HEAD)
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -523,7 +523,7 @@ jobs:
 
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Set outputs
@@ -722,7 +722,7 @@ jobs:
           password: ${{ secrets.RENKU_DOCKER_PASSWORD }}
       - uses: actions/checkout@v4
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -779,7 +779,7 @@ jobs:
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
           echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -842,7 +842,7 @@ jobs:
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
           echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
@@ -902,7 +902,7 @@ jobs:
           echo "sha_short=$sha_short" >> $GITHUB_OUTPUT
           echo "renku_base=${DOCKER_PREFIX}-vscode:${{ matrix.BASE_IMAGE_TAG }}-${sha_short}" >> $GITHUB_OUTPUT
       - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3.2.0
+        uses: docker/setup-qemu-action@v3.3.0
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
       - name: Docker meta
