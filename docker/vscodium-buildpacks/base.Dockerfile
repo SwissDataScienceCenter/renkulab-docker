@@ -24,15 +24,6 @@ RUN apt-get update && \
 	&& \
 	mkdir -p /codium-server && \
 	curl -L https://github.com/VSCodium/vscodium/releases/download/${VSCODIUM_VERSION}/vscodium-reh-web-linux-x64-${VSCODIUM_VERSION}.tar.gz | tar -xz -C /codium-server && \
-	# curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash && \
-	# source /root/.nvm/nvm.sh && \
-	# nvm install 20 && \
-	# NODE_BINARY="$(which node)" && \
-	# cp "$NODE_BINARY" /codium-server/node && \
-	# cd /codium-server && \
-	# npm install && \
-	# npm rebuild && \
-	# cd / && \
 	rm -rf /var/lib/apt/lists/*
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
