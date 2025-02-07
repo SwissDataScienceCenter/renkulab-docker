@@ -956,7 +956,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_PREFIX }}-vscodium-python-runimage:
+          images: ${{ env.DOCKER_PREFIX }}-vscodium-python-runimage
           tags: |
             type=sha,prefix=${{ matrix.BASE_IMAGE_TAG }}-
             type=semver,pattern={{version}},prefix=${{ matrix.BASE_IMAGE_TAG }}-
