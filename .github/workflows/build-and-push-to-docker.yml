@@ -46,6 +46,7 @@ jobs:
           - docker/vscode/conda.Dockerfile
           - docker/vscode/poetry.Dockerfile
           - docker/vscode/R.Dockerfile
+          - docker/vscodium-buildpacks/base.Dockerfile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
