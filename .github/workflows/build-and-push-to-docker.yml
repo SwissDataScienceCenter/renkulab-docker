@@ -930,7 +930,7 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           provenance: false
 
-  build-buildpack-vscode-python:
+  build-vscodium-python-runimage:
     needs: lint
     runs-on: ubuntu-latest
 
@@ -956,7 +956,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ env.DOCKER_PREFIX }}-buildpack-vscode-python
+          images: ${{ env.DOCKER_PREFIX }}-vscodium-python-runimage:
           tags: |
             type=sha,prefix=${{ matrix.BASE_IMAGE_TAG }}-
             type=semver,pattern={{version}},prefix=${{ matrix.BASE_IMAGE_TAG }}-
@@ -968,8 +968,8 @@ jobs:
             BASE_IMAGE=${{ matrix.BASE_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: docker/vscodium-buildpacks
-          file: docker/vscodium-buildpacks/base.Dockerfile
+          context: docker/vscodium-runimage
+          file: docker/vscodium-runimage/python.Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
