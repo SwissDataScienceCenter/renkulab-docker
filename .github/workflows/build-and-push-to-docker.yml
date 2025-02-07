@@ -967,8 +967,8 @@ jobs:
             BASE_IMAGE=${{ matrix.BASE_IMAGE }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          context: docker/vscode
-          file: docker/vscode/base.Dockerfile
+          context: docker/vscodium-buildpacks
+          file: docker/vscodium-buildpacks/base.Dockerfile
           labels: ${{ steps.meta.outputs.labels }}
           push: true
           tags: ${{ steps.meta.outputs.tags }}
