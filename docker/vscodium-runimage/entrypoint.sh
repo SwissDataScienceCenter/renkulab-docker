@@ -31,6 +31,13 @@ fi
 RENKU_SESSION_IP="${RENKU_SESSION_IP:-0.0.0.0}"
 RENKU_SESSION_PORT="${RENKU_SESSION_PORT:-8888}"
 
+if hash "python" 2> /dev/null; then
+  set +e
+  python -m venv "${RENKU_MOUNT_DIR}/.venv" --system-site-packages
+  source "${RENKU_MOUNT_DIR}/.venv/bin/activate"
+  set -e
+fi
+
 /codium-server/bin/codium-server \
   --server-base-path "${RENKU_BASE_URL_PATH}" \
   --host "${RENKU_SESSION_IP}" \
