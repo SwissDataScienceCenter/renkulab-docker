@@ -131,7 +131,6 @@ jobs:
         BASE_PYTHON_VERSION:
           - "3.10"
           - "3.9"
-          - "3.8"
     steps:
       - name: Docker Login
         uses: docker/login-action@v3
@@ -202,8 +201,6 @@ jobs:
         - BASE_PYTHON_VERSION: "3.10"
           REGISTRY: docker.io
         - BASE_PYTHON_VERSION: "3.9"
-          REGISTRY: docker.io
-        - BASE_PYTHON_VERSION: "3.8"
           REGISTRY: docker.io
     steps:
       - name: Docker Login
